@@ -1,0 +1,2110 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Mestre Paulo - Personal Trainer Pro</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #1e293b;
+            --primary-dark: #0f172a;
+            --accent: #3b82f6;
+            --accent-hover: #2563eb;
+            --success: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --bg: #f1f5f9;
+            --card-bg: #ffffff;
+            --text: #1e293b;
+            --text-light: #64748b;
+            --border: #e2e8f0;
+            --shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            --shadow-lg: 0 10px 30px rgba(0, 0, 0, 0.1);
+            --radius: 16px;
+            --radius-sm: 10px;
+            --sidebar-width: 280px;
+            --transition: all 0.3s ease;
+            --gradient-primary: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+            --gradient-accent: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+            --gradient-success: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+        }
+
+        .hidden { display: none !important; }
+
+        /* ========== LOGIN ========== */
+        #loginScreen {
+            position: fixed;
+            inset: 0;
+            background: var(--gradient-primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            animation: fadeIn 0.5s;
+        }
+
+        .login-box {
+            background: var(--card-bg);
+            padding: 50px 40px;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-lg);
+            width: 100%;
+            max-width: 420px;
+            animation: slideUp 0.6s;
+            position: relative;
+            overflow: hidden;
+        }
+        .login-box::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 6px;
+            background: var(--gradient-accent);
+        }
+        .login-box h1 { font-size: 28px; text-align: center; margin-bottom: 4px; color: var(--primary); font-weight: 700; letter-spacing: -0.5px; }
+        .login-box p { text-align: center; color: var(--text-light); margin-bottom: 32px; font-size: 14px; font-weight: 400; }
+
+        .form-group { margin-bottom: 20px; }
+        .form-group label { display: block; font-weight: 600; font-size: 13px; margin-bottom: 8px; color: var(--text); }
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%; padding: 12px 16px; border: 2px solid var(--border); border-radius: var(--radius-sm);
+            font-size: 14px; background: #f8fafc; transition: var(--transition);
+        }
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+            outline: none; border-color: var(--accent); background: #fff; box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+        }
+
+        .btn {
+            padding: 12px 20px; border: none; border-radius: var(--radius-sm); font-weight: 600; font-size: 14px;
+            cursor: pointer; transition: var(--transition); display: inline-flex; align-items: center; gap: 8px;
+            letter-spacing: 0.3px;
+        }
+        .btn-primary { background: var(--gradient-accent); color: #fff; box-shadow: 0 4px 14px rgba(59, 130, 246, 0.3); }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4); }
+        .btn-success { background: var(--gradient-success); color: #fff; box-shadow: 0 4px 14px rgba(16, 185, 129, 0.3); }
+        .btn-success:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4); }
+        .btn-danger { background: #ef4444; color: #fff; box-shadow: 0 4px 14px rgba(239, 68, 68, 0.3); }
+        .btn-danger:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(239, 68, 68, 0.4); }
+        .btn-sm { padding: 8px 12px; font-size: 12px; border-radius: 8px; }
+        .btn-outline { background: transparent; border: 2px solid var(--border); color: var(--text); }
+        .btn-outline:hover { background: #f8fafc; border-color: #cbd5e1; }
+        .login-btn { width: 100%; padding: 14px; font-size: 16px; margin-top: 12px; justify-content: center; }
+
+        .login-error { background: #fef2f2; color: var(--danger); padding: 12px; border-radius: 8px; font-size: 13px; margin-bottom: 20px; text-align: center; border-left: 4px solid var(--danger); }
+
+        /* ========== APP LAYOUT ========== */
+        #app { display: flex; min-height: 100vh; }
+
+        .sidebar {
+            width: var(--sidebar-width); background: var(--gradient-primary); color: #f1f5f9;
+            display: flex; flex-direction: column; position: fixed; top: 0; left: 0; bottom: 0; z-index: 100;
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: 4px 0 20px rgba(0,0,0,0.1);
+        }
+        .sidebar-brand { padding: 28px 24px; font-size: 22px; font-weight: 700; border-bottom: 1px solid rgba(255, 255, 255, 0.08); display: flex; align-items: center; gap: 12px; letter-spacing: -0.5px; }
+        .sidebar-nav { flex: 1; padding: 24px 12px; overflow-y: auto; }
+        .nav-item {
+            display: flex; align-items: center; gap: 14px; padding: 14px 18px; background: transparent; border: none;
+            color: #cbd5e1; font-size: 14px; font-weight: 500; cursor: pointer; transition: var(--transition);
+            width: 100%; text-align: left; border-left: 4px solid transparent; border-radius: 10px; margin-bottom: 4px;
+        }
+        .nav-item:hover { background: rgba(255, 255, 255, 0.06); color: #fff; }
+        .nav-item.active { background: rgba(59, 130, 246, 0.2); color: #fff; border-left-color: var(--accent); }
+        .sidebar-footer { padding: 20px 24px; border-top: 1px solid rgba(255, 255, 255, 0.08); display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+        .sidebar-footer .user-info { font-size: 13px; font-weight: 600; }
+        .sidebar-footer .user-info span { display: block; color: #94a3b8; font-weight: 400; font-size: 11px; }
+
+        .main-content { flex: 1; margin-left: var(--sidebar-width); display: flex; flex-direction: column; min-height: 100vh; }
+        .topbar { background: rgba(255,255,255,0.9); backdrop-filter: blur(10px); padding: 20px 32px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; box-shadow: 0 2px 10px rgba(0,0,0,0.03); position: sticky; top: 0; z-index: 50; }
+        .topbar h2 { font-size: 24px; font-weight: 700; letter-spacing: -0.5px; }
+
+        .section {
+            display: none;
+            padding: 32px;
+            position: relative;
+            background: transparent;
+            z-index: 0;
+            animation: fadeIn 0.4s;
+        }
+        .section.active { display: block; }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+
+        .card { background: var(--card-bg); border-radius: var(--radius); box-shadow: var(--shadow); padding: 28px; margin-bottom: 28px; position: relative; z-index: 1; transition: var(--transition); border: 1px solid rgba(0,0,0,0.02); }
+        .card:hover { box-shadow: var(--shadow-lg); }
+        .card-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; flex-wrap: wrap; gap: 12px; }
+        .card-header h3 { font-size: 20px; font-weight: 700; letter-spacing: -0.3px; }
+        .table-container { overflow-x: auto; border-radius: var(--radius-sm); }
+        table { width: 100%; border-collapse: collapse; font-size: 14px; }
+        table th, table td { padding: 16px 18px; text-align: left; border-bottom: 1px solid var(--border); }
+        table th { background: #f8fafc; font-weight: 700; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-light); }
+        table tr:hover td { background: #f8fafc; }
+
+        .badge { padding: 5px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; display: inline-block; }
+        .badge-agendada { background: #e0f2fe; color: #0284c7; }
+        .badge-concluida { background: #d1fae5; color: #059669; }
+        .badge-cancelada { background: #fee2e2; color: #dc2626; }
+        .badge-admin { background: #fef3c7; color: #d97706; }
+        .badge-padrao { background: #e2e8f0; color: #475569; }
+        .badge-aluno { background: #e0e7ff; color: #4f46e5; }
+
+        .thumb { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; background: #e2e8f0; display: flex; align-items: center; justify-content: center; font-size: 18px; }
+
+        .dashboard-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 24px; margin-bottom: 28px; }
+        .stat-card { background: var(--card-bg); border-radius: var(--radius); box-shadow: var(--shadow); padding: 24px; display: flex; align-items: center; gap: 18px; position: relative; z-index: 1; transition: var(--transition); border: 1px solid rgba(0,0,0,0.02); }
+        .stat-card:hover { transform: translateY(-5px); box-shadow: var(--shadow-lg); }
+        .stat-icon { width: 56px; height: 56px; border-radius: 16px; background: var(--gradient-accent); display: flex; align-items: center; justify-content: center; font-size: 28px; color: #fff; flex-shrink: 0; }
+        .stat-info h4 { font-size: 28px; font-weight: 700; line-height: 1.2; }
+        .stat-info p { color: var(--text-light); font-size: 13px; font-weight: 500; }
+
+        .modal { display: none; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.6); z-index: 200; align-items: center; justify-content: center; padding: 20px; backdrop-filter: blur(4px); }
+        .modal.show { display: flex; }
+        .modal-content { background: #fff; border-radius: var(--radius); width: 100%; max-width: 650px; max-height: 90vh; overflow-y: auto; box-shadow: 0 25px 60px rgba(0, 0, 0, 0.2); animation: slideUp 0.3s; }
+        .modal-header { padding: 24px 28px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; background: #fff; border-radius: var(--radius) var(--radius) 0 0; z-index: 10; }
+        .modal-header h3 { font-size: 20px; font-weight: 700; }
+        .modal-close { background: none; border: none; font-size: 32px; cursor: pointer; color: var(--text-light); line-height: 1; transition: var(--transition); }
+        .modal-close:hover { color: var(--text); transform: rotate(90deg); }
+        .modal-body { padding: 28px; }
+        .modal-footer { padding: 20px 28px; border-top: 1px solid var(--border); display: flex; justify-content: flex-end; gap: 12px; }
+
+        .photo-upload { display: flex; align-items: center; gap: 20px; margin-bottom: 12px; }
+        .photo-preview { width: 70px; height: 70px; border-radius: 50%; object-fit: cover; background: #e2e8f0; display: flex; align-items: center; justify-content: center; font-size: 32px; }
+
+        #studentModal .photo-upload { display: block; text-align: center; }
+        #studentModal .photo-preview { width: 160px; height: 160px; border-radius: 50%; object-fit: cover; margin: 0 auto 20px; background: #e2e8f0; border: 4px solid #e2e8f0; }
+
+        body.fullscreen .sidebar { transform: translateX(-100%); }
+        body.fullscreen .main-content { margin-left: 0; }
+        body.fullscreen .sidebar.open { transform: translateX(0); }
+
+        #studentModal.modal { padding: 0; align-items: stretch; justify-content: flex-start; }
+        #studentModal .modal-content { width: 100%; max-width: 100%; height: 100vh; max-height: 100vh; margin: 0; border-radius: 0; display: flex; flex-direction: column; box-shadow: none; }
+        #studentModal .modal-header { border-radius: 0; flex-shrink: 0; }
+        #studentModal .modal-body { flex: 1; overflow-y: auto; }
+        #studentModal .modal-footer { flex-shrink: 0; border-radius: 0; }
+
+        /* Evolução fotos no modal */
+        .evolution-section { margin-top: 20px; border-top: 2px solid var(--border); padding-top: 20px; }
+        .evolution-thumbs { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 12px; }
+        .evolution-thumb { position: relative; width: 80px; height: 80px; border-radius: 10px; overflow: hidden; border: 2px solid #e2e8f0; }
+        .evolution-thumb img { width: 100%; height: 100%; object-fit: cover; cursor: pointer; }
+        .evolution-thumb .remove-evo { position: absolute; top: 4px; right: 4px; background: rgba(239,68,68,0.9); color: #fff; border: none; border-radius: 50%; width: 22px; height: 22px; font-size: 12px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+        .evolution-thumb .remove-evo:hover { background: #dc2626; }
+
+        .album-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 24px; margin-top: 10px; }
+        .album-item { background: var(--card-bg); border-radius: var(--radius); overflow: hidden; box-shadow: var(--shadow); transition: var(--transition); border: 1px solid var(--border); }
+        .album-item:hover { transform: translateY(-6px); box-shadow: var(--shadow-lg); }
+        .album-item img { width: 100%; height: 180px; object-fit: cover; background: #f0f2f5; display: block; cursor: pointer; }
+        .album-item-info { padding: 16px; }
+        .album-item-info h4 { font-size: 15px; margin-bottom: 4px; color: var(--text); font-weight: 600; }
+        .album-item-info p { font-size: 13px; color: var(--text-light); margin-bottom: 12px; }
+        .album-item-actions { display: flex; gap: 8px; }
+        .album-item-actions .btn { font-size: 12px; padding: 6px 10px; }
+
+        .lightbox { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.95); z-index: 1000; display: flex; align-items: center; justify-content: center; cursor: zoom-out; }
+        .lightbox img { max-width: 95%; max-height: 95%; object-fit: contain; cursor: default; }
+        .lightbox-close { position: absolute; top: 20px; right: 30px; font-size: 40px; color: #fff; cursor: pointer; transition: var(--transition); }
+        .lightbox-close:hover { color: #ddd; }
+
+        .toast-container { position: fixed; bottom: 24px; right: 24px; z-index: 300; display: flex; flex-direction: column; gap: 8px; }
+        .toast { background: var(--primary-dark); color: #fff; padding: 16px 20px; border-radius: 12px; font-size: 14px; font-weight: 500; box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2); animation: slideIn 0.3s; }
+        .toast.success { background: #059669; }
+        .toast.error { background: #dc2626; }
+        .toast.warning { background: #d97706; }
+        @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+
+        .permissions-container { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 8px; }
+        .perm-module { background: #f8fafc; border-radius: 10px; padding: 14px; }
+        .perm-module strong { display: block; margin-bottom: 8px; font-size: 14px; }
+        .perm-actions { display: flex; flex-wrap: wrap; gap: 12px; }
+        .perm-check { display: flex; align-items: center; gap: 6px; font-size: 13px; }
+        .permissions-updated { font-size: 12px; color: var(--text-light); margin-top: 12px; text-align: right; }
+
+        .weekly-schedule { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; margin-top: 16px; }
+        .day-card { border: 1px solid var(--border); border-radius: 12px; padding: 16px; background: #f8fafc; transition: var(--transition); }
+        .day-card:hover { background: #fff; box-shadow: var(--shadow); }
+        .day-card h4 { font-size: 16px; margin-bottom: 12px; color: var(--text); font-weight: 600; }
+        .workout-item { background: #fff; border: 1px solid var(--border); border-radius: 8px; padding: 10px; margin-bottom: 8px; }
+        .workout-item strong { display: block; font-size: 14px; }
+        .workout-item small { display: block; color: var(--text-light); font-size: 12px; }
+        .workout-item pre { margin: 6px 0 0; white-space: pre-wrap; font-family: 'Poppins', sans-serif; font-size: 12px; color: var(--text); }
+
+        .student-area { background: var(--card-bg); border-radius: var(--radius); box-shadow: var(--shadow); padding: 32px; margin-bottom: 24px; }
+        .student-area h2 { margin-bottom: 20px; font-size: 28px; font-weight: 700; letter-spacing: -0.5px; display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+        .student-area .highlight { background: #fefce8; border-left: 5px solid var(--warning); padding: 20px; border-radius: 12px; margin-bottom: 24px; }
+        .student-area .evolutions-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 16px; margin-top: 16px; }
+        .student-area .evolution-card { background: #fff; border-radius: 12px; overflow: hidden; box-shadow: var(--shadow); border: 1px solid var(--border); }
+        .student-area .evolution-card img { width: 100%; height: 160px; object-fit: cover; cursor: pointer; }
+        .student-area .evolution-card .evo-info { padding: 10px; }
+        .student-area .evolution-card .evo-info p { font-size: 12px; color: var(--text-light); margin-bottom: 4px; }
+        .student-area .evolution-card .evo-info small { font-size: 11px; color: #94a3b8; }
+
+        .student-avatar { width: 60px; height: 60px; border-radius: 50%; object-fit: cover; border: 3px solid var(--accent); }
+
+        .note-helper { font-size: 12px; color: var(--text-light); font-style: italic; margin-top: 6px; }
+
+        @media (max-width: 768px) {
+            body.fullscreen .sidebar { transform: translateX(-100%); }
+            body.fullscreen .sidebar.open { transform: translateX(0); }
+            body.fullscreen .main-content { margin-left: 0; }
+            .permissions-container { grid-template-columns: 1fr; }
+            .section { padding: 16px; }
+            #studentModal .modal-body { padding: 16px; }
+            #studentModal .modal-header, #studentModal .modal-footer { padding: 12px 16px; }
+            #studentModal .photo-preview { width: 120px; height: 120px; }
+            .album-grid { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; }
+            .lightbox-close { font-size: 32px; top: 10px; right: 15px; }
+            .login-box { padding: 30px 20px; }
+            .student-avatar { width: 50px; height: 50px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Tela de Login -->
+    <div id="loginScreen">
+        <div class="login-box" id="loginPersonalBox">
+            <h1>🏋️ Mestre Paulo</h1>
+            <p>Sistema de Gestão para Personal Trainer</p>
+            <div id="loginError" class="login-error hidden"></div>
+            <form onsubmit="handleLogin(event)">
+                <div class="form-group">
+                    <label>Usuário</label>
+                    <input type="text" id="loginUsername" placeholder="Digite seu usuário" required autocomplete="off"
+                           autofocus oninput="this.value = this.value.toUpperCase()"
+                           onkeydown="if(event.key==='Enter'){event.preventDefault(); document.getElementById('loginPassword').focus();}">
+                </div>
+                <div class="form-group">
+                    <label>Senha</label>
+                    <input type="password" id="loginPassword" placeholder="Digite sua senha" required autocomplete="off"
+                           onkeydown="if(event.key==='Enter'){event.preventDefault(); document.getElementById('loginScreen').querySelector('form').requestSubmit();}">
+                </div>
+                <button type="submit" class="btn btn-primary login-btn">Entrar</button>
+            </form>
+            <button class="btn btn-outline login-btn" style="margin-top:10px;" onclick="showStudentLogin()">Sou Aluno</button>
+        </div>
+
+        <div class="login-box hidden" id="loginStudentBox">
+            <h1>🏋️ Mestre Paulo</h1>
+            <p>Área do Aluno - Login</p>
+            <div id="studentLoginError" class="login-error hidden"></div>
+            <form onsubmit="handleStudentLogin(event)">
+                <div class="form-group">
+                    <label>Usuário</label>
+                    <input type="text" id="studentLoginUsername" placeholder="Seu nome de usuário" required autocomplete="off"
+                           autofocus oninput="this.value = this.value.toUpperCase()"
+                           onkeydown="if(event.key==='Enter'){event.preventDefault(); document.getElementById('studentLoginPassword').focus();}">
+                </div>
+                <div class="form-group">
+                    <label>Senha</label>
+                    <input type="password" id="studentLoginPassword" placeholder="Telefone sem DDD" required autocomplete="off"
+                           onkeydown="if(event.key==='Enter'){event.preventDefault(); document.getElementById('loginStudentBox').querySelector('form').requestSubmit();}">
+                </div>
+                <button type="submit" class="btn btn-primary login-btn">Entrar</button>
+            </form>
+            <button class="btn btn-outline login-btn" style="margin-top:10px;" onclick="showPersonalLogin()">Voltar ao Login do Personal</button>
+        </div>
+    </div>
+
+    <!-- Aplicativo -->
+    <div id="app" class="hidden">
+        <div class="sidebar" id="sidebar">
+            <div class="sidebar-brand">💪 Mestre Paulo</div>
+            <div class="sidebar-nav" id="sidebarNav"></div>
+            <div class="sidebar-footer">
+                <div class="user-info">
+                    <span id="loggedUserName"></span>
+                    <span id="loggedUserRole"></span>
+                </div>
+                <button class="btn btn-sm btn-outline" style="color:#fff;border-color:rgba(255,255,255,0.3);" onclick="logout()">Sair</button>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <div class="topbar">
+                <h2 id="pageTitle">Dashboard</h2>
+                <button class="btn btn-sm btn-outline" onclick="toggleSidebar()">☰ Menu</button>
+            </div>
+
+            <!-- Dashboard -->
+            <section id="section-dashboard" class="section active">
+                <div class="dashboard-cards" id="dashboardCards"></div>
+                <div class="card">
+                    <div class="card-header"><h3>Próximas Aulas</h3></div>
+                    <div class="table-container">
+                        <table>
+                            <thead><tr><th>Data</th><th>Hora</th><th>Aluno</th><th>Academia</th><th>Status</th></tr></thead>
+                            <tbody id="dashboardScheduleTable"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Alunos -->
+            <section id="section-alunos" class="section">
+                <div class="card">
+                    <div class="card-header"><h3>👥 Alunos</h3><button class="btn btn-primary" id="btnAddStudent" onclick="openStudentForm()">+ Novo Aluno</button></div>
+                    <div class="table-container">
+                        <table>
+                            <thead><tr><th>Foto</th><th>Nome</th><th>Academia</th><th>CPF</th><th>Celular</th><th>Valor/Aula</th><th>Ações</th></tr></thead>
+                            <tbody id="studentsTableBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Academias -->
+            <section id="section-academias" class="section">
+                <div class="card">
+                    <div class="card-header"><h3>🏋️ Academias</h3><button class="btn btn-primary" id="btnAddAcademy" onclick="openAcademyForm()">+ Nova Academia</button></div>
+                    <div class="table-container">
+                        <table>
+                            <thead><tr><th>Nome</th><th>Endereço</th><th>Telefone</th><th>Responsável</th><th>Ações</th></tr></thead>
+                            <tbody id="academiesTableBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Agenda -->
+            <section id="section-agenda" class="section">
+                <div class="card">
+                    <div class="card-header"><h3>📅 Agenda de Aulas</h3>
+                        <div>
+                            <button class="btn btn-outline" id="btnAddRecurringSchedule" onclick="openRecurringScheduleForm()" style="display:none;">+ Aulas Recorrentes</button>
+                            <button class="btn btn-primary" id="btnAddSchedule" onclick="openScheduleForm()">+ Nova Aula</button>
+                        </div>
+                    </div>
+                    <div class="table-container">
+                        <table>
+                            <thead><tr><th>Data</th><th>Hora</th><th>Aluno</th><th>Academia</th><th>Status</th><th>Ações</th></tr></thead>
+                            <tbody id="scheduleTableBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Treinos -->
+            <section id="section-treinos" class="section">
+                <div class="card">
+                    <div class="card-header"><h3>📋 Treinos Semanais</h3><button class="btn btn-primary" id="btnAddWorkout" onclick="openWorkoutForm()">+ Novo Treino</button></div>
+                    <div id="weeklySchedule" class="weekly-schedule"></div>
+                    <hr style="margin: 24px 0; border-color: #e2e8f0;">
+                    <div class="table-container">
+                        <table>
+                            <thead><tr><th>Nome do Treino</th><th>Grupo Muscular</th><th>Dia da Semana</th><th>Aluno Destinado</th><th>Ações</th></tr></thead>
+                            <tbody id="workoutsTableBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Álbum -->
+            <section id="section-album" class="section">
+                <div class="card">
+                    <div class="card-header"><h3>🖼️ Álbum de Fotos</h3><button class="btn btn-primary" id="btnAddAlbum" onclick="openAlbumForm()">+ Nova Foto</button></div>
+                    <div id="albumGrid" class="album-grid"></div>
+                </div>
+            </section>
+
+            <!-- Fluxo de Caixa -->
+            <section id="section-fluxocaixa" class="section">
+                <div class="card">
+                    <div class="card-header"><h3>💰 Fluxo de Caixa</h3><button class="btn btn-primary" id="btnAddCashflow" onclick="openCashflowForm()">+ Novo Lançamento</button></div>
+                    <div class="table-container">
+                        <table>
+                            <thead><tr><th>Data</th><th>Descrição</th><th>Entrada</th><th>Saída</th><th>Forma de Pagamento</th><th>Ações</th></tr></thead>
+                            <tbody id="cashflowTableBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Filtro -->
+            <section id="section-filtro" class="section">
+                <div class="card">
+                    <div class="card-header"><h3>🔍 Filtro Avançado</h3></div>
+                    <div class="form-group" style="display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px;">
+                        <div>
+                            <label>Filtrar em (Módulo)</label>
+                            <select id="filtroModulo">
+                                <option value="todos">Todos os módulos</option>
+                                <option value="alunos">Alunos</option>
+                                <option value="academias">Academias</option>
+                                <option value="agenda">Agenda</option>
+                                <option value="fluxocaixa">Fluxo de Caixa</option>
+                                <option value="album">Álbum</option>
+                                <option value="treinos">Treinos</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label>Data Inicial</label>
+                            <input type="date" id="filtroDataInicio">
+                        </div>
+                        <div>
+                            <label>Data Final</label>
+                            <input type="date" id="filtroDataFim">
+                        </div>
+                        <div>
+                            <label>CPF (Alunos e Aulas)</label>
+                            <input type="text" id="filtroCpf" placeholder="000.000.000-00">
+                        </div>
+                        <div>
+                            <label>Celular (Alunos e Aulas)</label>
+                            <input type="text" id="filtroCelular" placeholder="(00) 00000-0000">
+                        </div>
+                        <div>
+                            <label>Academia (Alunos, Aulas, Caixa)</label>
+                            <select id="filtroAcademia"></select>
+                        </div>
+                        <div>
+                            <label>Entrada mín (R$) - Caixa</label>
+                            <input type="number" id="filtroEntradaMin" step="0.01" min="0" placeholder="0.00">
+                        </div>
+                        <div>
+                            <label>Saída mín (R$) - Caixa</label>
+                            <input type="number" id="filtroSaidaMin" step="0.01" min="0" placeholder="0.00">
+                        </div>
+                        <div>
+                            <label>Descrição (contém) - Caixa</label>
+                            <input type="text" id="filtroDescricao" placeholder="Parte da descrição">
+                        </div>
+                    </div>
+                    <button class="btn btn-primary" onclick="aplicarFiltro()">Pesquisar</button>
+                    <hr style="margin: 20px 0; border-color: #e2e8f0;">
+                    <div class="table-container">
+                        <table>
+                            <thead><tr><th>Tipo</th><th>Data</th><th>Descrição/Nome</th><th>Detalhes</th><th>Valor/Contato</th><th>Academia</th></tr></thead>
+                            <tbody id="filtroResultsTable"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Usuários -->
+            <section id="section-usuarios" class="section">
+                <div class="card">
+                    <div class="card-header"><h3>🔐 Usuários e Permissões</h3><button class="btn btn-primary" id="btnAddUser" onclick="openUserForm()">+ Novo Usuário</button></div>
+                    <div class="table-container">
+                        <table>
+                            <thead><tr><th>Usuário</th><th>Nome</th><th>Perfil</th><th>Ativo</th><th>Ações</th></tr></thead>
+                            <tbody id="usersTableBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Área do Aluno (para visualização de treinos) -->
+            <section id="section-aluno" class="section">
+                <div class="student-area" id="studentArea"></div>
+            </section>
+        </div>
+    </div>
+
+    <!-- Modais -->
+    <div class="modal" id="studentModal">
+        <div class="modal-content">
+            <div class="modal-header"><h3>Cadastro de Aluno</h3><button class="modal-close" onclick="closeModal('studentModal')">&times;</button></div>
+            <form id="studentForm" onsubmit="saveStudent(event)">
+                <div class="modal-body">
+                    <div class="photo-upload">
+                        <img id="studentFotoPreview" class="photo-preview" src="" alt="Foto" style="background:#e2e8f0;">
+                        <input type="file" id="studentFoto" accept="image/*" onchange="handleStudentPhoto(event)" style="display:none;">
+                        <button type="button" class="btn btn-outline" onclick="document.getElementById('studentFoto').click()">📷 Adicionar Foto</button>
+                    </div>
+                    <div class="form-group"><label>Nome *</label><input type="text" id="studentNome" required placeholder="Nome do aluno" onkeydown="if(event.key==='Enter'){event.preventDefault(); document.getElementById('studentCpf').focus();}"></div>
+                    <div class="form-group"><label>CPF</label><input type="text" id="studentCpf" placeholder="000.000.000-00" onkeydown="if(event.key==='Enter'){event.preventDefault(); document.getElementById('studentAcademia').focus();}"></div>
+                    <div class="form-group"><label>Academia</label><select id="studentAcademia" onkeydown="if(event.key==='Enter'){event.preventDefault(); document.getElementById('studentObjetivo').focus();}"></select></div>
+                    <div class="form-group"><label>Objetivo</label><input type="text" id="studentObjetivo" placeholder="Ex: Hipertrofia, Emagrecimento..." onkeydown="if(event.key==='Enter'){event.preventDefault(); document.getElementById('studentTelefone').focus();}"></div>
+                    <div class="form-group"><label>Celular</label><input type="text" id="studentTelefone" placeholder="(00) 00000-0000" onkeydown="if(event.key==='Enter'){event.preventDefault(); document.getElementById('studentEmail').focus();}"></div>
+                    <div class="form-group"><label>Email</label><input type="email" id="studentEmail" placeholder="email@exemplo.com" onkeydown="if(event.key==='Enter'){event.preventDefault(); document.getElementById('studentValorAula').focus();}"></div>
+                    <div class="form-group"><label>Valor por Aula (R$) *</label><input type="number" id="studentValorAula" step="0.01" min="0" required placeholder="0.00" onkeydown="if(event.key==='Enter'){event.preventDefault(); document.getElementById('studentObservacoes').focus();}"></div>
+                    <div class="form-group"><label>Observações</label><textarea id="studentObservacoes" rows="3" placeholder="Anotações importantes..." onkeydown="if(event.key==='Enter' && !event.shiftKey){event.preventDefault(); document.getElementById('studentModal').querySelector('button[type=submit]').focus();}"></textarea></div>
+
+                    <!-- Seção de Fotos de Evolução -->
+                    <div class="evolution-section">
+                        <h4 style="margin-bottom: 12px; font-size: 16px; font-weight: 600;">📸 Fotos do Aluno (Evolução)</h4>
+                        <button type="button" class="btn btn-outline btn-sm" onclick="document.getElementById('evolutionFotoInput').click()">+ Adicionar Foto</button>
+                        <input type="file" id="evolutionFotoInput" accept="image/*" style="display:none;" onchange="handleEvolutionPhoto(event)">
+                        <div id="evolutionThumbs" class="evolution-thumbs"></div>
+                        <p class="note-helper">Estas fotos ficarão visíveis para o aluno quando ele entrar na área dele.</p>
+                    </div>
+                </div>
+                <div class="modal-footer"><button type="button" class="btn btn-outline" onclick="closeModal('studentModal')">Cancelar</button><button type="submit" class="btn btn-success">Salvar</button></div>
+            </form>
+        </div>
+    </div>
+
+    <div class="modal" id="academyModal">
+        <div class="modal-content">
+            <div class="modal-header"><h3>Cadastro de Academia</h3><button class="modal-close" onclick="closeModal('academyModal')">&times;</button></div>
+            <form id="academyForm" onsubmit="saveAcademy(event)">
+                <div class="modal-body">
+                    <div class="form-group"><label>Nome *</label><input type="text" id="academyNome" required placeholder="Nome da academia" onkeydown="if(event.key==='Enter'){event.preventDefault(); document.getElementById('academyEndereco').focus();}"></div>
+                    <div class="form-group"><label>Endereço</label><input type="text" id="academyEndereco" placeholder="Rua, número, bairro" onkeydown="if(event.key==='Enter'){event.preventDefault(); document.getElementById('academyTelefone').focus();}"></div>
+                    <div class="form-group"><label>Telefone</label><input type="text" id="academyTelefone" placeholder="(00) 00000-0000" onkeydown="if(event.key==='Enter'){event.preventDefault(); document.getElementById('academyResponsavel').focus();}"></div>
+                    <div class="form-group"><label>Responsável</label><input type="text" id="academyResponsavel" placeholder="Nome do responsável" onkeydown="if(event.key==='Enter'){event.preventDefault(); document.getElementById('academyModal').querySelector('button[type=submit]').focus();}"></div>
+                </div>
+                <div class="modal-footer"><button type="button" class="btn btn-outline" onclick="closeModal('academyModal')">Cancelar</button><button type="submit" class="btn btn-success">Salvar</button></div>
+            </form>
+        </div>
+    </div>
+
+    <div class="modal" id="scheduleModal">
+        <div class="modal-content">
+            <div class="modal-header"><h3>Agendamento de Aula</h3><button class="modal-close" onclick="closeModal('scheduleModal')">&times;</button></div>
+            <form id="scheduleForm" onsubmit="saveSchedule(event)">
+                <div class="modal-body">
+                    <div class="form-group"><label>Data *</label><input type="date" id="scheduleData" required onkeydown="if(event.key==='Enter'){event.preventDefault(); document.getElementById('scheduleHora').focus();}"></div>
+                    <div class="form-group"><label>Hora *</label><input type="time" id="scheduleHora" required onkeydown="if(event.key==='Enter'){event.preventDefault(); document.getElementById('scheduleAluno').focus();}"></div>
+                    <div class="form-group"><label>Aluno *</label><select id="scheduleAluno" required onkeydown="if(event.key==='Enter'){event.preventDefault(); document.getElementById('scheduleAcademia').focus();}"></select></div>
+                    <div class="form-group"><label>Academia *</label><select id="scheduleAcademia" required onkeydown="if(event.key==='Enter'){event.preventDefault(); document.getElementById('scheduleStatus').focus();}"></select></div>
+                    <div class="form-group"><label>Status</label><select id="scheduleStatus" onkeydown="if(event.key==='Enter'){event.preventDefault(); document.getElementById('scheduleModal').querySelector('button[type=submit]').focus();}"><option value="Agendada">Agendada</option><option value="Concluída">Concluída</option><option value="Cancelada">Cancelada</option></select></div>
+                </div>
+                <div class="modal-footer"><button type="button" class="btn btn-outline" onclick="closeModal('scheduleModal')">Cancelar</button><button type="submit" class="btn btn-success">Salvar</button></div>
+            </form>
+        </div>
+    </div>
+
+    <div class="modal" id="recurringScheduleModal">
+        <div class="modal-content">
+            <div class="modal-header"><h3>Agendar Aulas Recorrentes</h3><button class="modal-close" onclick="closeModal('recurringScheduleModal')">&times;</button></div>
+            <form id="recurringScheduleForm" onsubmit="saveRecurringSchedule(event)">
+                <div class="modal-body">
+                    <div class="form-group"><label>Aluno *</label><select id="recurringAluno" required onkeydown="if(event.key==='Enter'){event.preventDefault(); document.getElementById('recurringAcademia').focus();}"></select></div>
+                    <div class="form-group"><label>Academia *</label><select id="recurringAcademia" required onkeydown="if(event.key==='Enter'){event.preventDefault(); document.getElementById('recurringHora').focus();}"></select></div>
+                    <div class="form-group"><label>Hora *</label><input type="time" id="recurringHora" required onkeydown="if(event.key==='Enter'){event.preventDefault(); document.getElementById('recurringStartDate').focus();}"></div>
+                    <div class="form-group"><label>Data Inicial *</label><input type="date" id="recurringStartDate" required onkeydown="if(event.key==='Enter'){event.preventDefault(); document.getElementById('recurringEndDate').focus();}"></div>
+                    <div class="form-group"><label>Data Final *</label><input type="date" id="recurringEndDate" required onkeydown="if(event.key==='Enter'){event.preventDefault(); document.querySelector('#recurringScheduleForm .perm-actions input[type=checkbox]').focus();}"></div>
+                    <div class="form-group"><label>Dias da Semana *</label><div class="perm-actions" style="flex-wrap: wrap;">
+                        <label class="perm-check"><input type="checkbox" value="1" onkeydown="if(event.key==='Enter'){event.preventDefault(); this.nextElementSibling ? this.nextElementSibling.focus() : document.getElementById('recurringStatus').focus();}"> Seg</label>
+                        <label class="perm-check"><input type="checkbox" value="2" onkeydown="if(event.key==='Enter'){event.preventDefault(); this.nextElementSibling ? this.nextElementSibling.focus() : document.getElementById('recurringStatus').focus();}"> Ter</label>
+                        <label class="perm-check"><input type="checkbox" value="3" onkeydown="if(event.key==='Enter'){event.preventDefault(); this.nextElementSibling ? this.nextElementSibling.focus() : document.getElementById('recurringStatus').focus();}"> Qua</label>
+                        <label class="perm-check"><input type="checkbox" value="4" onkeydown="if(event.key==='Enter'){event.preventDefault(); this.nextElementSibling ? this.nextElementSibling.focus() : document.getElementById('recurringStatus').focus();}"> Qui</label>
+                        <label class="perm-check"><input type="checkbox" value="5" onkeydown="if(event.key==='Enter'){event.preventDefault(); this.nextElementSibling ? this.nextElementSibling.focus() : document.getElementById('recurringStatus').focus();}"> Sex</label>
+                        <label class="perm-check"><input type="checkbox" value="6" onkeydown="if(event.key==='Enter'){event.preventDefault(); this.nextElementSibling ? this.nextElementSibling.focus() : document.getElementById('recurringStatus').focus();}"> Sáb</label>
+                        <label class="perm-check"><input type="checkbox" value="0" onkeydown="if(event.key==='Enter'){event.preventDefault(); document.getElementById('recurringStatus').focus();}"> Dom</label>
+                    </div></div>
+                    <div class="form-group"><label>Status</label><select id="recurringStatus" onkeydown="if(event.key==='Enter'){event.preventDefault(); document.getElementById('recurringScheduleModal').querySelector('button[type=submit]').focus();}"><option value="Agendada">Agendada</option><option value="Concluída">Concluída</option><option value="Cancelada">Cancelada</option></select></div>
+                </div>
+                <div class="modal-footer"><button type="button" class="btn btn-outline" onclick="closeModal('recurringScheduleModal')">Cancelar</button><button type="submit" class="btn btn-success">Gerar Aulas</button></div>
+            </form>
+        </div>
+    </div>
+
+    <div class="modal" id="cashflowModal">
+        <div class="modal-content">
+            <div class="modal-header"><h3>Lançamento no Fluxo de Caixa</h3><button class="modal-close" onclick="closeModal('cashflowModal')">&times;</button></div>
+            <form id="cashflowForm" onsubmit="saveCashflow(event)">
+                <div class="modal-body">
+                    <div class="form-group"><label>Data *</label><input type="date" id="cashflowData" required onkeydown="if(event.key==='Enter'){event.preventDefault(); document.getElementById('cashflowDescricao').focus();}"></div>
+                    <div class="form-group"><label>Descrição *</label><input type="text" id="cashflowDescricao" required placeholder="Ex: Aula particular, Compra de material..." onkeydown="if(event.key==='Enter'){event.preventDefault(); document.getElementById('cashflowEntrada').focus();}"></div>
+                    <div class="form-group"><label>Entrada (R$)</label><input type="number" id="cashflowEntrada" step="0.01" min="0" placeholder="0.00" onkeydown="if(event.key==='Enter'){event.preventDefault(); document.getElementById('cashflowSaida').focus();}"></div>
+                    <div class="form-group"><label>Saída (R$)</label><input type="number" id="cashflowSaida" step="0.01" min="0" placeholder="0.00" onkeydown="if(event.key==='Enter'){event.preventDefault(); document.getElementById('cashflowFormaPgto').focus();}"></div>
+                    <div class="form-group"><label>Forma de Pagamento</label><select id="cashflowFormaPgto" onkeydown="if(event.key==='Enter'){event.preventDefault(); document.getElementById('cashflowModal').querySelector('button[type=submit]').focus();}"><option value="Dinheiro">Dinheiro</option><option value="Pix">Pix</option><option value="Cartão de Crédito">Cartão de Crédito</option><option value="Cartão de Débito">Cartão de Débito</option><option value="Transferência">Transferência</option><option value="Outro">Outro</option></select></div>
+                </div>
+                <div class="modal-footer"><button type="button" class="btn btn-outline" onclick="closeModal('cashflowModal')">Cancelar</button><button type="submit" class="btn btn-success">Salvar</button></div>
+            </form>
+        </div>
+    </div>
+
+    <div class="modal" id="userModal">
+        <div class="modal-content">
+            <div class="modal-header"><h3>Cadastro de Usuário</h3><button class="modal-close" onclick="closeModal('userModal')">&times;</button></div>
+            <form id="userForm" onsubmit="saveUser(event)">
+                <div class="modal-body">
+                    <div class="form-group"><label>Usuário *</label><input type="text" id="userUsername" required placeholder="Nome de usuário" autocomplete="off" oninput="this.value = this.value.toUpperCase()" onkeydown="if(event.key==='Enter'){event.preventDefault(); document.getElementById('userPassword').focus();}"></div>
+                    <div class="form-group"><label>Senha <span id="userPasswordHint" style="font-weight:400;color:#64748b;">*</span></label><input type="text" id="userPassword" placeholder="Digite a senha" autocomplete="new-password" onkeydown="if(event.key==='Enter'){event.preventDefault(); document.getElementById('userNome').focus();}"></div>
+                    <div class="form-group"><label>Nome completo</label><input type="text" id="userNome" placeholder="Nome do usuário" onkeydown="if(event.key==='Enter'){event.preventDefault(); document.getElementById('userRole').focus();}"></div>
+                    <div class="form-group"><label>Perfil</label><select id="userRole" onkeydown="if(event.key==='Enter'){event.preventDefault(); document.getElementById('userActive').focus();}"><option value="padrao">Padrão</option><option value="admin">Administrador</option><option value="aluno">Aluno</option></select></div>
+                    <div class="form-group"><label><input type="checkbox" id="userActive" checked onkeydown="if(event.key==='Enter'){event.preventDefault(); document.getElementById('userModal').querySelector('button[type=submit]').focus();}"> Usuário ativo</label></div>
+                    <div class="form-group"><label>Permissões de Acesso <span style="font-weight:400;color:#64748b;">(gerado automaticamente)</span></label><div id="permissionsContainer" class="permissions-container"></div><div class="permissions-updated">Atualizado em: <span id="permissionsUpdatedAt"></span></div></div>
+                </div>
+                <div class="modal-footer"><button type="button" class="btn btn-outline" onclick="closeModal('userModal')">Cancelar</button><button type="submit" class="btn btn-success">Salvar</button></div>
+            </form>
+        </div>
+    </div>
+
+    <div class="modal" id="albumModal">
+        <div class="modal-content">
+            <div class="modal-header"><h3>Foto do Álbum</h3><button class="modal-close" onclick="closeModal('albumModal')">&times;</button></div>
+            <form id="albumForm" onsubmit="saveAlbum(event)">
+                <div class="modal-body">
+                    <div class="photo-upload" style="flex-direction: column; align-items: center; gap: 10px;">
+                        <img id="albumFotoPreview" class="photo-preview" src="" alt="Foto" style="width: 100%; height: 200px; border-radius: 8px; object-fit: contain; background:#e2e8f0;">
+                        <input type="file" id="albumFoto" accept="image/*" onchange="handleAlbumPhoto(event)" style="display:none;">
+                        <button type="button" class="btn btn-outline" onclick="document.getElementById('albumFoto').click()">📷 Selecionar Foto</button>
+                    </div>
+                    <div class="form-group"><label>Título</label><input type="text" id="albumTitulo" placeholder="Título da foto" onkeydown="if(event.key==='Enter'){event.preventDefault(); document.getElementById('albumDescricao').focus();}"></div>
+                    <div class="form-group"><label>Descrição</label><textarea id="albumDescricao" rows="2" placeholder="Descrição da foto" onkeydown="if(event.key==='Enter' && !event.shiftKey){event.preventDefault(); document.getElementById('albumModal').querySelector('button[type=submit]').focus();}"></textarea></div>
+                </div>
+                <div class="modal-footer"><button type="button" class="btn btn-outline" onclick="closeModal('albumModal')">Cancelar</button><button type="submit" class="btn btn-success">Salvar</button></div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal de Treino -->
+    <div class="modal" id="workoutModal">
+        <div class="modal-content">
+            <div class="modal-header"><h3>Cadastro de Treino</h3><button class="modal-close" onclick="closeModal('workoutModal')">&times;</button></div>
+            <form id="workoutForm" onsubmit="saveWorkout(event)">
+                <div class="modal-body">
+                    <div class="form-group"><label>Nome do Treino *</label><input type="text" id="workoutNome" required placeholder="Ex: Treino A - Peito e Tríceps" onkeydown="if(event.key==='Enter'){event.preventDefault(); document.getElementById('workoutGrupo').focus();}"></div>
+                    <div class="form-group"><label>Grupo Muscular *</label><input type="text" id="workoutGrupo" required placeholder="Ex: Peito, Tríceps, Ombro..." onkeydown="if(event.key==='Enter'){event.preventDefault(); document.getElementById('workoutDia').focus();}"></div>
+                    <div class="form-group"><label>Dia da Semana *</label><select id="workoutDia" required onkeydown="if(event.key==='Enter'){event.preventDefault(); document.getElementById('workoutAluno').focus();}">
+                        <option value="1">Segunda-feira</option>
+                        <option value="2">Terça-feira</option>
+                        <option value="3">Quarta-feira</option>
+                        <option value="4">Quinta-feira</option>
+                        <option value="5">Sexta-feira</option>
+                        <option value="6">Sábado</option>
+                        <option value="0">Domingo</option>
+                    </select></div>
+                    <div class="form-group"><label>Aluno Destinado (opcional)</label><select id="workoutAluno" onkeydown="if(event.key==='Enter'){event.preventDefault(); document.getElementById('workoutExercicios').focus();}"></select></div>
+                    <div class="form-group"><label>Exercícios / Descrição</label><textarea id="workoutExercicios" rows="4" placeholder="Lista de exercícios, séries, repetições..." onkeydown="if(event.key==='Enter' && !event.shiftKey){event.preventDefault(); document.getElementById('workoutModal').querySelector('button[type=submit]').focus();}"></textarea></div>
+                </div>
+                <div class="modal-footer"><button type="button" class="btn btn-outline" onclick="closeModal('workoutModal')">Cancelar</button><button type="submit" class="btn btn-success">Salvar</button></div>
+            </form>
+        </div>
+    </div>
+
+    <div id="lightbox" class="lightbox hidden" onclick="closeLightbox()">
+        <span class="lightbox-close" onclick="closeLightbox()">&times;</span>
+        <img id="lightboxImage" src="" alt="Foto ampliada" onclick="event.stopPropagation();">
+    </div>
+
+    <div class="toast-container" id="toastContainer"></div>
+
+    <script>
+        // ==================== DADOS E CONFIG ====================
+        const STORAGE_KEY = 'mestrePauloPersonalTrainer_v1';
+
+        const MODULES = [
+            { key: 'dashboard', label: 'Dashboard', icon: '📊', actions: ['ver'] },
+            { key: 'alunos', label: 'Alunos', icon: '👥', actions: ['ver', 'criar', 'editar', 'excluir'] },
+            { key: 'academias', label: 'Academias', icon: '🏋️', actions: ['ver', 'criar', 'editar', 'excluir'] },
+            { key: 'agenda', label: 'Agenda', icon: '📅', actions: ['ver', 'criar', 'editar', 'excluir'] },
+            { key: 'treinos', label: 'Treinos', icon: '📋', actions: ['ver', 'criar', 'editar', 'excluir'] },
+            { key: 'album', label: 'Álbum', icon: '🖼️', actions: ['ver', 'criar', 'editar', 'excluir'] },
+            { key: 'fluxocaixa', label: 'Fluxo de Caixa', icon: '💰', actions: ['ver', 'criar', 'editar', 'excluir'] },
+            { key: 'filtro', label: 'Filtro', icon: '🔍', actions: ['ver'] },
+            { key: 'usuarios', label: 'Usuários', icon: '🔐', actions: ['ver', 'criar', 'editar', 'excluir'] }
+        ];
+
+        const ACTION_LABELS = { ver: 'Ver', criar: 'Criar', editar: 'Editar', excluir: 'Excluir' };
+
+        let state = {
+            users: [],
+            students: [],
+            academias: [],
+            schedule: [],
+            workouts: [],
+            album: [],
+            cashflow: []
+        };
+        let currentUser = null;
+        let currentStudent = null; // aluno logado na área do aluno
+        let editingId = null;
+        let studentFotoData = '';
+        let albumFotoData = '';
+        let currentSection = 'dashboard';
+        let studentEvolucaoFotos = []; // array temporário para fotos de evolução no modal
+
+        // ==================== UTILITÁRIOS ====================
+        function genId() { return Date.now().toString(36) + Math.random().toString(36).substr(2, 5); }
+        function esc(str) { return String(str ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;'); }
+        function val(id) { return document.getElementById(id).value.trim(); }
+        function formatCurrency(v) { return Number(v || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }); }
+        function formatDate(dateStr) { if (!dateStr) return ''; const [y, m, d] = dateStr.split('-'); return `${d}/${m}/${y}`; }
+        function formatDateInput(date) { const y = date.getFullYear(); const m = String(date.getMonth() + 1).padStart(2, '0'); const d = String(date.getDate()).padStart(2, '0'); return `${y}-${m}-${d}`; }
+        function getWeekdayName(day) { const names = ['Domingo', 'Segunda-feira', 'Terça-feira', 'Quarta-feira', 'Quinta-feira', 'Sexta-feira', 'Sábado']; return names[day]; }
+        function toast(msg, type = 'success') {
+            const container = document.getElementById('toastContainer');
+            const el = document.createElement('div');
+            el.className = `toast ${type}`;
+            el.textContent = msg;
+            container.appendChild(el);
+            setTimeout(() => el.remove(), 4000);
+        }
+        function saveState() { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
+        function loadState() {
+            const raw = localStorage.getItem(STORAGE_KEY);
+            if (raw) {
+                try {
+                    state = JSON.parse(raw);
+                    if (!state.users || !Array.isArray(state.users)) state.users = [];
+                    if (!state.students || !Array.isArray(state.students)) state.students = [];
+                    if (!state.academias || !Array.isArray(state.academias)) state.academias = [];
+                    if (!state.schedule || !Array.isArray(state.schedule)) state.schedule = [];
+                    if (!state.workouts || !Array.isArray(state.workouts)) state.workouts = [];
+                    if (!state.album || !Array.isArray(state.album)) state.album = [];
+                    if (!state.cashflow || !Array.isArray(state.cashflow)) state.cashflow = [];
+                    // Garantir que alunos tenham evolucaoFotos
+                    state.students.forEach(s => { if (!s.evolucaoFotos) s.evolucaoFotos = []; });
+                    // Migração: criar usuários para alunos existentes
+                    ensureStudentUsers();
+                } catch (e) { seedData(); }
+            } else { seedData(); }
+            if (state.users.length === 0) seedData();
+        }
+        function seedData() {
+            state.users = [{ id: genId(), username: 'SERGIO', password: '080888', nome: 'Sérgio', role: 'admin', active: true, permissions: {} }];
+            state.academias = [{ id: genId(), nome: 'Academia Exemplo', endereco: 'Rua das Flores, 123', telefone: '(11) 99999-0000', responsavel: 'Carlos' }];
+            state.students = [];
+            state.schedule = [];
+            state.workouts = [];
+            state.album = [];
+            state.cashflow = [];
+            saveState();
+        }
+
+        // Função para garantir que cada aluno tenha um usuário vinculado
+        function ensureStudentUsers() {
+            state.students.forEach(student => {
+                if (!state.users.some(u => u.alunoId === student.id)) {
+                    createUserForStudent(student);
+                }
+            });
+            saveState();
+        }
+
+        // Função para gerar username a partir do nome do aluno
+        function slugify(text) {
+            if (!text) return 'ALUNO';
+            return text.normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+                .toUpperCase().replace(/[^A-Z0-9]/g, '').trim() || 'ALUNO';
+        }
+
+        function generateStudentUsername(nome, existingUsers, alunoId = null) {
+            let base = slugify(nome);
+            let username = base;
+            let counter = 1;
+            while (existingUsers.some(u => u.username === username && u.id !== alunoId)) {
+                username = base + counter;
+                counter++;
+            }
+            return username;
+        }
+
+        // Função para extrair senha do telefone (sem DDD)
+        function getPhoneWithoutDDD(phone) {
+            let digits = String(phone || '').replace(/\D/g, '');
+            if (digits.length >= 10) {
+                digits = digits.substring(2); // remove DDD (2 primeiros dígitos)
+            }
+            return digits;
+        }
+
+        // Cria usuário para aluno
+        function createUserForStudent(student) {
+            const username = generateStudentUsername(student.nome, state.users, student.id ? null : undefined);
+            const password = getPhoneWithoutDDD(student.telefone);
+            const newUser = {
+                id: genId(),
+                username: username,
+                password: password,
+                nome: student.nome,
+                role: 'aluno',
+                active: true,
+                permissions: {},
+                alunoId: student.id
+            };
+            state.users.push(newUser);
+            return newUser;
+        }
+
+        // Atualiza usuário do aluno (senha e nome, se necessário)
+        function updateUserForStudent(student) {
+            const user = state.users.find(u => u.alunoId === student.id);
+            if (user) {
+                // Atualizar senha se telefone mudou
+                const newPassword = getPhoneWithoutDDD(student.telefone);
+                if (user.password !== newPassword) {
+                    user.password = newPassword;
+                }
+                if (user.nome !== student.nome) {
+                    user.nome = student.nome;
+                }
+                // Não altera username para não confundir
+            }
+        }
+
+        // ==================== PERMISSÕES ====================
+        function can(moduleKey, action = 'ver') {
+            if (!currentUser) return false;
+            if (currentUser.role === 'admin') return true;
+            return currentUser.permissions && currentUser.permissions[`${moduleKey}:${action}`] === true;
+        }
+        function renderPermissionMatrix(user) {
+            const container = document.getElementById('permissionsContainer');
+            const role = document.getElementById('userRole').value;
+            let html = '';
+            if (role === 'aluno') {
+                html = '<p style="color:#64748b;">Usuários do tipo Aluno não possuem permissões de painel.</p>';
+            } else {
+                MODULES.forEach(mod => {
+                    html += `<div class="perm-module"><strong>${mod.icon} ${mod.label}</strong><div class="perm-actions">`;
+                    mod.actions.forEach(action => {
+                        const key = `${mod.key}:${action}`;
+                        const isAdmin = role === 'admin';
+                        const checked = isAdmin ? 'checked' : (user && user.permissions && user.permissions[key] ? 'checked' : '');
+                        const disabled = isAdmin ? 'disabled' : '';
+                        html += `<label class="perm-check"><input type="checkbox" id="perm_${mod.key}_${action}" data-module="${mod.key}" data-action="${action}" ${checked} ${disabled}> ${ACTION_LABELS[action]}</label>`;
+                    });
+                    html += `</div></div>`;
+                });
+            }
+            container.innerHTML = html;
+            document.getElementById('permissionsUpdatedAt').textContent = new Date().toLocaleString();
+        }
+        function collectPermissions() {
+            const perms = {};
+            MODULES.forEach(mod => {
+                mod.actions.forEach(action => {
+                    const cb = document.getElementById(`perm_${mod.key}_${action}`);
+                    if (cb) perms[`${mod.key}:${action}`] = cb.checked;
+                });
+            });
+            return perms;
+        }
+
+        // ==================== FULLSCREEN ====================
+        function enterFullscreen() {
+            const elem = document.documentElement;
+            if (elem.requestFullscreen) {
+                elem.requestFullscreen().catch(err => { window.scrollTo(0, 1); });
+            } else if (elem.webkitRequestFullscreen) {
+                elem.webkitRequestFullscreen();
+            } else if (elem.msRequestFullscreen) {
+                elem.msRequestFullscreen();
+            } else {
+                window.scrollTo(0, 1);
+            }
+        }
+
+        function exitFullscreen() {
+            if (document.fullscreenElement) {
+                document.exitFullscreen().catch(() => {});
+            } else if (document.webkitFullscreenElement) {
+                document.webkitExitFullscreen();
+            } else if (document.msFullscreenElement) {
+                document.msExitFullscreen();
+            }
+        }
+
+        // ==================== LOGIN/LOGOUT ====================
+        function showStudentLogin() {
+            document.getElementById('loginPersonalBox').classList.add('hidden');
+            document.getElementById('loginStudentBox').classList.remove('hidden');
+            document.getElementById('studentLoginError').classList.add('hidden');
+            document.getElementById('studentLoginUsername').value = '';
+            document.getElementById('studentLoginPassword').value = '';
+        }
+        function showPersonalLogin() {
+            document.getElementById('loginStudentBox').classList.add('hidden');
+            document.getElementById('loginPersonalBox').classList.remove('hidden');
+            document.getElementById('loginError').classList.add('hidden');
+        }
+
+        function handleStudentLogin(e) {
+            e.preventDefault();
+            const username = val('studentLoginUsername').toUpperCase();
+            const password = val('studentLoginPassword');
+            if (!username || !password) {
+                document.getElementById('studentLoginError').textContent = 'Preencha usuário e senha.';
+                document.getElementById('studentLoginError').classList.remove('hidden');
+                return;
+            }
+            const user = state.users.find(u => u.username.toUpperCase() === username && u.password === password && u.role === 'aluno' && u.active !== false);
+            if (!user) {
+                document.getElementById('studentLoginError').textContent = 'Usuário ou senha inválidos.';
+                document.getElementById('studentLoginError').classList.remove('hidden');
+                return;
+            }
+            const student = state.students.find(s => s.id === user.alunoId);
+            if (!student) {
+                document.getElementById('studentLoginError').textContent = 'Aluno vinculado não encontrado.';
+                document.getElementById('studentLoginError').classList.remove('hidden');
+                return;
+            }
+            currentStudent = student;
+            document.getElementById('loginScreen').classList.add('hidden');
+            document.getElementById('app').classList.remove('hidden');
+            document.getElementById('sidebar').classList.add('hidden');
+            document.getElementById('sidebar').classList.remove('open');
+            document.body.classList.add('fullscreen');
+            enterFullscreen();
+            navigate('aluno');
+            toast('Bem-vindo, ' + student.nome + '!');
+        }
+
+        function handleLogin(e) {
+            e.preventDefault();
+            const username = val('loginUsername').toUpperCase();
+            const password = val('loginPassword');
+            const user = state.users.find(u => u.username.toUpperCase() === username && u.password === password && u.active !== false && u.role !== 'aluno');
+            if (!user) {
+                const err = document.getElementById('loginError');
+                err.textContent = 'Usuário ou senha inválidos ou usuário inativo.';
+                err.classList.remove('hidden');
+                return;
+            }
+            currentUser = user;
+            currentStudent = null;
+            document.getElementById('loginScreen').classList.add('hidden');
+            document.getElementById('app').classList.remove('hidden');
+            document.getElementById('sidebar').classList.remove('hidden');
+            document.getElementById('loggedUserName').textContent = currentUser.nome || currentUser.username;
+            document.getElementById('loggedUserRole').textContent = currentUser.role === 'admin' ? 'Administrador' : currentUser.role === 'aluno' ? 'Aluno' : 'Usuário Padrão';
+            document.body.classList.add('fullscreen');
+            enterFullscreen();
+            renderNav();
+            const firstPermitted = MODULES.find(m => can(m.key, 'ver'));
+            navigate(firstPermitted ? firstPermitted.key : 'dashboard');
+            toast('Bem-vindo, ' + (currentUser.nome || currentUser.username) + '!');
+        }
+
+        function logout() {
+            if (currentStudent) {
+                // logout do aluno
+                currentStudent = null;
+                document.getElementById('app').classList.add('hidden');
+                document.getElementById('loginScreen').classList.remove('hidden');
+                document.getElementById('loginStudentBox').classList.add('hidden');
+                document.getElementById('loginPersonalBox').classList.remove('hidden');
+                document.getElementById('studentLoginError').classList.add('hidden');
+                document.body.classList.remove('fullscreen');
+                document.getElementById('sidebar').classList.remove('hidden');
+                document.getElementById('sidebar').classList.remove('open');
+                closeLightbox();
+                exitFullscreen();
+            } else {
+                // logout do personal
+                currentUser = null;
+                document.getElementById('app').classList.add('hidden');
+                document.getElementById('loginScreen').classList.remove('hidden');
+                document.getElementById('loginPassword').value = '';
+                document.getElementById('loginError').classList.add('hidden');
+                document.body.classList.remove('fullscreen');
+                document.getElementById('sidebar').classList.remove('hidden');
+                document.getElementById('sidebar').classList.remove('open');
+                closeLightbox();
+                exitFullscreen();
+            }
+        }
+
+        // ==================== NAVEGAÇÃO ====================
+        function toggleSidebar() {
+            if (!currentStudent) document.getElementById('sidebar').classList.toggle('open');
+        }
+        function renderNav() {
+            const nav = document.getElementById('sidebarNav');
+            let html = '';
+            MODULES.forEach(mod => {
+                if (can(mod.key, 'ver')) {
+                    html += `<button class="nav-item ${currentSection === mod.key ? 'active' : ''}" data-section="${mod.key}" onclick="navigate('${mod.key}')">${mod.icon} <span>${mod.label}</span></button>`;
+                }
+            });
+            nav.innerHTML = html;
+        }
+        function navigate(section) {
+            if (section === 'aluno') {
+                if (!currentStudent) { toast('Acesso apenas para alunos.', 'error'); return; }
+                currentSection = 'aluno';
+                document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+                document.getElementById('section-aluno').classList.add('active');
+                document.getElementById('pageTitle').textContent = 'Meus Treinos';
+                document.getElementById('sidebar').classList.add('hidden');
+                renderAlunoArea();
+                return;
+            }
+            if (!can(section, 'ver')) { toast('Acesso negado a esta área.', 'error'); return; }
+            currentSection = section;
+            renderNav();
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            const el = document.getElementById('section-' + section);
+            if (el) el.classList.add('active');
+            const mod = MODULES.find(m => m.key === section);
+            document.getElementById('pageTitle').textContent = mod ? mod.label : '';
+
+            document.body.classList.add('fullscreen');
+            document.getElementById('sidebar').classList.remove('open');
+            closeLightbox();
+
+            const btnAluno = document.getElementById('btnAddStudent');
+            if (btnAluno) btnAluno.style.display = can('alunos', 'criar') ? '' : 'none';
+            const btnAcademia = document.getElementById('btnAddAcademia');
+            if (btnAcademia) btnAcademia.style.display = can('academias', 'criar') ? '' : 'none';
+            const btnSchedule = document.getElementById('btnAddSchedule');
+            if (btnSchedule) btnSchedule.style.display = can('agenda', 'criar') ? '' : 'none';
+            const btnRecurring = document.getElementById('btnAddRecurringSchedule');
+            if (btnRecurring) btnRecurring.style.display = can('agenda', 'criar') ? '' : 'none';
+            const btnAlbum = document.getElementById('btnAddAlbum');
+            if (btnAlbum) btnAlbum.style.display = can('album', 'criar') ? '' : 'none';
+            const btnCashflow = document.getElementById('btnAddCashflow');
+            if (btnCashflow) btnCashflow.style.display = can('fluxocaixa', 'criar') ? '' : 'none';
+            const btnUser = document.getElementById('btnAddUser');
+            if (btnUser) btnUser.style.display = can('usuarios', 'criar') ? '' : 'none';
+            const btnWorkout = document.getElementById('btnAddWorkout');
+            if (btnWorkout) btnWorkout.style.display = can('treinos', 'criar') ? '' : 'none';
+
+            if (section === 'dashboard') renderDashboard();
+            if (section === 'alunos') renderStudents();
+            if (section === 'academias') renderAcademies();
+            if (section === 'agenda') renderSchedule();
+            if (section === 'treinos') renderWorkouts();
+            if (section === 'album') renderAlbum();
+            if (section === 'fluxocaixa') renderCashflow();
+            if (section === 'filtro') { fillFiltroAcademia(); }
+            if (section === 'usuarios') { renderUsers(); renderPermissionMatrix(null); }
+        }
+
+        // ==================== DASHBOARD ====================
+        function renderDashboard() {
+            const totalAlunos = state.students.length;
+            const totalAcademias = state.academias.length;
+            const totalAgendadas = state.schedule.filter(a => a.status === 'Agendada').length;
+            const totalFotos = state.album.length;
+            const totalTreinos = state.workouts.length;
+            const now = new Date();
+            const currentMonth = now.getMonth();
+            const currentYear = now.getFullYear();
+            let receitaMes = 0;
+            state.schedule.forEach(a => {
+                const d = new Date(a.data + 'T00:00:00');
+                if (d.getMonth() === currentMonth && d.getFullYear() === currentYear && a.status !== 'Cancelada') {
+                    const aluno = state.students.find(s => s.id === a.alunoId);
+                    if (aluno) receitaMes += parseFloat(aluno.valorAula) || 0;
+                }
+            });
+            let entradaMes = 0, saidaMes = 0;
+            state.cashflow.forEach(c => {
+                const d = new Date(c.data + 'T00:00:00');
+                if (d.getMonth() === currentMonth && d.getFullYear() === currentYear) {
+                    entradaMes += parseFloat(c.entrada) || 0;
+                    saidaMes += parseFloat(c.saida) || 0;
+                }
+            });
+            document.getElementById('dashboardCards').innerHTML = `
+                <div class="stat-card"><div class="stat-icon">👥</div><div class="stat-info"><h4>${totalAlunos}</h4><p>Alunos Ativos</p></div></div>
+                <div class="stat-card"><div class="stat-icon">🏋️</div><div class="stat-info"><h4>${totalAcademias}</h4><p>Academias</p></div></div>
+                <div class="stat-card"><div class="stat-icon">📅</div><div class="stat-info"><h4>${totalAgendadas}</h4><p>Aulas Agendadas</p></div></div>
+                <div class="stat-card"><div class="stat-icon">📋</div><div class="stat-info"><h4>${totalTreinos}</h4><p>Treinos Cadastrados</p></div></div>
+                <div class="stat-card"><div class="stat-icon">🖼️</div><div class="stat-info"><h4>${totalFotos}</h4><p>Fotos no Álbum</p></div></div>
+                <div class="stat-card"><div class="stat-icon">💰</div><div class="stat-info"><h4>${formatCurrency(receitaMes)}</h4><p>Receita do Mês</p></div></div>
+                <div class="stat-card"><div class="stat-icon">📈</div><div class="stat-info"><h4>${formatCurrency(entradaMes - saidaMes)}</h4><p>Saldo do Mês (Caixa)</p></div></div>
+            `;
+            const sorted = [...state.schedule]
+                .filter(a => new Date(a.data + 'T' + a.hora) >= new Date())
+                .sort((a, b) => (a.data + 'T' + a.hora).localeCompare(b.data + 'T' + b.hora))
+                .slice(0, 5);
+            let html = '';
+            sorted.forEach(a => {
+                const aluno = state.students.find(s => s.id === a.alunoId);
+                const acad = state.academias.find(g => g.id === a.academiaId);
+                html += `<tr><td>${esc(formatDate(a.data))}</td><td>${esc(a.hora)}</td><td>${esc(aluno ? aluno.nome : 'Aluno removido')}</td><td>${esc(acad ? acad.nome : 'Academia removida')}</td><td><span class="badge badge-${a.status.toLowerCase()}">${esc(a.status)}</span></td></tr>`;
+            });
+            document.getElementById('dashboardScheduleTable').innerHTML = html || '<tr><td colspan="5">Nenhuma aula futura.</td></tr>';
+        }
+
+        // ==================== ALUNOS ====================
+        function fillAcademiaSelect(selectId, selectedId) {
+            const select = document.getElementById(selectId);
+            if (!select) return;
+            let html = '<option value="">Selecione...</option>';
+            state.academias.forEach(a => {
+                html += `<option value="${a.id}" ${selectedId === a.id ? 'selected' : ''}>${esc(a.nome)}</option>`;
+            });
+            select.innerHTML = html;
+        }
+        function fillStudentSelect(selectId, selectedId) {
+            const select = document.getElementById(selectId);
+            if (!select) return;
+            let html = '<option value="">Selecione...</option>';
+            state.students.forEach(s => {
+                html += `<option value="${s.id}" ${selectedId === s.id ? 'selected' : ''}>${esc(s.nome)}</option>`;
+            });
+            select.innerHTML = html;
+        }
+        function handleStudentPhoto(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = e => {
+                const img = new Image();
+                img.onload = () => {
+                    const canvas = document.createElement('canvas');
+                    let width = img.width, height = img.height;
+                    const max = 200;
+                    if (width > height && width > max) { height *= max / width; width = max; }
+                    else if (height > max) { width *= max / height; height = max; }
+                    canvas.width = width; canvas.height = height;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, width, height);
+                    studentFotoData = canvas.toDataURL('image/jpeg', 0.7);
+                    document.getElementById('studentFotoPreview').src = studentFotoData;
+                };
+                img.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function handleEvolutionPhoto(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = e => {
+                const img = new Image();
+                img.onload = () => {
+                    const canvas = document.createElement('canvas');
+                    let width = img.width, height = img.height;
+                    const max = 600;
+                    if (width > height && width > max) { height *= max / width; width = max; }
+                    else if (height > max) { width *= max / height; height = max; }
+                    canvas.width = width; canvas.height = height;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, width, height);
+                    const fotoData = canvas.toDataURL('image/jpeg', 0.8);
+                    studentEvolucaoFotos.push({
+                        id: genId(),
+                        data: formatDateInput(new Date()),
+                        foto: fotoData,
+                        legenda: ''
+                    });
+                    renderEvolutionThumbs();
+                };
+                img.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+            event.target.value = '';
+        }
+
+        function renderEvolutionThumbs() {
+            const container = document.getElementById('evolutionThumbs');
+            if (!container) return;
+            let html = '';
+            studentEvolucaoFotos.forEach(foto => {
+                html += `
+                    <div class="evolution-thumb">
+                        <img src="${esc(foto.foto)}" alt="Evolução" onclick="openLightbox('${esc(foto.foto)}')">
+                        <button type="button" class="remove-evo" onclick="removeEvolutionPhoto('${foto.id}')">&times;</button>
+                    </div>`;
+            });
+            container.innerHTML = html || '<p style="color:#64748b;">Nenhuma foto adicionada.</p>';
+        }
+
+        function removeEvolutionPhoto(id) {
+            studentEvolucaoFotos = studentEvolucaoFotos.filter(f => f.id !== id);
+            renderEvolutionThumbs();
+        }
+
+        function openStudentForm(id) {
+            if (id) { if (!can('alunos', 'editar')) { toast('Sem permissão para editar.', 'error'); return; } }
+            else { if (!can('alunos', 'criar')) { toast('Sem permissão para criar.', 'error'); return; } }
+            editingId = id || null;
+            document.getElementById('studentForm').reset();
+            studentFotoData = '';
+            document.getElementById('studentFotoPreview').src = '';
+            studentEvolucaoFotos = [];
+            document.getElementById('evolutionThumbs').innerHTML = '<p style="color:#64748b;">Nenhuma foto adicionada.</p>';
+            fillAcademiaSelect('studentAcademia');
+            if (id) {
+                const s = state.students.find(s => s.id === id);
+                if (!s) return;
+                document.getElementById('studentNome').value = s.nome;
+                document.getElementById('studentCpf').value = s.cpf || '';
+                document.getElementById('studentAcademia').value = s.academiaId || '';
+                document.getElementById('studentObjetivo').value = s.objetivo || '';
+                document.getElementById('studentTelefone').value = s.telefone || '';
+                document.getElementById('studentEmail').value = s.email || '';
+                document.getElementById('studentValorAula').value = s.valorAula || '';
+                document.getElementById('studentObservacoes').value = s.observacoes || '';
+                studentFotoData = s.foto || '';
+                document.getElementById('studentFotoPreview').src = studentFotoData || '';
+                studentEvolucaoFotos = s.evolucaoFotos ? [...s.evolucaoFotos] : [];
+                renderEvolutionThumbs();
+            }
+            openModal('studentModal');
+        }
+        function saveStudent(e) {
+            e.preventDefault();
+            if (editingId && !can('alunos', 'editar')) return;
+            if (!editingId && !can('alunos', 'criar')) return;
+            const nome = val('studentNome');
+            if (!nome) { toast('Informe o nome do aluno.', 'error'); return; }
+            const cpf = val('studentCpf');
+            const academiaId = val('studentAcademia');
+            const objetivo = val('studentObjetivo');
+            const telefone = val('studentTelefone');
+            const email = val('studentEmail');
+            const valorAula = parseFloat(val('studentValorAula')) || 0;
+            const observacoes = val('studentObservacoes');
+            const foto = studentFotoData || '';
+            const evolucaoFotos = studentEvolucaoFotos;
+
+            if (editingId) {
+                const idx = state.students.findIndex(s => s.id === editingId);
+                if (idx > -1) state.students[idx] = { ...state.students[idx], nome, cpf, academiaId, objetivo, telefone, email, valorAula, observacoes, foto, evolucaoFotos };
+                updateUserForStudent(state.students[idx]);
+                saveState();
+                closeModal('studentModal');
+                renderStudents();
+                fillStudentSelect('workoutAluno');
+                toast('Aluno salvo com sucesso!');
+            } else {
+                const newStudent = { id: genId(), nome, cpf, academiaId, objetivo, telefone, email, valorAula, observacoes, foto, evolucaoFotos };
+                state.students.push(newStudent);
+                const user = createUserForStudent(newStudent);
+                saveState();
+                closeModal('studentModal');
+                renderStudents();
+                fillStudentSelect('workoutAluno');
+                toast(`Aluno salvo! Usuário: ${user.username} | Senha: ${user.password}`, 'success');
+            }
+        }
+
+        function deleteStudent(id) {
+            if (!can('alunos', 'excluir')) { toast('Sem permissão para excluir.', 'error'); return; }
+            if (!confirmAdminDeletion()) return;
+            state.students = state.students.filter(s => s.id !== id);
+            state.workouts = state.workouts.filter(w => w.alunoId !== id);
+            state.users = state.users.filter(u => u.alunoId !== id);
+            saveState(); renderStudents(); renderWorkouts(); fillStudentSelect('workoutAluno'); renderUsers(); toast('Aluno excluído.', 'warning');
+        }
+
+        function confirmAdminDeletion() {
+            const admin = state.users.find(u => u.role === 'admin');
+            if (!admin) {
+                toast('Nenhum administrador encontrado no sistema.', 'error');
+                return false;
+            }
+            const senha = window.prompt("🔐 Confirmação de Segurança\nDigite a senha do Administrador para excluir este registro:");
+            if (senha === null) return false;
+            if (senha !== admin.password) {
+                toast('Senha do administrador incorreta!', 'error');
+                return false;
+            }
+            return true;
+        }
+
+        function renderStudents() {
+            const tbody = document.getElementById('studentsTableBody');
+            let html = '';
+            state.students.forEach(s => {
+                const academia = state.academias.find(a => a.id === s.academiaId);
+                const foto = s.foto ? `<img class="thumb" src="${esc(s.foto)}" alt="Foto">` : '<div class="thumb">👤</div>';
+                html += `<tr>
+                    <td>${foto}</td>
+                    <td>${esc(s.nome)}</td>
+                    <td>${esc(academia ? academia.nome : '-')}</td>
+                    <td>${esc(s.cpf || '-')}</td>
+                    <td>${esc(s.telefone || '-')}</td>
+                    <td>${formatCurrency(s.valorAula)}</td>
+                    <td>
+                        <button class="btn btn-sm btn-outline" onclick="openStudentForm('${s.id}')" ${can('alunos', 'editar') ? '' : 'disabled'}>✏️</button>
+                        <button class="btn btn-sm btn-danger" onclick="deleteStudent('${s.id}')" ${can('alunos', 'excluir') ? '' : 'disabled'}>🗑️</button>
+                    </td>
+                </tr>`;
+            });
+            tbody.innerHTML = html || '<tr><td colspan="7">Nenhum aluno cadastrado.</td></tr>';
+        }
+
+        // ==================== ACADEMIAS ====================
+        function openAcademyForm(id) {
+            if (id) { if (!can('academias', 'editar')) { toast('Sem permissão para editar.', 'error'); return; } }
+            else { if (!can('academias', 'criar')) { toast('Sem permissão para criar.', 'error'); return; } }
+            editingId = id || null;
+            document.getElementById('academyForm').reset();
+            if (id) {
+                const a = state.academias.find(a => a.id === id);
+                if (!a) return;
+                document.getElementById('academyNome').value = a.nome;
+                document.getElementById('academyEndereco').value = a.endereco || '';
+                document.getElementById('academyTelefone').value = a.telefone || '';
+                document.getElementById('academyResponsavel').value = a.responsavel || '';
+            }
+            openModal('academyModal');
+        }
+        function saveAcademy(e) {
+            e.preventDefault();
+            if (editingId && !can('academias', 'editar')) return;
+            if (!editingId && !can('academias', 'criar')) return;
+            const nome = val('academyNome');
+            if (!nome) { toast('Informe o nome da academia.', 'error'); return; }
+            const endereco = val('academyEndereco');
+            const telefone = val('academyTelefone');
+            const responsavel = val('academyResponsavel');
+            if (editingId) {
+                const idx = state.academias.findIndex(a => a.id === editingId);
+                if (idx > -1) state.academias[idx] = { ...state.academias[idx], nome, endereco, telefone, responsavel };
+            } else {
+                state.academias.push({ id: genId(), nome, endereco, telefone, responsavel });
+            }
+            saveState(); closeModal('academyModal'); renderAcademies(); toast('Academia salva com sucesso!');
+        }
+        function deleteAcademy(id) {
+            if (!can('academias', 'excluir')) { toast('Sem permissão para excluir.', 'error'); return; }
+            if (!confirmAdminDeletion()) return;
+            state.academias = state.academias.filter(a => a.id !== id);
+            saveState(); renderAcademies(); toast('Academia excluída.', 'warning');
+        }
+        function renderAcademies() {
+            const tbody = document.getElementById('academiesTableBody');
+            let html = '';
+            state.academias.forEach(a => {
+                html += `<tr><td>${esc(a.nome)}</td><td>${esc(a.endereco || '-')}</td><td>${esc(a.telefone || '-')}</td><td>${esc(a.responsavel || '-')}</td><td>
+                    <button class="btn btn-sm btn-outline" onclick="openAcademyForm('${a.id}')" ${can('academias', 'editar') ? '' : 'disabled'}>✏️</button>
+                    <button class="btn btn-sm btn-danger" onclick="deleteAcademy('${a.id}')" ${can('academias', 'excluir') ? '' : 'disabled'}>🗑️</button>
+                </td></tr>`;
+            });
+            tbody.innerHTML = html || '<tr><td colspan="5">Nenhuma academia cadastrada.</td></tr>';
+        }
+
+        // ==================== AGENDA ====================
+        function openScheduleForm(id) {
+            if (id) { if (!can('agenda', 'editar')) { toast('Sem permissão para editar.', 'error'); return; } }
+            else { if (!can('agenda', 'criar')) { toast('Sem permissão para criar.', 'error'); return; } }
+            editingId = id || null;
+            document.getElementById('scheduleForm').reset();
+            fillStudentSelect('scheduleAluno');
+            fillAcademiaSelect('scheduleAcademia');
+            if (id) {
+                const a = state.schedule.find(a => a.id === id);
+                if (!a) return;
+                document.getElementById('scheduleData').value = a.data;
+                document.getElementById('scheduleHora').value = a.hora;
+                document.getElementById('scheduleAluno').value = a.alunoId;
+                document.getElementById('scheduleAcademia').value = a.academiaId;
+                document.getElementById('scheduleStatus').value = a.status;
+            } else {
+                document.getElementById('scheduleStatus').value = 'Agendada';
+            }
+            openModal('scheduleModal');
+        }
+        function saveSchedule(e) {
+            e.preventDefault();
+            if (editingId && !can('agenda', 'editar')) return;
+            if (!editingId && !can('agenda', 'criar')) return;
+            const data = val('scheduleData');
+            const hora = val('scheduleHora');
+            const alunoId = val('scheduleAluno');
+            const academiaId = val('scheduleAcademia');
+            const status = val('scheduleStatus');
+            if (!data || !hora || !alunoId || !academiaId) { toast('Preencha todos os campos obrigatórios.', 'error'); return; }
+            if (editingId) {
+                const idx = state.schedule.findIndex(a => a.id === editingId);
+                if (idx > -1) state.schedule[idx] = { ...state.schedule[idx], data, hora, alunoId, academiaId, status };
+            } else {
+                state.schedule.push({ id: genId(), data, hora, alunoId, academiaId, status });
+            }
+            saveState(); closeModal('scheduleModal'); renderSchedule(); toast('Aula agendada com sucesso!');
+        }
+        function deleteSchedule(id) {
+            if (!can('agenda', 'excluir')) { toast('Sem permissão para excluir.', 'error'); return; }
+            if (!confirmAdminDeletion()) return;
+            state.schedule = state.schedule.filter(a => a.id !== id);
+            saveState(); renderSchedule(); toast('Agendamento excluído.', 'warning');
+        }
+        function renderSchedule() {
+            const tbody = document.getElementById('scheduleTableBody');
+            const sorted = [...state.schedule].sort((a, b) => (a.data + 'T' + a.hora).localeCompare(b.data + 'T' + b.hora));
+            let html = '';
+            sorted.forEach(a => {
+                const aluno = state.students.find(s => s.id === a.alunoId);
+                const acad = state.academias.find(g => g.id === a.academiaId);
+                const badgeClass = a.status === 'Agendada' ? 'badge-agendada' : a.status === 'Concluída' ? 'badge-concluida' : 'badge-cancelada';
+                html += `<tr><td>${formatDate(a.data)}</td><td>${esc(a.hora)}</td><td>${esc(aluno ? aluno.nome : 'Aluno removido')}</td><td>${esc(acad ? acad.nome : 'Academia removida')}</td><td><span class="badge ${badgeClass}">${esc(a.status)}</span></td><td>
+                    <button class="btn btn-sm btn-outline" onclick="openScheduleForm('${a.id}')" ${can('agenda', 'editar') ? '' : 'disabled'}>✏️</button>
+                    <button class="btn btn-sm btn-danger" onclick="deleteSchedule('${a.id}')" ${can('agenda', 'excluir') ? '' : 'disabled'}>🗑️</button>
+                </td></tr>`;
+            });
+            tbody.innerHTML = html || '<tr><td colspan="6">Nenhuma aula agendada.</td></tr>';
+        }
+
+        // ==================== AGENDA RECORRENTE ====================
+        function openRecurringScheduleForm() {
+            if (!can('agenda', 'criar')) { toast('Sem permissão para criar.', 'error'); return; }
+            document.getElementById('recurringScheduleForm').reset();
+            fillStudentSelect('recurringAluno');
+            fillAcademiaSelect('recurringAcademia');
+            const now = new Date();
+            const firstDay = new Date(now.getFullYear(), now.getMonth(), 1);
+            const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+            document.getElementById('recurringStartDate').value = formatDateInput(firstDay);
+            document.getElementById('recurringEndDate').value = formatDateInput(lastDay);
+            document.getElementById('recurringStatus').value = 'Agendada';
+            openModal('recurringScheduleModal');
+        }
+        function saveRecurringSchedule(e) {
+            e.preventDefault();
+            if (!can('agenda', 'criar')) { toast('Sem permissão para criar.', 'error'); return; }
+            const alunoId = val('recurringAluno');
+            const academiaId = val('recurringAcademia');
+            const hora = val('recurringHora');
+            const startDate = val('recurringStartDate');
+            const endDate = val('recurringEndDate');
+            const status = val('recurringStatus');
+            const selectedDays = [];
+            document.querySelectorAll('#recurringScheduleForm input[type="checkbox"]:checked').forEach(cb => selectedDays.push(parseInt(cb.value)));
+            if (!alunoId || !academiaId || !hora || !startDate || !endDate || selectedDays.length === 0) {
+                toast('Preencha todos os campos e selecione pelo menos um dia da semana.', 'error');
+                return;
+            }
+            const start = new Date(startDate + 'T00:00:00');
+            const end = new Date(endDate + 'T00:00:00');
+            if (start > end) { toast('A data final deve ser posterior à inicial.', 'error'); return; }
+            const newEntries = [];
+            let current = new Date(start);
+            while (current <= end) {
+                if (selectedDays.includes(current.getDay())) {
+                    const dateStr = formatDateInput(current);
+                    newEntries.push({ id: genId(), data: dateStr, hora: hora, alunoId: alunoId, academiaId: academiaId, status: status });
+                }
+                current.setDate(current.getDate() + 1);
+            }
+            if (newEntries.length === 0) { toast('Nenhum dia selecionado dentro do período.', 'warning'); return; }
+            state.schedule.push(...newEntries);
+            saveState(); closeModal('recurringScheduleModal'); renderSchedule();
+            toast(`Geradas ${newEntries.length} aulas recorrentes!`);
+        }
+
+        // ==================== TREINOS ====================
+        function fillWorkoutAlunoSelect(selectedId) {
+            const select = document.getElementById('workoutAluno');
+            if (!select) return;
+            let html = '<option value="">Todos os alunos (geral)</option>';
+            state.students.forEach(s => {
+                html += `<option value="${s.id}" ${selectedId === s.id ? 'selected' : ''}>${esc(s.nome)}</option>`;
+            });
+            select.innerHTML = html;
+        }
+        function openWorkoutForm(id) {
+            if (id) { if (!can('treinos', 'editar')) { toast('Sem permissão para editar.', 'error'); return; } }
+            else { if (!can('treinos', 'criar')) { toast('Sem permissão para criar.', 'error'); return; } }
+            editingId = id || null;
+            document.getElementById('workoutForm').reset();
+            fillWorkoutAlunoSelect(null);
+            if (id) {
+                const w = state.workouts.find(w => w.id === id);
+                if (!w) return;
+                document.getElementById('workoutNome').value = w.nome;
+                document.getElementById('workoutGrupo').value = w.grupo;
+                document.getElementById('workoutDia').value = w.diaSemana;
+                document.getElementById('workoutAluno').value = w.alunoId || '';
+                document.getElementById('workoutExercicios').value = w.exercicios || '';
+                fillWorkoutAlunoSelect(w.alunoId || '');
+            } else {
+                fillWorkoutAlunoSelect('');
+            }
+            openModal('workoutModal');
+        }
+        function saveWorkout(e) {
+            e.preventDefault();
+            if (editingId && !can('treinos', 'editar')) return;
+            if (!editingId && !can('treinos', 'criar')) return;
+            const nome = val('workoutNome');
+            const grupo = val('workoutGrupo');
+            const diaSemana = parseInt(val('workoutDia'));
+            const alunoId = val('workoutAluno') || null;
+            const exercicios = val('workoutExercicios');
+            if (!nome || !grupo) { toast('Informe nome e grupo muscular.', 'error'); return; }
+            if (editingId) {
+                const idx = state.workouts.findIndex(w => w.id === editingId);
+                if (idx > -1) state.workouts[idx] = { ...state.workouts[idx], nome, grupo, diaSemana, alunoId, exercicios };
+            } else {
+                state.workouts.push({ id: genId(), nome, grupo, diaSemana, alunoId, exercicios });
+            }
+            saveState(); closeModal('workoutModal'); renderWorkouts(); toast('Treino salvo com sucesso!');
+        }
+        function deleteWorkout(id) {
+            if (!can('treinos', 'excluir')) { toast('Sem permissão para excluir.', 'error'); return; }
+            if (!confirmAdminDeletion()) return;
+            state.workouts = state.workouts.filter(w => w.id !== id);
+            saveState(); renderWorkouts(); toast('Treino excluído.', 'warning');
+        }
+        function renderWorkouts() {
+            const tbody = document.getElementById('workoutsTableBody');
+            let html = '';
+            state.workouts.forEach(w => {
+                const aluno = state.students.find(s => s.id === w.alunoId);
+                const alunoNome = aluno ? aluno.nome : 'Todos';
+                html += `<tr>
+                    <td>${esc(w.nome)}</td>
+                    <td>${esc(w.grupo)}</td>
+                    <td>${esc(getWeekdayName(w.diaSemana))}</td>
+                    <td>${esc(alunoNome)}</td>
+                    <td>
+                        <button class="btn btn-sm btn-outline" onclick="openWorkoutForm('${w.id}')" ${can('treinos', 'editar') ? '' : 'disabled'}>✏️</button>
+                        <button class="btn btn-sm btn-danger" onclick="deleteWorkout('${w.id}')" ${can('treinos', 'excluir') ? '' : 'disabled'}>🗑️</button>
+                    </td>
+                </tr>`;
+            });
+            tbody.innerHTML = html || '<tr><td colspan="5">Nenhum treino cadastrado.</td></tr>';
+            const weekly = document.getElementById('weeklySchedule');
+            const days = [0,1,2,3,4,5,6];
+            let weekHtml = '';
+            days.forEach(day => {
+                const dayWorkouts = state.workouts.filter(w => w.diaSemana === day);
+                weekHtml += `<div class="day-card"><h4>${getWeekdayName(day)}</h4>`;
+                if (dayWorkouts.length === 0) {
+                    weekHtml += '<small style="color:#94a3b8;">Nenhum treino</small>';
+                } else {
+                    dayWorkouts.forEach(w => {
+                        const aluno = state.students.find(s => s.id === w.alunoId);
+                        const alunoNome = aluno ? aluno.nome : 'Todos';
+                        weekHtml += `<div class="workout-item"><strong>${esc(w.nome)}</strong><small>${esc(w.grupo)} | Aluno: ${esc(alunoNome)}</small></div>`;
+                    });
+                }
+                weekHtml += '</div>';
+            });
+            weekly.innerHTML = weekHtml;
+        }
+
+        // ==================== ÁREA DO ALUNO ====================
+        function renderAlunoArea() {
+            const area = document.getElementById('studentArea');
+            if (!currentStudent) return;
+            const studentWorkouts = state.workouts.filter(w => w.alunoId === null || w.alunoId === currentStudent.id);
+            const today = new Date().getDay();
+            const todayWorkouts = studentWorkouts.filter(w => w.diaSemana === today);
+
+            let html = `<h2>`;
+            if (currentStudent.foto) {
+                html += `<img class="student-avatar" src="${esc(currentStudent.foto)}" alt="Foto">`;
+            }
+            html += `Olá, ${esc(currentStudent.nome)}!</h2>`;
+            if (todayWorkouts.length > 0) {
+                html += `<div class="highlight"><h3>🏋️ Treino de Hoje (${getWeekdayName(today)})</h3>`;
+                todayWorkouts.forEach(w => {
+                    html += `<p><strong>${esc(w.nome)}</strong> - ${esc(w.grupo)}</p>`;
+                    if (w.exercicios) html += `<pre style="white-space: pre-wrap; font-family: inherit; margin-top:8px;">${esc(w.exercicios)}</pre>`;
+                });
+                html += '</div>';
+            } else {
+                html += `<div class="highlight"><h3>📅 Hoje é ${getWeekdayName(today)}</h3><p>Nenhum treino atribuído para hoje.</p></div>`;
+            }
+            html += '<h3>Treinos da Semana</h3>';
+            const days = [0,1,2,3,4,5,6];
+            days.forEach(day => {
+                const dayWorkouts = studentWorkouts.filter(w => w.diaSemana === day);
+                html += `<div class="day-card"><h4>${getWeekdayName(day)}</h4>`;
+                if (dayWorkouts.length === 0) {
+                    html += '<small style="color:#94a3b8;">Nenhum treino</small>';
+                } else {
+                    dayWorkouts.forEach(w => {
+                        html += `<div class="workout-item"><strong>${esc(w.nome)}</strong><small>${esc(w.grupo)}</small>`;
+                        if (w.exercicios) html += `<pre style="white-space: pre-wrap; font-family: inherit; font-size:12px; margin-top:6px;">${esc(w.exercicios)}</pre>`;
+                        html += `</div>`;
+                    });
+                }
+                html += '</div>';
+            });
+
+            // Galeria de evolução
+            html += '<h3 style="margin-top: 32px;">📸 Minhas Fotos de Evolução</h3>';
+            const evolucaoFotos = currentStudent.evolucaoFotos || [];
+            if (evolucaoFotos.length === 0) {
+                html += '<p style="color:#94a3b8;">Nenhuma foto de evolução adicionada ainda.</p>';
+            } else {
+                html += '<div class="evolutions-grid">';
+                evolucaoFotos.forEach(foto => {
+                    html += `
+                        <div class="evolution-card">
+                            <img src="${esc(foto.foto)}" alt="Evolução" onclick="openLightbox('${esc(foto.foto)}')">
+                            <div class="evo-info">
+                                <p>${esc(foto.legenda || 'Sem legenda')}</p>
+                                <small>${esc(formatDate(foto.data))}</small>
+                            </div>
+                        </div>`;
+                });
+                html += '</div>';
+            }
+
+            html += `<button class="btn btn-outline" onclick="logout()" style="margin-top:20px;">Sair</button>`;
+            area.innerHTML = html;
+        }
+
+        // ==================== ÁLBUM ====================
+        function handleAlbumPhoto(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = e => {
+                const img = new Image();
+                img.onload = () => {
+                    const canvas = document.createElement('canvas');
+                    let width = img.width, height = img.height;
+                    const max = 800;
+                    if (width > height && width > max) { height *= max / width; width = max; }
+                    else if (height > max) { width *= max / height; height = max; }
+                    canvas.width = width; canvas.height = height;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, width, height);
+                    albumFotoData = canvas.toDataURL('image/jpeg', 0.8);
+                    document.getElementById('albumFotoPreview').src = albumFotoData;
+                };
+                img.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+        function openAlbumForm(id) {
+            if (id) { if (!can('album', 'editar')) { toast('Sem permissão para editar.', 'error'); return; } }
+            else { if (!can('album', 'criar')) { toast('Sem permissão para criar.', 'error'); return; } }
+            editingId = id || null;
+            document.getElementById('albumForm').reset();
+            albumFotoData = '';
+            document.getElementById('albumFotoPreview').src = '';
+            if (id) {
+                const item = state.album.find(item => item.id === id);
+                if (!item) return;
+                document.getElementById('albumTitulo').value = item.titulo || '';
+                document.getElementById('albumDescricao').value = item.descricao || '';
+                albumFotoData = item.foto || '';
+                document.getElementById('albumFotoPreview').src = albumFotoData || '';
+            }
+            openModal('albumModal');
+        }
+        function saveAlbum(e) {
+            e.preventDefault();
+            if (editingId && !can('album', 'editar')) return;
+            if (!editingId && !can('album', 'criar')) return;
+            const titulo = val('albumTitulo');
+            const descricao = val('albumDescricao');
+            const foto = albumFotoData || '';
+            if (!foto) { toast('Selecione uma foto para o álbum.', 'error'); return; }
+            if (editingId) {
+                const idx = state.album.findIndex(item => item.id === editingId);
+                if (idx > -1) state.album[idx] = { ...state.album[idx], titulo, descricao, foto };
+            } else {
+                state.album.push({ id: genId(), titulo, descricao, foto, data: new Date().toISOString() });
+            }
+            saveState();
+            closeModal('albumModal');
+            renderAlbum();
+            toast('Foto salva no álbum com sucesso!');
+        }
+        function deleteAlbum(id) {
+            if (!can('album', 'excluir')) { toast('Sem permissão para excluir.', 'error'); return; }
+            if (!confirmAdminDeletion()) return;
+            state.album = state.album.filter(item => item.id !== id);
+            saveState(); renderAlbum(); toast('Foto excluída do álbum.', 'warning');
+        }
+        function renderAlbum() {
+            const grid = document.getElementById('albumGrid');
+            if (!grid) return;
+            let html = '';
+            if (state.album.length === 0) {
+                html = '<p style="color:#64748b;">Nenhuma foto no álbum. Clique em "+ Nova Foto" para adicionar.</p>';
+            } else {
+                state.album.forEach(item => {
+                    html += `
+                    <div class="album-item">
+                        <img src="${esc(item.foto)}" alt="${esc(item.titulo || 'Foto')}" onclick="openLightbox(this.src)" style="cursor: pointer;">
+                        <div class="album-item-info">
+                            <h4>${esc(item.titulo || 'Sem título')}</h4>
+                            <p>${esc(item.descricao || 'Sem descrição')}</p>
+                            <div class="album-item-actions">
+                                <button class="btn btn-sm btn-outline" onclick="openAlbumForm('${item.id}')" ${can('album', 'editar') ? '' : 'disabled'}>✏️</button>
+                                <button class="btn btn-sm btn-danger" onclick="deleteAlbum('${item.id}')" ${can('album', 'excluir') ? '' : 'disabled'}>🗑️</button>
+                            </div>
+                        </div>
+                    </div>`;
+                });
+            }
+            grid.innerHTML = html;
+        }
+        function openLightbox(src) {
+            const lightbox = document.getElementById('lightbox');
+            const img = document.getElementById('lightboxImage');
+            img.src = src;
+            lightbox.classList.remove('hidden');
+        }
+        function closeLightbox() {
+            document.getElementById('lightbox').classList.add('hidden');
+            document.getElementById('lightboxImage').src = '';
+        }
+
+        // ==================== FLUXO DE CAIXA ====================
+        function openCashflowForm(id) {
+            if (id) { if (!can('fluxocaixa', 'editar')) { toast('Sem permissão para editar.', 'error'); return; } }
+            else { if (!can('fluxocaixa', 'criar')) { toast('Sem permissão para criar.', 'error'); return; } }
+            editingId = id || null;
+            document.getElementById('cashflowForm').reset();
+            if (id) {
+                const c = state.cashflow.find(c => c.id === id);
+                if (!c) return;
+                document.getElementById('cashflowData').value = c.data;
+                document.getElementById('cashflowDescricao').value = c.descricao;
+                document.getElementById('cashflowEntrada').value = c.entrada || '';
+                document.getElementById('cashflowSaida').value = c.saida || '';
+                document.getElementById('cashflowFormaPgto').value = c.forma_pgto || 'Dinheiro';
+            } else {
+                document.getElementById('cashflowFormaPgto').value = 'Dinheiro';
+                document.getElementById('cashflowData').value = formatDateInput(new Date());
+            }
+            openModal('cashflowModal');
+        }
+        function saveCashflow(e) {
+            e.preventDefault();
+            if (editingId && !can('fluxocaixa', 'editar')) return;
+            if (!editingId && !can('fluxocaixa', 'criar')) return;
+            const data = val('cashflowData');
+            const descricao = val('cashflowDescricao');
+            const entrada = parseFloat(val('cashflowEntrada')) || 0;
+            const saida = parseFloat(val('cashflowSaida')) || 0;
+            const forma_pgto = val('cashflowFormaPgto');
+            if (!data || !descricao) { toast('Informe data e descrição.', 'error'); return; }
+            if (entrada === 0 && saida === 0) { toast('Informe ao menos uma entrada ou saída.', 'error'); return; }
+            if (editingId) {
+                const idx = state.cashflow.findIndex(c => c.id === editingId);
+                if (idx > -1) state.cashflow[idx] = { ...state.cashflow[idx], data, descricao, entrada, saida, forma_pgto };
+            } else {
+                state.cashflow.push({ id: genId(), data, descricao, entrada, saida, forma_pgto });
+            }
+            saveState(); closeModal('cashflowModal'); renderCashflow(); toast('Lançamento salvo com sucesso!');
+        }
+        function deleteCashflow(id) {
+            if (!can('fluxocaixa', 'excluir')) { toast('Sem permissão para excluir.', 'error'); return; }
+            if (!confirmAdminDeletion()) return;
+            state.cashflow = state.cashflow.filter(c => c.id !== id);
+            saveState(); renderCashflow(); toast('Lançamento excluído.', 'warning');
+        }
+        function renderCashflow() {
+            const tbody = document.getElementById('cashflowTableBody');
+            const sorted = [...state.cashflow].sort((a, b) => a.data.localeCompare(b.data));
+            let html = '';
+            sorted.forEach(c => {
+                html += `<tr><td>${formatDate(c.data)}</td><td>${esc(c.descricao)}</td><td>${c.entrada > 0 ? formatCurrency(c.entrada) : '-'}</td><td>${c.saida > 0 ? formatCurrency(c.saida) : '-'}</td><td>${esc(c.forma_pgto || '-')}</td><td>
+                    <button class="btn btn-sm btn-outline" onclick="openCashflowForm('${c.id}')" ${can('fluxocaixa', 'editar') ? '' : 'disabled'}>✏️</button>
+                    <button class="btn btn-sm btn-danger" onclick="deleteCashflow('${c.id}')" ${can('fluxocaixa', 'excluir') ? '' : 'disabled'}>🗑️</button>
+                </td></tr>`;
+            });
+            tbody.innerHTML = html || '<tr><td colspan="6">Nenhum lançamento registrado.</td></tr>';
+        }
+
+        // ==================== FILTRO ====================
+        function fillFiltroAcademia() {
+            const select = document.getElementById('filtroAcademia');
+            let html = '<option value="">Todas</option>';
+            state.academias.forEach(a => html += `<option value="${a.id}">${esc(a.nome)}</option>`);
+            select.innerHTML = html;
+        }
+
+        function aplicarFiltro() {
+            if (!can('filtro', 'ver')) { toast('Acesso negado ao filtro.', 'error'); return; }
+
+            const moduloSelecionado = val('filtroModulo');
+            const dataIni = val('filtroDataInicio');
+            const dataFim = val('filtroDataFim');
+            const cpf = val('filtroCpf').replace(/\D/g, '');
+            const celular = val('filtroCelular').replace(/\D/g, '');
+            const academiaId = val('filtroAcademia');
+            const entradaMin = parseFloat(val('filtroEntradaMin')) || 0;
+            const saidaMin = parseFloat(val('filtroSaidaMin')) || 0;
+            const descricao = val('filtroDescricao').toLowerCase();
+
+            let modulesToSearch = [];
+            if (moduloSelecionado === 'todos') {
+                const temFiltroEspecifico = dataIni || dataFim || cpf || celular || academiaId || entradaMin > 0 || saidaMin > 0 || descricao;
+                if (!temFiltroEspecifico) {
+                    toast('Selecione um módulo ou preencha pelo menos um filtro para pesquisar.', 'warning');
+                    return;
+                }
+                modulesToSearch = ['alunos', 'academias', 'agenda', 'album', 'fluxocaixa', 'treinos'];
+            } else {
+                modulesToSearch = [moduloSelecionado];
+            }
+
+            const results = [];
+
+            if (modulesToSearch.includes('alunos')) {
+                state.students.forEach(s => {
+                    const acad = state.academias.find(a => a.id === s.academiaId);
+                    let match = true;
+                    if (cpf) {
+                        const cpfAluno = (s.cpf || '').replace(/\D/g, '');
+                        if (!cpfAluno.includes(cpf)) match = false;
+                    }
+                    if (celular) {
+                        const celAluno = (s.telefone || '').replace(/\D/g, '');
+                        if (!celAluno.includes(celular)) match = false;
+                    }
+                    if (academiaId) {
+                        if (s.academiaId !== academiaId) match = false;
+                    }
+                    if (match) {
+                        results.push({
+                            tipo: 'Aluno',
+                            data: '',
+                            descricao: s.nome,
+                            detalhes: `CPF: ${s.cpf || '-'} | Cel: ${s.telefone || '-'}`,
+                            valor: `Valor/aula: ${formatCurrency(s.valorAula)}`,
+                            academia: acad ? acad.nome : '-'
+                        });
+                    }
+                });
+            }
+
+            if (modulesToSearch.includes('academias')) {
+                state.academias.forEach(a => {
+                    let match = true;
+                    if (academiaId && a.id !== academiaId) match = false;
+                    if (match) {
+                        results.push({
+                            tipo: 'Academia',
+                            data: '',
+                            descricao: a.nome,
+                            detalhes: `Endereço: ${a.endereco || '-'} | Tel: ${a.telefone || '-'}`,
+                            valor: `Responsável: ${a.responsavel || '-'}`,
+                            academia: a.nome
+                        });
+                    }
+                });
+            }
+
+            if (modulesToSearch.includes('agenda')) {
+                state.schedule.forEach(a => {
+                    const aluno = state.students.find(s => s.id === a.alunoId);
+                    const acad = state.academias.find(g => g.id === a.academiaId);
+                    let match = true;
+                    if (dataIni && a.data < dataIni) match = false;
+                    if (dataFim && a.data > dataFim) match = false;
+                    if (academiaId && a.academiaId !== academiaId) match = false;
+                    if (cpf) {
+                        if (!aluno || !aluno.cpf) match = false;
+                        else {
+                            const cpfAluno = aluno.cpf.replace(/\D/g, '');
+                            if (!cpfAluno.includes(cpf)) match = false;
+                        }
+                    }
+                    if (celular) {
+                        if (!aluno || !aluno.telefone) match = false;
+                        else {
+                            const celAluno = aluno.telefone.replace(/\D/g, '');
+                            if (!celAluno.includes(celular)) match = false;
+                        }
+                    }
+                    if (match) {
+                        results.push({
+                            tipo: 'Aula',
+                            data: a.data,
+                            descricao: a.hora,
+                            detalhes: aluno ? aluno.nome : 'Aluno removido',
+                            valor: a.status,
+                            academia: acad ? acad.nome : '-'
+                        });
+                    }
+                });
+            }
+
+            if (modulesToSearch.includes('album')) {
+                state.album.forEach(item => {
+                    let match = true;
+                    if (dataIni && item.data && item.data.slice(0,10) < dataIni) match = false;
+                    if (dataFim && item.data && item.data.slice(0,10) > dataFim) match = false;
+                    if (descricao && item.descricao && !item.descricao.toLowerCase().includes(descricao)) match = false;
+                    if (match) {
+                        results.push({
+                            tipo: 'Álbum',
+                            data: item.data ? item.data.slice(0,10) : '',
+                            descricao: item.titulo || 'Foto',
+                            detalhes: item.descricao || 'Sem descrição',
+                            valor: '',
+                            academia: '-'
+                        });
+                    }
+                });
+            }
+
+            if (modulesToSearch.includes('fluxocaixa')) {
+                state.cashflow.forEach(c => {
+                    let match = true;
+                    if (dataIni && c.data < dataIni) match = false;
+                    if (dataFim && c.data > dataFim) match = false;
+                    if (entradaMin > 0 && (parseFloat(c.entrada) || 0) < entradaMin) match = false;
+                    if (saidaMin > 0 && (parseFloat(c.saida) || 0) < saidaMin) match = false;
+                    if (descricao && !c.descricao.toLowerCase().includes(descricao)) match = false;
+                    if (academiaId) match = false;
+                    if (match) {
+                        results.push({
+                            tipo: 'Caixa',
+                            data: c.data,
+                            descricao: c.descricao,
+                            detalhes: c.forma_pgto || '-',
+                            valor: `Entrada: ${c.entrada > 0 ? formatCurrency(c.entrada) : '-'} / Saída: ${c.saida > 0 ? formatCurrency(c.saida) : '-'}`,
+                            academia: '-'
+                        });
+                    }
+                });
+            }
+
+            if (modulesToSearch.includes('treinos')) {
+                state.workouts.forEach(w => {
+                    const aluno = state.students.find(s => s.id === w.alunoId);
+                    let match = true;
+                    if (descricao && !w.nome.toLowerCase().includes(descricao) && !w.grupo.toLowerCase().includes(descricao)) match = false;
+                    if (match) {
+                        results.push({
+                            tipo: 'Treino',
+                            data: '',
+                            descricao: w.nome,
+                            detalhes: `Grupo: ${w.grupo} | Dia: ${getWeekdayName(w.diaSemana)}`,
+                            valor: aluno ? `Aluno: ${aluno.nome}` : 'Todos os alunos',
+                            academia: '-'
+                        });
+                    }
+                });
+            }
+
+            results.sort((a, b) => (a.data || '').localeCompare(b.data || '') || a.tipo.localeCompare(b.tipo));
+
+            const tbody = document.getElementById('filtroResultsTable');
+            if (results.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6">Nenhum resultado encontrado.</td></tr>';
+                return;
+            }
+            let html = '';
+            results.forEach(r => {
+                html += `<tr>
+                    <td>${esc(r.tipo)}</td>
+                    <td>${r.data ? formatDate(r.data) : '-'}</td>
+                    <td>${esc(r.descricao)}</td>
+                    <td>${esc(r.detalhes)}</td>
+                    <td>${esc(r.valor)}</td>
+                    <td>${esc(r.academia || '-')}</td>
+                </tr>`;
+            });
+            tbody.innerHTML = html;
+        }
+
+        // ==================== USUÁRIOS ====================
+        function openUserForm(id) {
+            if (id) { if (!can('usuarios', 'editar')) { toast('Sem permissão para editar.', 'error'); return; } }
+            else { if (!can('usuarios', 'criar')) { toast('Sem permissão para criar.', 'error'); return; } }
+            editingId = id || null;
+            document.getElementById('userForm').reset();
+            document.getElementById('userActive').checked = true;
+            document.getElementById('userPasswordHint').textContent = '*';
+            document.getElementById('userRole').value = 'padrao';
+            if (id) {
+                const u = state.users.find(u => u.id === id);
+                if (!u) return;
+                document.getElementById('userUsername').value = u.username;
+                document.getElementById('userPassword').value = '';
+                document.getElementById('userPasswordHint').textContent = '(deixe em branco para manter)';
+                document.getElementById('userNome').value = u.nome || '';
+                document.getElementById('userRole').value = u.role || 'padrao';
+                document.getElementById('userActive').checked = u.active !== false;
+                renderPermissionMatrix(u);
+            } else {
+                renderPermissionMatrix(null);
+            }
+            openModal('userModal');
+        }
+        function saveUser(e) {
+            e.preventDefault();
+            if (editingId && !can('usuarios', 'editar')) return;
+            if (!editingId && !can('usuarios', 'criar')) return;
+            const username = val('userUsername').toUpperCase();
+            const password = val('userPassword');
+            const nome = val('userNome');
+            const role = val('userRole');
+            const active = document.getElementById('userActive').checked;
+            if (!username) { toast('Informe o usuário.', 'error'); return; }
+            if (role === 'aluno' && !nome) { toast('Para usuários do tipo Aluno, informe o nome completo.', 'error'); return; }
+
+            if (editingId) {
+                const existing = state.users.find(u => u.id === editingId);
+                if (!existing) return;
+                if (state.users.some(u => u.username.toUpperCase() === username && u.id !== editingId)) {
+                    toast('Já existe um usuário com esse nome.', 'error');
+                    return;
+                }
+                existing.username = username;
+                existing.nome = nome;
+                existing.role = role;
+                existing.active = active;
+                if (password) existing.password = password;
+                if (role === 'admin') { existing.permissions = {}; }
+                else if (role === 'aluno') { existing.permissions = {}; }
+                else { existing.permissions = collectPermissions(); }
+                if (currentUser && currentUser.id === editingId) { currentUser = existing; }
+            } else {
+                if (!password) { toast('A senha é obrigatória para novo usuário.', 'error'); return; }
+                if (state.users.some(u => u.username.toUpperCase() === username)) {
+                    toast('Já existe um usuário com esse nome.', 'error');
+                    return;
+                }
+                const newUser = { id: genId(), username, password, nome, role, active, permissions: role === 'admin' || role === 'aluno' ? {} : collectPermissions() };
+                state.users.push(newUser);
+            }
+            saveState(); closeModal('userModal'); renderUsers(); renderNav();
+            if (currentUser) {
+                document.getElementById('loggedUserName').textContent = currentUser.nome || currentUser.username;
+                document.getElementById('loggedUserRole').textContent = currentUser.role === 'admin' ? 'Administrador' : currentUser.role === 'aluno' ? 'Aluno' : 'Usuário Padrão';
+            }
+            toast('Usuário salvo com sucesso!');
+        }
+        function deleteUser(id) {
+            if (!can('usuarios', 'excluir')) { toast('Sem permissão para excluir.', 'error'); return; }
+            if (id === currentUser.id) { toast('Você não pode excluir seu próprio usuário.', 'error'); return; }
+            if (!confirmAdminDeletion()) return;
+            state.users = state.users.filter(u => u.id !== id);
+            saveState(); renderUsers(); toast('Usuário excluído.', 'warning');
+        }
+        function renderUsers() {
+            const tbody = document.getElementById('usersTableBody');
+            let html = '';
+            state.users.forEach(u => {
+                let perfilBadge = '';
+                if (u.role === 'admin') perfilBadge = '<span class="badge badge-admin">Admin</span>';
+                else if (u.role === 'aluno') perfilBadge = '<span class="badge badge-aluno">Aluno</span>';
+                else perfilBadge = '<span class="badge badge-padrao">Padrão</span>';
+                const ativo = u.active !== false ? '✅' : '❌';
+                html += `<tr><td>${esc(u.username)}</td><td>${esc(u.nome || '-')}</td><td>${perfilBadge}</td><td>${ativo}</td><td>
+                    <button class="btn btn-sm btn-outline" onclick="openUserForm('${u.id}')" ${can('usuarios', 'editar') ? '' : 'disabled'}>✏️</button>
+                    <button class="btn btn-sm btn-danger" onclick="deleteUser('${u.id}')" ${can('usuarios', 'excluir') ? '' : 'disabled'}>🗑️</button>
+                </td></tr>`;
+            });
+            tbody.innerHTML = html || '<tr><td colspan="5">Nenhum usuário cadastrado.</td></tr>';
+        }
+
+        // ==================== MODAL HELPERS ====================
+        function openModal(id) { document.getElementById(id).classList.add('show'); }
+        function closeModal(id) { document.getElementById(id).classList.remove('show'); }
+        document.querySelectorAll('.modal').forEach(m => {
+            m.addEventListener('click', function (e) { if (e.target === this) closeModal(this.id); });
+        });
+        document.getElementById('userRole').addEventListener('change', function () {
+            const userId = editingId;
+            const u = userId ? state.users.find(u => u.id === userId) : null;
+            renderPermissionMatrix(u);
+        });
+
+        // ==================== INICIALIZAÇÃO ====================
+        loadState();
+        renderNav();
+        renderDashboard();
+
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') closeLightbox();
+        });
+    </script>
+</body>
+</html>
