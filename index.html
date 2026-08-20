@@ -1207,6 +1207,16 @@
             if (section === 'auditoria') renderAuditoria();
         }
 
+        // ==================== MODAL CONTROLS ====================
+        function openModal(id) {
+            const modal = document.getElementById(id);
+            if (modal) modal.classList.add('show');
+        }
+        function closeModal(id) {
+            const modal = document.getElementById(id);
+            if (modal) modal.classList.remove('show');
+        }
+
         // ==================== DASHBOARD ====================
         function renderDashboard() {
             const totalAlunos = state.students.length;
@@ -1295,6 +1305,7 @@
                 img.src = e.target.result;
             };
             reader.readAsDataURL(file);
+            event.target.value = ''; // Reset para permitir selecionar a mesma foto novamente
         }
 
         function handleEvolutionPhoto(event) {
@@ -1899,6 +1910,7 @@
                 img.src = e.target.result;
             };
             reader.readAsDataURL(file);
+            event.target.value = ''; // Reset para permitir selecionar a mesma foto novamente
         }
         function openAlbumForm(id) {
             if (id) { if (!can('album', 'editar')) { toast('Sem permissão para editar.', 'error'); return; } }
@@ -2464,7 +2476,6 @@
                     // i=0 corresponde a Segunda-feira, i=6 a Domingo
                     // Precisamos calcular a data real: se weekStart é segunda, basta adicionar i dias.
                     // Mas se não for segunda, a diferença é (weekStartDate.getDay() - 1). Vamos calcular offset.
-                    const offset = (i + (jsDay === 1 ? 0 : (1 - jsDay + 7) % 7)) % 7; // ajuste para alinhar com Segunda
                     const currentDate = new Date(weekStartDate);
                     currentDate.setDate(weekStartDate.getDate() + i);
                     const dateStr = formatDateInput(currentDate);
