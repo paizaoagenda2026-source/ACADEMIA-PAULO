@@ -259,6 +259,22 @@
 
         .note-helper { font-size: 12px; color: var(--text-light); font-style: italic; margin-top: 6px; }
 
+        .audit-log-table td { font-size: 13px; }
+        .audit-log-table .log-time { white-space: nowrap; }
+
+        /* Agenda grade styles */
+        .agenda-view-toggle { display: flex; gap: 8px; margin-bottom: 16px; }
+        .agenda-view-toggle .btn.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+        .grade-filter { display: flex; flex-wrap: wrap; gap: 12px; align-items: flex-end; margin-bottom: 16px; }
+        .grade-filter .form-group { margin-bottom: 0; }
+        .grade-filter .form-group label { margin-bottom: 4px; }
+        .grade-filter .form-group input, .grade-filter .form-group select { padding: 8px 12px; }
+        .availability-grid-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+        .availability-grid-table th, .availability-grid-table td { padding: 8px 10px; text-align: center; border: 1px solid var(--border); }
+        .availability-grid-table th { background: #f8fafc; font-weight: 600; }
+        .availability-grid-table td.ocupado { background: #fee2e2; color: #dc2626; font-weight: 500; }
+        .availability-grid-table td.livre { background: #d1fae5; color: #059669; font-weight: 500; }
+
         @media (max-width: 768px) {
             body.fullscreen .sidebar { transform: translateX(-100%); }
             body.fullscreen .sidebar.open { transform: translateX(0); }
@@ -272,6 +288,7 @@
             .lightbox-close { font-size: 32px; top: 10px; right: 15px; }
             .login-box { padding: 30px 20px; }
             .student-avatar { width: 50px; height: 50px; }
+            .grade-filter { flex-direction: column; align-items: stretch; }
         }
     </style>
 </head>
@@ -293,6 +310,7 @@
                 <div class="form-group">
                     <label>Senha</label>
                     <input type="password" id="loginPassword" placeholder="Digite sua senha" required autocomplete="off"
+                           oninput="this.value = this.value.toUpperCase()"
                            onkeydown="if(event.key==='Enter'){event.preventDefault(); document.getElementById('loginScreen').querySelector('form').requestSubmit();}">
                 </div>
                 <button type="submit" class="btn btn-primary login-btn">Entrar</button>
@@ -314,6 +332,7 @@
                 <div class="form-group">
                     <label>Senha</label>
                     <input type="password" id="studentLoginPassword" placeholder="Telefone sem DDD" required autocomplete="off"
+                           oninput="this.value = this.value.toUpperCase()"
                            onkeydown="if(event.key==='Enter'){event.preventDefault(); document.getElementById('loginStudentBox').querySelector('form').requestSubmit();}">
                 </div>
                 <button type="submit" class="btn btn-primary login-btn">Entrar</button>
@@ -385,17 +404,60 @@
             <!-- Agenda -->
             <section id="section-agenda" class="section">
                 <div class="card">
-                    <div class="card-header"><h3>📅 Agenda de Aulas</h3>
-                        <div>
+                    <div class="card-header">
+                        <h3>📅 Agenda de Aulas</h3>
+                        <div style="display: flex; gap: 8px; align-items: center;">
+                            <button class="btn btn-outline" id="btnDeleteSelectedSchedule" onclick="deleteSelectedSchedule()" style="display:none;">Excluir Selecionados</button>
                             <button class="btn btn-outline" id="btnAddRecurringSchedule" onclick="openRecurringScheduleForm()" style="display:none;">+ Aulas Recorrentes</button>
                             <button class="btn btn-primary" id="btnAddSchedule" onclick="openScheduleForm()">+ Nova Aula</button>
                         </div>
                     </div>
-                    <div class="table-container">
-                        <table>
-                            <thead><tr><th>Data</th><th>Hora</th><th>Aluno</th><th>Academia</th><th>Status</th><th>Ações</th></tr></thead>
-                            <tbody id="scheduleTableBody"></tbody>
-                        </table>
+                    <div class="agenda-view-toggle">
+                        <button class="btn btn-sm btn-outline active" id="btnAgendaViewList" onclick="setAgendaView('list')">Lista de Aulas</button>
+                        <button class="btn btn-sm btn-outline" id="btnAgendaViewGrade" onclick="setAgendaView('grade')">Grade de Horários</button>
+                    </div>
+                    <div id="agendaListContainer">
+                        <div class="table-container">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th style="width:40px;"><input type="checkbox" id="selectAllSchedule" onclick="toggleSelectAllSchedule()" title="Selecionar todos" style="display:none;"></th>
+                                        <th>Data</th>
+                                        <th>Dia da Semana</th>
+                                        <th>Hora</th>
+                                        <th>Aluno</th>
+                                        <th>Academia</th>
+                                        <th>Status</th>
+                                        <th>Ações</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="scheduleTableBody"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div id="agendaGradeContainer" class="hidden">
+                        <div class="grade-filter">
+                            <div class="form-group">
+                                <label>Data inicial da semana</label>
+                                <input type="date" id="gradeWeekStart" value="">
+                            </div>
+                            <div class="form-group">
+                                <label>Hora inicial</label>
+                                <input type="time" id="gradeStartTime" value="06:00">
+                            </div>
+                            <div class="form-group">
+                                <label>Hora final</label>
+                                <input type="time" id="gradeEndTime" value="22:00">
+                            </div>
+                            <div class="form-group">
+                                <label>Duração (min)</label>
+                                <input type="number" id="gradeDuration" value="60" min="15" step="15">
+                            </div>
+                            <button class="btn btn-primary" onclick="generateAvailabilityGrid()">Gerar Grade</button>
+                        </div>
+                        <div id="availabilityGridContainer">
+                            <p style="color:#64748b;">Selecione os parâmetros e clique em "Gerar Grade".</p>
+                        </div>
                     </div>
                 </div>
             </section>
@@ -408,7 +470,7 @@
                     <hr style="margin: 24px 0; border-color: #e2e8f0;">
                     <div class="table-container">
                         <table>
-                            <thead><tr><th>Nome do Treino</th><th>Grupo Muscular</th><th>Dia da Semana</th><th>Aluno Destinado</th><th>Ações</th></tr></thead>
+                            <thead><tr><th>Nome do Treino</th><th>Grupo Muscular</th><th>Dias da Semana</th><th>Horário</th><th>Academia</th><th>Aluno Destinado</th><th>Ações</th></tr></thead>
                             <tbody id="workoutsTableBody"></tbody>
                         </table>
                     </div>
@@ -505,6 +567,30 @@
                         <table>
                             <thead><tr><th>Usuário</th><th>Nome</th><th>Perfil</th><th>Ativo</th><th>Ações</th></tr></thead>
                             <tbody id="usersTableBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Auditoria -->
+            <section id="section-auditoria" class="section">
+                <div class="card">
+                    <div class="card-header">
+                        <h3>🕵️ Auditoria de Usuários</h3>
+                        <button class="btn btn-danger" id="btnClearAuditLogs" onclick="clearAuditLogs()" style="display:none;">Limpar Logs</button>
+                    </div>
+                    <div class="table-container">
+                        <table class="audit-log-table">
+                            <thead>
+                                <tr>
+                                    <th>Data/Hora</th>
+                                    <th>Usuário</th>
+                                    <th>Ação</th>
+                                    <th>Módulo</th>
+                                    <th>Detalhes</th>
+                                </tr>
+                            </thead>
+                            <tbody id="auditLogsTableBody"></tbody>
                         </table>
                     </div>
                 </div>
@@ -630,7 +716,7 @@
             <form id="userForm" onsubmit="saveUser(event)">
                 <div class="modal-body">
                     <div class="form-group"><label>Usuário *</label><input type="text" id="userUsername" required placeholder="Nome de usuário" autocomplete="off" oninput="this.value = this.value.toUpperCase()" onkeydown="if(event.key==='Enter'){event.preventDefault(); document.getElementById('userPassword').focus();}"></div>
-                    <div class="form-group"><label>Senha <span id="userPasswordHint" style="font-weight:400;color:#64748b;">*</span></label><input type="text" id="userPassword" placeholder="Digite a senha" autocomplete="new-password" onkeydown="if(event.key==='Enter'){event.preventDefault(); document.getElementById('userNome').focus();}"></div>
+                    <div class="form-group"><label>Senha <span id="userPasswordHint" style="font-weight:400;color:#64748b;">*</span></label><input type="text" id="userPassword" placeholder="Digite a senha" autocomplete="new-password" oninput="this.value = this.value.toUpperCase()" onkeydown="if(event.key==='Enter'){event.preventDefault(); document.getElementById('userNome').focus();}"></div>
                     <div class="form-group"><label>Nome completo</label><input type="text" id="userNome" placeholder="Nome do usuário" onkeydown="if(event.key==='Enter'){event.preventDefault(); document.getElementById('userRole').focus();}"></div>
                     <div class="form-group"><label>Perfil</label><select id="userRole" onkeydown="if(event.key==='Enter'){event.preventDefault(); document.getElementById('userActive').focus();}"><option value="padrao">Padrão</option><option value="admin">Administrador</option><option value="aluno">Aluno</option></select></div>
                     <div class="form-group"><label><input type="checkbox" id="userActive" checked onkeydown="if(event.key==='Enter'){event.preventDefault(); document.getElementById('userModal').querySelector('button[type=submit]').focus();}"> Usuário ativo</label></div>
@@ -666,16 +752,21 @@
             <form id="workoutForm" onsubmit="saveWorkout(event)">
                 <div class="modal-body">
                     <div class="form-group"><label>Nome do Treino *</label><input type="text" id="workoutNome" required placeholder="Ex: Treino A - Peito e Tríceps" onkeydown="if(event.key==='Enter'){event.preventDefault(); document.getElementById('workoutGrupo').focus();}"></div>
-                    <div class="form-group"><label>Grupo Muscular *</label><input type="text" id="workoutGrupo" required placeholder="Ex: Peito, Tríceps, Ombro..." onkeydown="if(event.key==='Enter'){event.preventDefault(); document.getElementById('workoutDia').focus();}"></div>
-                    <div class="form-group"><label>Dia da Semana *</label><select id="workoutDia" required onkeydown="if(event.key==='Enter'){event.preventDefault(); document.getElementById('workoutAluno').focus();}">
-                        <option value="1">Segunda-feira</option>
-                        <option value="2">Terça-feira</option>
-                        <option value="3">Quarta-feira</option>
-                        <option value="4">Quinta-feira</option>
-                        <option value="5">Sexta-feira</option>
-                        <option value="6">Sábado</option>
-                        <option value="0">Domingo</option>
-                    </select></div>
+                    <div class="form-group"><label>Grupo Muscular *</label><input type="text" id="workoutGrupo" required placeholder="Ex: Peito, Tríceps, Ombro..." onkeydown="if(event.key==='Enter'){event.preventDefault(); document.getElementById('workoutHorario').focus();}"></div>
+                    <div class="form-group"><label>Horário do Treino</label><input type="time" id="workoutHorario" onkeydown="if(event.key==='Enter'){event.preventDefault(); document.getElementById('workoutAcademia').focus();}"></div>
+                    <div class="form-group"><label>Academia</label><select id="workoutAcademia" onkeydown="if(event.key==='Enter'){event.preventDefault(); document.getElementById('workoutDiasContainer').focus();}"></select></div>
+                    <div class="form-group">
+                        <label>Dias da Semana *</label>
+                        <div class="perm-actions" id="workoutDiasContainer" style="flex-wrap: wrap;">
+                            <label class="perm-check"><input type="checkbox" value="1"> Seg</label>
+                            <label class="perm-check"><input type="checkbox" value="2"> Ter</label>
+                            <label class="perm-check"><input type="checkbox" value="3"> Qua</label>
+                            <label class="perm-check"><input type="checkbox" value="4"> Qui</label>
+                            <label class="perm-check"><input type="checkbox" value="5"> Sex</label>
+                            <label class="perm-check"><input type="checkbox" value="6"> Sáb</label>
+                            <label class="perm-check"><input type="checkbox" value="0"> Dom</label>
+                        </div>
+                    </div>
                     <div class="form-group"><label>Aluno Destinado (opcional)</label><select id="workoutAluno" onkeydown="if(event.key==='Enter'){event.preventDefault(); document.getElementById('workoutExercicios').focus();}"></select></div>
                     <div class="form-group"><label>Exercícios / Descrição</label><textarea id="workoutExercicios" rows="4" placeholder="Lista de exercícios, séries, repetições..." onkeydown="if(event.key==='Enter' && !event.shiftKey){event.preventDefault(); document.getElementById('workoutModal').querySelector('button[type=submit]').focus();}"></textarea></div>
                 </div>
@@ -704,7 +795,8 @@
             { key: 'album', label: 'Álbum', icon: '🖼️', actions: ['ver', 'criar', 'editar', 'excluir'] },
             { key: 'fluxocaixa', label: 'Fluxo de Caixa', icon: '💰', actions: ['ver', 'criar', 'editar', 'excluir'] },
             { key: 'filtro', label: 'Filtro', icon: '🔍', actions: ['ver'] },
-            { key: 'usuarios', label: 'Usuários', icon: '🔐', actions: ['ver', 'criar', 'editar', 'excluir'] }
+            { key: 'usuarios', label: 'Usuários', icon: '🔐', actions: ['ver', 'criar', 'editar', 'excluir'] },
+            { key: 'auditoria', label: 'Auditoria', icon: '🕵️', actions: ['ver', 'excluir'] }
         ];
 
         const ACTION_LABELS = { ver: 'Ver', criar: 'Criar', editar: 'Editar', excluir: 'Excluir' };
@@ -716,15 +808,16 @@
             schedule: [],
             workouts: [],
             album: [],
-            cashflow: []
+            cashflow: [],
+            auditLogs: []
         };
         let currentUser = null;
-        let currentStudent = null; // aluno logado na área do aluno
+        let currentStudent = null;
         let editingId = null;
         let studentFotoData = '';
         let albumFotoData = '';
         let currentSection = 'dashboard';
-        let studentEvolucaoFotos = []; // array temporário para fotos de evolução no modal
+        let studentEvolucaoFotos = [];
 
         // ==================== UTILITÁRIOS ====================
         function genId() { return Date.now().toString(36) + Math.random().toString(36).substr(2, 5); }
@@ -732,8 +825,15 @@
         function val(id) { return document.getElementById(id).value.trim(); }
         function formatCurrency(v) { return Number(v || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }); }
         function formatDate(dateStr) { if (!dateStr) return ''; const [y, m, d] = dateStr.split('-'); return `${d}/${m}/${y}`; }
+        function formatDateTime(isoStr) {
+            if (!isoStr) return '-';
+            const d = new Date(isoStr);
+            if (isNaN(d)) return '-';
+            return d.toLocaleString('pt-BR');
+        }
         function formatDateInput(date) { const y = date.getFullYear(); const m = String(date.getMonth() + 1).padStart(2, '0'); const d = String(date.getDate()).padStart(2, '0'); return `${y}-${m}-${d}`; }
         function getWeekdayName(day) { const names = ['Domingo', 'Segunda-feira', 'Terça-feira', 'Quarta-feira', 'Quinta-feira', 'Sexta-feira', 'Sábado']; return names[day]; }
+        function getWeekdayFromDate(dateStr) { const d = new Date(dateStr + 'T00:00:00'); return isNaN(d) ? '-' : getWeekdayName(d.getDay()); }
         function toast(msg, type = 'success') {
             const container = document.getElementById('toastContainer');
             const el = document.createElement('div');
@@ -743,6 +843,23 @@
             setTimeout(() => el.remove(), 4000);
         }
         function saveState() { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
+        function logAction(action, details, moduleKey) {
+            if (!state.auditLogs) state.auditLogs = [];
+            const userIdentifier = currentUser ? currentUser.username : (currentStudent ? currentStudent.nome : 'Sistema');
+            state.auditLogs.push({
+                id: genId(),
+                timestamp: new Date().toISOString(),
+                user: userIdentifier,
+                action: action,
+                module: moduleKey,
+                details: details || ''
+            });
+            // Limitar a 500 registros
+            if (state.auditLogs.length > 500) {
+                state.auditLogs = state.auditLogs.slice(-500);
+            }
+            saveState();
+        }
         function loadState() {
             const raw = localStorage.getItem(STORAGE_KEY);
             if (raw) {
@@ -755,9 +872,22 @@
                     if (!state.workouts || !Array.isArray(state.workouts)) state.workouts = [];
                     if (!state.album || !Array.isArray(state.album)) state.album = [];
                     if (!state.cashflow || !Array.isArray(state.cashflow)) state.cashflow = [];
-                    // Garantir que alunos tenham evolucaoFotos
+                    if (!state.auditLogs || !Array.isArray(state.auditLogs)) state.auditLogs = [];
+                    // Normalização para MAIÚSCULAS
+                    state.users.forEach(u => {
+                        if (u.username) u.username = u.username.toUpperCase();
+                        if (u.password) u.password = u.password.toUpperCase();
+                    });
                     state.students.forEach(s => { if (!s.evolucaoFotos) s.evolucaoFotos = []; });
-                    // Migração: criar usuários para alunos existentes
+                    // Normalização de workouts: converter diaSemana antigo para diasSemana (array)
+                    state.workouts.forEach(w => {
+                        if (!w.diasSemana && w.diaSemana !== undefined) {
+                            w.diasSemana = [w.diaSemana];
+                        }
+                        if (!w.diasSemana) w.diasSemana = [];
+                        if (w.horario === undefined) w.horario = '';
+                        if (w.academiaId === undefined) w.academiaId = null;
+                    });
                     ensureStudentUsers();
                 } catch (e) { seedData(); }
             } else { seedData(); }
@@ -771,6 +901,7 @@
             state.workouts = [];
             state.album = [];
             state.cashflow = [];
+            state.auditLogs = [];
             saveState();
         }
 
@@ -784,7 +915,6 @@
             saveState();
         }
 
-        // Função para gerar username a partir do nome do aluno
         function slugify(text) {
             if (!text) return 'ALUNO';
             return text.normalize('NFD').replace(/[\u0300-\u036f]/g, '')
@@ -802,22 +932,20 @@
             return username;
         }
 
-        // Função para extrair senha do telefone (sem DDD)
         function getPhoneWithoutDDD(phone) {
             let digits = String(phone || '').replace(/\D/g, '');
             if (digits.length >= 10) {
-                digits = digits.substring(2); // remove DDD (2 primeiros dígitos)
+                digits = digits.substring(2);
             }
             return digits;
         }
 
-        // Cria usuário para aluno
         function createUserForStudent(student) {
             const username = generateStudentUsername(student.nome, state.users, student.id ? null : undefined);
-            const password = getPhoneWithoutDDD(student.telefone);
+            const password = getPhoneWithoutDDD(student.telefone).toUpperCase();
             const newUser = {
                 id: genId(),
-                username: username,
+                username: username.toUpperCase(),
                 password: password,
                 nome: student.nome,
                 role: 'aluno',
@@ -829,19 +957,16 @@
             return newUser;
         }
 
-        // Atualiza usuário do aluno (senha e nome, se necessário)
         function updateUserForStudent(student) {
             const user = state.users.find(u => u.alunoId === student.id);
             if (user) {
-                // Atualizar senha se telefone mudou
-                const newPassword = getPhoneWithoutDDD(student.telefone);
+                const newPassword = getPhoneWithoutDDD(student.telefone).toUpperCase();
                 if (user.password !== newPassword) {
                     user.password = newPassword;
                 }
                 if (user.nome !== student.nome) {
                     user.nome = student.nome;
                 }
-                // Não altera username para não confundir
             }
         }
 
@@ -925,13 +1050,13 @@
         function handleStudentLogin(e) {
             e.preventDefault();
             const username = val('studentLoginUsername').toUpperCase();
-            const password = val('studentLoginPassword');
+            const password = val('studentLoginPassword').toUpperCase();
             if (!username || !password) {
                 document.getElementById('studentLoginError').textContent = 'Preencha usuário e senha.';
                 document.getElementById('studentLoginError').classList.remove('hidden');
                 return;
             }
-            const user = state.users.find(u => u.username.toUpperCase() === username && u.password === password && u.role === 'aluno' && u.active !== false);
+            const user = state.users.find(u => u.username.toUpperCase() === username && u.password.toUpperCase() === password && u.role === 'aluno' && u.active !== false);
             if (!user) {
                 document.getElementById('studentLoginError').textContent = 'Usuário ou senha inválidos.';
                 document.getElementById('studentLoginError').classList.remove('hidden');
@@ -944,6 +1069,7 @@
                 return;
             }
             currentStudent = student;
+            logAction('Login Aluno', `Aluno ${student.nome} entrou no sistema`, 'aluno');
             document.getElementById('loginScreen').classList.add('hidden');
             document.getElementById('app').classList.remove('hidden');
             document.getElementById('sidebar').classList.add('hidden');
@@ -957,8 +1083,8 @@
         function handleLogin(e) {
             e.preventDefault();
             const username = val('loginUsername').toUpperCase();
-            const password = val('loginPassword');
-            const user = state.users.find(u => u.username.toUpperCase() === username && u.password === password && u.active !== false && u.role !== 'aluno');
+            const password = val('loginPassword').toUpperCase();
+            const user = state.users.find(u => u.username.toUpperCase() === username && u.password.toUpperCase() === password && u.active !== false && u.role !== 'aluno');
             if (!user) {
                 const err = document.getElementById('loginError');
                 err.textContent = 'Usuário ou senha inválidos ou usuário inativo.';
@@ -967,6 +1093,7 @@
             }
             currentUser = user;
             currentStudent = null;
+            logAction('Login', `Usuário ${user.username} entrou no sistema`, 'dashboard');
             document.getElementById('loginScreen').classList.add('hidden');
             document.getElementById('app').classList.remove('hidden');
             document.getElementById('sidebar').classList.remove('hidden');
@@ -982,7 +1109,7 @@
 
         function logout() {
             if (currentStudent) {
-                // logout do aluno
+                logAction('Logout Aluno', `Aluno ${currentStudent.nome} saiu`, 'aluno');
                 currentStudent = null;
                 document.getElementById('app').classList.add('hidden');
                 document.getElementById('loginScreen').classList.remove('hidden');
@@ -995,7 +1122,7 @@
                 closeLightbox();
                 exitFullscreen();
             } else {
-                // logout do personal
+                if (currentUser) logAction('Logout', `Usuário ${currentUser.username} saiu`, 'dashboard');
                 currentUser = null;
                 document.getElementById('app').classList.add('hidden');
                 document.getElementById('loginScreen').classList.remove('hidden');
@@ -1055,6 +1182,8 @@
             if (btnSchedule) btnSchedule.style.display = can('agenda', 'criar') ? '' : 'none';
             const btnRecurring = document.getElementById('btnAddRecurringSchedule');
             if (btnRecurring) btnRecurring.style.display = can('agenda', 'criar') ? '' : 'none';
+            const btnDeleteSelected = document.getElementById('btnDeleteSelectedSchedule');
+            if (btnDeleteSelected) btnDeleteSelected.style.display = can('agenda', 'excluir') ? '' : 'none';
             const btnAlbum = document.getElementById('btnAddAlbum');
             if (btnAlbum) btnAlbum.style.display = can('album', 'criar') ? '' : 'none';
             const btnCashflow = document.getElementById('btnAddCashflow');
@@ -1063,6 +1192,8 @@
             if (btnUser) btnUser.style.display = can('usuarios', 'criar') ? '' : 'none';
             const btnWorkout = document.getElementById('btnAddWorkout');
             if (btnWorkout) btnWorkout.style.display = can('treinos', 'criar') ? '' : 'none';
+            const btnClearAudit = document.getElementById('btnClearAuditLogs');
+            if (btnClearAudit) btnClearAudit.style.display = can('auditoria', 'excluir') ? '' : 'none';
 
             if (section === 'dashboard') renderDashboard();
             if (section === 'alunos') renderStudents();
@@ -1073,6 +1204,7 @@
             if (section === 'fluxocaixa') renderCashflow();
             if (section === 'filtro') { fillFiltroAcademia(); }
             if (section === 'usuarios') { renderUsers(); renderPermissionMatrix(null); }
+            if (section === 'auditoria') renderAuditoria();
         }
 
         // ==================== DASHBOARD ====================
@@ -1260,8 +1392,11 @@
 
             if (editingId) {
                 const idx = state.students.findIndex(s => s.id === editingId);
-                if (idx > -1) state.students[idx] = { ...state.students[idx], nome, cpf, academiaId, objetivo, telefone, email, valorAula, observacoes, foto, evolucaoFotos };
-                updateUserForStudent(state.students[idx]);
+                if (idx > -1) {
+                    state.students[idx] = { ...state.students[idx], nome, cpf, academiaId, objetivo, telefone, email, valorAula, observacoes, foto, evolucaoFotos };
+                    updateUserForStudent(state.students[idx]);
+                    logAction('Editar Aluno', `Aluno ${nome} editado`, 'alunos');
+                }
                 saveState();
                 closeModal('studentModal');
                 renderStudents();
@@ -1271,6 +1406,7 @@
                 const newStudent = { id: genId(), nome, cpf, academiaId, objetivo, telefone, email, valorAula, observacoes, foto, evolucaoFotos };
                 state.students.push(newStudent);
                 const user = createUserForStudent(newStudent);
+                logAction('Criar Aluno', `Aluno ${nome} criado. Usuário: ${user.username}`, 'alunos');
                 saveState();
                 closeModal('studentModal');
                 renderStudents();
@@ -1282,6 +1418,8 @@
         function deleteStudent(id) {
             if (!can('alunos', 'excluir')) { toast('Sem permissão para excluir.', 'error'); return; }
             if (!confirmAdminDeletion()) return;
+            const student = state.students.find(s => s.id === id);
+            if (student) logAction('Excluir Aluno', `Aluno ${student.nome} excluído`, 'alunos');
             state.students = state.students.filter(s => s.id !== id);
             state.workouts = state.workouts.filter(w => w.alunoId !== id);
             state.users = state.users.filter(u => u.alunoId !== id);
@@ -1296,7 +1434,7 @@
             }
             const senha = window.prompt("🔐 Confirmação de Segurança\nDigite a senha do Administrador para excluir este registro:");
             if (senha === null) return false;
-            if (senha !== admin.password) {
+            if (senha.toUpperCase() !== admin.password.toUpperCase()) {
                 toast('Senha do administrador incorreta!', 'error');
                 return false;
             }
@@ -1352,17 +1490,26 @@
             const responsavel = val('academyResponsavel');
             if (editingId) {
                 const idx = state.academias.findIndex(a => a.id === editingId);
-                if (idx > -1) state.academias[idx] = { ...state.academias[idx], nome, endereco, telefone, responsavel };
+                if (idx > -1) {
+                    state.academias[idx] = { ...state.academias[idx], nome, endereco, telefone, responsavel };
+                    logAction('Editar Academia', `Academia ${nome} editada`, 'academias');
+                }
             } else {
-                state.academias.push({ id: genId(), nome, endereco, telefone, responsavel });
+                const nova = { id: genId(), nome, endereco, telefone, responsavel };
+                state.academias.push(nova);
+                logAction('Criar Academia', `Academia ${nome} criada`, 'academias');
             }
             saveState(); closeModal('academyModal'); renderAcademies(); toast('Academia salva com sucesso!');
         }
         function deleteAcademy(id) {
             if (!can('academias', 'excluir')) { toast('Sem permissão para excluir.', 'error'); return; }
             if (!confirmAdminDeletion()) return;
+            const academia = state.academias.find(a => a.id === id);
+            if (academia) logAction('Excluir Academia', `Academia ${academia.nome} excluída`, 'academias');
             state.academias = state.academias.filter(a => a.id !== id);
-            saveState(); renderAcademies(); toast('Academia excluída.', 'warning');
+            // Atualizar workouts que referenciavam essa academia
+            state.workouts.forEach(w => { if (w.academiaId === id) w.academiaId = null; });
+            saveState(); renderAcademies(); renderWorkouts(); toast('Academia excluída.', 'warning');
         }
         function renderAcademies() {
             const tbody = document.getElementById('academiesTableBody');
@@ -1409,32 +1556,74 @@
             if (!data || !hora || !alunoId || !academiaId) { toast('Preencha todos os campos obrigatórios.', 'error'); return; }
             if (editingId) {
                 const idx = state.schedule.findIndex(a => a.id === editingId);
-                if (idx > -1) state.schedule[idx] = { ...state.schedule[idx], data, hora, alunoId, academiaId, status };
+                if (idx > -1) {
+                    state.schedule[idx] = { ...state.schedule[idx], data, hora, alunoId, academiaId, status };
+                    logAction('Editar Aula', `Aula ${data} ${hora} editada`, 'agenda');
+                }
             } else {
-                state.schedule.push({ id: genId(), data, hora, alunoId, academiaId, status });
+                const nova = { id: genId(), data, hora, alunoId, academiaId, status };
+                state.schedule.push(nova);
+                logAction('Criar Aula', `Aula ${data} ${hora} criada`, 'agenda');
             }
             saveState(); closeModal('scheduleModal'); renderSchedule(); toast('Aula agendada com sucesso!');
         }
         function deleteSchedule(id) {
             if (!can('agenda', 'excluir')) { toast('Sem permissão para excluir.', 'error'); return; }
             if (!confirmAdminDeletion()) return;
+            const aula = state.schedule.find(a => a.id === id);
+            if (aula) logAction('Excluir Aula', `Aula ${aula.data} ${aula.hora} excluída`, 'agenda');
             state.schedule = state.schedule.filter(a => a.id !== id);
             saveState(); renderSchedule(); toast('Agendamento excluído.', 'warning');
+        }
+        function toggleSelectAllSchedule() {
+            const selectAll = document.getElementById('selectAllSchedule');
+            const checkboxes = document.querySelectorAll('#scheduleTableBody input[type="checkbox"][data-id]');
+            checkboxes.forEach(cb => cb.checked = selectAll.checked);
+        }
+        function deleteSelectedSchedule() {
+            if (!can('agenda', 'excluir')) { toast('Sem permissão para excluir.', 'error'); return; }
+            const checkboxes = document.querySelectorAll('#scheduleTableBody input[type="checkbox"]:checked[data-id]');
+            if (checkboxes.length === 0) { toast('Nenhuma aula selecionada.', 'warning'); return; }
+            if (!confirmAdminDeletion()) return;
+            const idsToDelete = [];
+            checkboxes.forEach(cb => idsToDelete.push(cb.getAttribute('data-id')));
+            const deletedCount = idsToDelete.length;
+            const aulas = state.schedule.filter(a => idsToDelete.includes(a.id));
+            aulas.forEach(a => logAction('Excluir Aula (seleção)', `Aula ${a.data} ${a.hora} excluída`, 'agenda'));
+            state.schedule = state.schedule.filter(a => !idsToDelete.includes(a.id));
+            saveState();
+            renderSchedule();
+            toast(`${deletedCount} aula(s) excluída(s) com sucesso!`, 'warning');
         }
         function renderSchedule() {
             const tbody = document.getElementById('scheduleTableBody');
             const sorted = [...state.schedule].sort((a, b) => (a.data + 'T' + a.hora).localeCompare(b.data + 'T' + b.hora));
             let html = '';
+            const canDelete = can('agenda', 'excluir');
+            const selectAll = document.getElementById('selectAllSchedule');
+            if (selectAll) selectAll.style.display = canDelete ? '' : 'none';
+            const btnDelete = document.getElementById('btnDeleteSelectedSchedule');
+            if (btnDelete) btnDelete.style.display = canDelete ? '' : 'none';
             sorted.forEach(a => {
                 const aluno = state.students.find(s => s.id === a.alunoId);
                 const acad = state.academias.find(g => g.id === a.academiaId);
                 const badgeClass = a.status === 'Agendada' ? 'badge-agendada' : a.status === 'Concluída' ? 'badge-concluida' : 'badge-cancelada';
-                html += `<tr><td>${formatDate(a.data)}</td><td>${esc(a.hora)}</td><td>${esc(aluno ? aluno.nome : 'Aluno removido')}</td><td>${esc(acad ? acad.nome : 'Academia removida')}</td><td><span class="badge ${badgeClass}">${esc(a.status)}</span></td><td>
-                    <button class="btn btn-sm btn-outline" onclick="openScheduleForm('${a.id}')" ${can('agenda', 'editar') ? '' : 'disabled'}>✏️</button>
-                    <button class="btn btn-sm btn-danger" onclick="deleteSchedule('${a.id}')" ${can('agenda', 'excluir') ? '' : 'disabled'}>🗑️</button>
-                </td></tr>`;
+                const weekday = getWeekdayFromDate(a.data);
+                html += `<tr>
+                    <td>${canDelete ? `<input type="checkbox" data-id="${a.id}" title="Selecionar">` : ''}</td>
+                    <td>${formatDate(a.data)}</td>
+                    <td>${esc(weekday)}</td>
+                    <td>${esc(a.hora)}</td>
+                    <td>${esc(aluno ? aluno.nome : 'Aluno removido')}</td>
+                    <td>${esc(acad ? acad.nome : 'Academia removida')}</td>
+                    <td><span class="badge ${badgeClass}">${esc(a.status)}</span></td>
+                    <td>
+                        <button class="btn btn-sm btn-outline" onclick="openScheduleForm('${a.id}')" ${can('agenda', 'editar') ? '' : 'disabled'}>✏️</button>
+                        <button class="btn btn-sm btn-danger" onclick="deleteSchedule('${a.id}')" ${can('agenda', 'excluir') ? '' : 'disabled'}>🗑️</button>
+                    </td>
+                </tr>`;
             });
-            tbody.innerHTML = html || '<tr><td colspan="6">Nenhuma aula agendada.</td></tr>';
+            tbody.innerHTML = html || `<tr><td colspan="8">Nenhuma aula agendada.</td></tr>`;
         }
 
         // ==================== AGENDA RECORRENTE ====================
@@ -1480,11 +1669,15 @@
             }
             if (newEntries.length === 0) { toast('Nenhum dia selecionado dentro do período.', 'warning'); return; }
             state.schedule.push(...newEntries);
+            logAction('Aulas Recorrentes', `Geradas ${newEntries.length} aulas recorrentes`, 'agenda');
             saveState(); closeModal('recurringScheduleModal'); renderSchedule();
             toast(`Geradas ${newEntries.length} aulas recorrentes!`);
         }
 
         // ==================== TREINOS ====================
+        function fillWorkoutAcademiaSelect(selectedId) {
+            fillAcademiaSelect('workoutAcademia', selectedId);
+        }
         function fillWorkoutAlunoSelect(selectedId) {
             const select = document.getElementById('workoutAluno');
             if (!select) return;
@@ -1499,18 +1692,29 @@
             else { if (!can('treinos', 'criar')) { toast('Sem permissão para criar.', 'error'); return; } }
             editingId = id || null;
             document.getElementById('workoutForm').reset();
+            // Limpar checkboxes de dias
+            document.querySelectorAll('#workoutDiasContainer input[type="checkbox"]').forEach(cb => cb.checked = false);
             fillWorkoutAlunoSelect(null);
+            fillWorkoutAcademiaSelect(null);
             if (id) {
                 const w = state.workouts.find(w => w.id === id);
                 if (!w) return;
                 document.getElementById('workoutNome').value = w.nome;
                 document.getElementById('workoutGrupo').value = w.grupo;
-                document.getElementById('workoutDia').value = w.diaSemana;
+                document.getElementById('workoutHorario').value = w.horario || '';
+                document.getElementById('workoutAcademia').value = w.academiaId || '';
+                // Marcar dias
+                const dias = w.diasSemana || (w.diaSemana !== undefined ? [w.diaSemana] : []);
+                document.querySelectorAll('#workoutDiasContainer input[type="checkbox"]').forEach(cb => {
+                    cb.checked = dias.includes(parseInt(cb.value));
+                });
                 document.getElementById('workoutAluno').value = w.alunoId || '';
                 document.getElementById('workoutExercicios').value = w.exercicios || '';
                 fillWorkoutAlunoSelect(w.alunoId || '');
+                fillWorkoutAcademiaSelect(w.academiaId || '');
             } else {
                 fillWorkoutAlunoSelect('');
+                fillWorkoutAcademiaSelect('');
             }
             openModal('workoutModal');
         }
@@ -1520,21 +1724,32 @@
             if (!editingId && !can('treinos', 'criar')) return;
             const nome = val('workoutNome');
             const grupo = val('workoutGrupo');
-            const diaSemana = parseInt(val('workoutDia'));
+            const horario = val('workoutHorario');
+            const academiaId = val('workoutAcademia') || null;
             const alunoId = val('workoutAluno') || null;
             const exercicios = val('workoutExercicios');
+            const diasSemana = [];
+            document.querySelectorAll('#workoutDiasContainer input[type="checkbox"]:checked').forEach(cb => diasSemana.push(parseInt(cb.value)));
             if (!nome || !grupo) { toast('Informe nome e grupo muscular.', 'error'); return; }
+            if (diasSemana.length === 0) { toast('Selecione pelo menos um dia da semana.', 'error'); return; }
             if (editingId) {
                 const idx = state.workouts.findIndex(w => w.id === editingId);
-                if (idx > -1) state.workouts[idx] = { ...state.workouts[idx], nome, grupo, diaSemana, alunoId, exercicios };
+                if (idx > -1) {
+                    state.workouts[idx] = { ...state.workouts[idx], nome, grupo, horario, academiaId, diasSemana, alunoId, exercicios };
+                    logAction('Editar Treino', `Treino ${nome} editado`, 'treinos');
+                }
             } else {
-                state.workouts.push({ id: genId(), nome, grupo, diaSemana, alunoId, exercicios });
+                const novo = { id: genId(), nome, grupo, horario, academiaId, diasSemana, alunoId, exercicios };
+                state.workouts.push(novo);
+                logAction('Criar Treino', `Treino ${nome} criado`, 'treinos');
             }
             saveState(); closeModal('workoutModal'); renderWorkouts(); toast('Treino salvo com sucesso!');
         }
         function deleteWorkout(id) {
             if (!can('treinos', 'excluir')) { toast('Sem permissão para excluir.', 'error'); return; }
             if (!confirmAdminDeletion()) return;
+            const treino = state.workouts.find(w => w.id === id);
+            if (treino) logAction('Excluir Treino', `Treino ${treino.nome} excluído`, 'treinos');
             state.workouts = state.workouts.filter(w => w.id !== id);
             saveState(); renderWorkouts(); toast('Treino excluído.', 'warning');
         }
@@ -1544,10 +1759,16 @@
             state.workouts.forEach(w => {
                 const aluno = state.students.find(s => s.id === w.alunoId);
                 const alunoNome = aluno ? aluno.nome : 'Todos';
+                const academia = state.academias.find(a => a.id === w.academiaId);
+                const academiaNome = academia ? academia.nome : '-';
+                const dias = w.diasSemana || (w.diaSemana !== undefined ? [w.diaSemana] : []);
+                const diasStr = dias.map(d => getWeekdayName(d)).join(', ');
                 html += `<tr>
                     <td>${esc(w.nome)}</td>
                     <td>${esc(w.grupo)}</td>
-                    <td>${esc(getWeekdayName(w.diaSemana))}</td>
+                    <td>${esc(diasStr)}</td>
+                    <td>${esc(w.horario || '-')}</td>
+                    <td>${esc(academiaNome)}</td>
                     <td>${esc(alunoNome)}</td>
                     <td>
                         <button class="btn btn-sm btn-outline" onclick="openWorkoutForm('${w.id}')" ${can('treinos', 'editar') ? '' : 'disabled'}>✏️</button>
@@ -1555,12 +1776,15 @@
                     </td>
                 </tr>`;
             });
-            tbody.innerHTML = html || '<tr><td colspan="5">Nenhum treino cadastrado.</td></tr>';
+            tbody.innerHTML = html || '<tr><td colspan="7">Nenhum treino cadastrado.</td></tr>';
             const weekly = document.getElementById('weeklySchedule');
             const days = [0,1,2,3,4,5,6];
             let weekHtml = '';
             days.forEach(day => {
-                const dayWorkouts = state.workouts.filter(w => w.diaSemana === day);
+                const dayWorkouts = state.workouts.filter(w => {
+                    const dias = w.diasSemana || (w.diaSemana !== undefined ? [w.diaSemana] : []);
+                    return dias.includes(day);
+                });
                 weekHtml += `<div class="day-card"><h4>${getWeekdayName(day)}</h4>`;
                 if (dayWorkouts.length === 0) {
                     weekHtml += '<small style="color:#94a3b8;">Nenhum treino</small>';
@@ -1568,7 +1792,9 @@
                     dayWorkouts.forEach(w => {
                         const aluno = state.students.find(s => s.id === w.alunoId);
                         const alunoNome = aluno ? aluno.nome : 'Todos';
-                        weekHtml += `<div class="workout-item"><strong>${esc(w.nome)}</strong><small>${esc(w.grupo)} | Aluno: ${esc(alunoNome)}</small></div>`;
+                        const academia = state.academias.find(a => a.id === w.academiaId);
+                        const academiaNome = academia ? academia.nome : '-';
+                        weekHtml += `<div class="workout-item"><strong>${esc(w.nome)}</strong><small>${esc(w.grupo)} | ${esc(w.horario || '')} | ${esc(academiaNome)} | Aluno: ${esc(alunoNome)}</small></div>`;
                     });
                 }
                 weekHtml += '</div>';
@@ -1582,7 +1808,10 @@
             if (!currentStudent) return;
             const studentWorkouts = state.workouts.filter(w => w.alunoId === null || w.alunoId === currentStudent.id);
             const today = new Date().getDay();
-            const todayWorkouts = studentWorkouts.filter(w => w.diaSemana === today);
+            const todayWorkouts = studentWorkouts.filter(w => {
+                const dias = w.diasSemana || (w.diaSemana !== undefined ? [w.diaSemana] : []);
+                return dias.includes(today);
+            });
 
             let html = `<h2>`;
             if (currentStudent.foto) {
@@ -1592,7 +1821,10 @@
             if (todayWorkouts.length > 0) {
                 html += `<div class="highlight"><h3>🏋️ Treino de Hoje (${getWeekdayName(today)})</h3>`;
                 todayWorkouts.forEach(w => {
+                    const academia = state.academias.find(a => a.id === w.academiaId);
+                    const academiaNome = academia ? academia.nome : '-';
                     html += `<p><strong>${esc(w.nome)}</strong> - ${esc(w.grupo)}</p>`;
+                    html += `<small>🕒 ${esc(w.horario || 'Horário não definido')} | 🏟️ ${esc(academiaNome)}</small>`;
                     if (w.exercicios) html += `<pre style="white-space: pre-wrap; font-family: inherit; margin-top:8px;">${esc(w.exercicios)}</pre>`;
                 });
                 html += '</div>';
@@ -1602,13 +1834,18 @@
             html += '<h3>Treinos da Semana</h3>';
             const days = [0,1,2,3,4,5,6];
             days.forEach(day => {
-                const dayWorkouts = studentWorkouts.filter(w => w.diaSemana === day);
+                const dayWorkouts = studentWorkouts.filter(w => {
+                    const dias = w.diasSemana || (w.diaSemana !== undefined ? [w.diaSemana] : []);
+                    return dias.includes(day);
+                });
                 html += `<div class="day-card"><h4>${getWeekdayName(day)}</h4>`;
                 if (dayWorkouts.length === 0) {
                     html += '<small style="color:#94a3b8;">Nenhum treino</small>';
                 } else {
                     dayWorkouts.forEach(w => {
-                        html += `<div class="workout-item"><strong>${esc(w.nome)}</strong><small>${esc(w.grupo)}</small>`;
+                        const academia = state.academias.find(a => a.id === w.academiaId);
+                        const academiaNome = academia ? academia.nome : '-';
+                        html += `<div class="workout-item"><strong>${esc(w.nome)}</strong><small>${esc(w.grupo)} | 🕒 ${esc(w.horario || '-')} | 🏟️ ${esc(academiaNome)}</small>`;
                         if (w.exercicios) html += `<pre style="white-space: pre-wrap; font-family: inherit; font-size:12px; margin-top:6px;">${esc(w.exercicios)}</pre>`;
                         html += `</div>`;
                     });
@@ -1690,9 +1927,14 @@
             if (!foto) { toast('Selecione uma foto para o álbum.', 'error'); return; }
             if (editingId) {
                 const idx = state.album.findIndex(item => item.id === editingId);
-                if (idx > -1) state.album[idx] = { ...state.album[idx], titulo, descricao, foto };
+                if (idx > -1) {
+                    state.album[idx] = { ...state.album[idx], titulo, descricao, foto };
+                    logAction('Editar Foto Álbum', `Foto ${titulo || 'sem título'} editada`, 'album');
+                }
             } else {
-                state.album.push({ id: genId(), titulo, descricao, foto, data: new Date().toISOString() });
+                const nova = { id: genId(), titulo, descricao, foto, data: new Date().toISOString() };
+                state.album.push(nova);
+                logAction('Adicionar Foto Álbum', `Foto ${titulo || 'sem título'} adicionada`, 'album');
             }
             saveState();
             closeModal('albumModal');
@@ -1702,6 +1944,8 @@
         function deleteAlbum(id) {
             if (!can('album', 'excluir')) { toast('Sem permissão para excluir.', 'error'); return; }
             if (!confirmAdminDeletion()) return;
+            const item = state.album.find(i => i.id === id);
+            if (item) logAction('Excluir Foto Álbum', `Foto ${item.titulo || 'sem título'} excluída`, 'album');
             state.album = state.album.filter(item => item.id !== id);
             saveState(); renderAlbum(); toast('Foto excluída do álbum.', 'warning');
         }
@@ -1773,15 +2017,22 @@
             if (entrada === 0 && saida === 0) { toast('Informe ao menos uma entrada ou saída.', 'error'); return; }
             if (editingId) {
                 const idx = state.cashflow.findIndex(c => c.id === editingId);
-                if (idx > -1) state.cashflow[idx] = { ...state.cashflow[idx], data, descricao, entrada, saida, forma_pgto };
+                if (idx > -1) {
+                    state.cashflow[idx] = { ...state.cashflow[idx], data, descricao, entrada, saida, forma_pgto };
+                    logAction('Editar Lançamento', `Lançamento ${descricao} editado`, 'fluxocaixa');
+                }
             } else {
-                state.cashflow.push({ id: genId(), data, descricao, entrada, saida, forma_pgto });
+                const novo = { id: genId(), data, descricao, entrada, saida, forma_pgto };
+                state.cashflow.push(novo);
+                logAction('Criar Lançamento', `Lançamento ${descricao} criado`, 'fluxocaixa');
             }
             saveState(); closeModal('cashflowModal'); renderCashflow(); toast('Lançamento salvo com sucesso!');
         }
         function deleteCashflow(id) {
             if (!can('fluxocaixa', 'excluir')) { toast('Sem permissão para excluir.', 'error'); return; }
             if (!confirmAdminDeletion()) return;
+            const lanc = state.cashflow.find(c => c.id === id);
+            if (lanc) logAction('Excluir Lançamento', `Lançamento ${lanc.descricao} excluído`, 'fluxocaixa');
             state.cashflow = state.cashflow.filter(c => c.id !== id);
             saveState(); renderCashflow(); toast('Lançamento excluído.', 'warning');
         }
@@ -1957,6 +2208,9 @@
             if (modulesToSearch.includes('treinos')) {
                 state.workouts.forEach(w => {
                     const aluno = state.students.find(s => s.id === w.alunoId);
+                    const academia = state.academias.find(a => a.id === w.academiaId);
+                    const dias = w.diasSemana || (w.diaSemana !== undefined ? [w.diaSemana] : []);
+                    const diasStr = dias.map(d => getWeekdayName(d)).join(', ');
                     let match = true;
                     if (descricao && !w.nome.toLowerCase().includes(descricao) && !w.grupo.toLowerCase().includes(descricao)) match = false;
                     if (match) {
@@ -1964,9 +2218,9 @@
                             tipo: 'Treino',
                             data: '',
                             descricao: w.nome,
-                            detalhes: `Grupo: ${w.grupo} | Dia: ${getWeekdayName(w.diaSemana)}`,
+                            detalhes: `Grupo: ${w.grupo} | Dias: ${diasStr} | Horário: ${w.horario || '-'} | Academia: ${academia ? academia.nome : '-'}`,
                             valor: aluno ? `Aluno: ${aluno.nome}` : 'Todos os alunos',
-                            academia: '-'
+                            academia: academia ? academia.nome : '-'
                         });
                     }
                 });
@@ -2022,7 +2276,7 @@
             if (editingId && !can('usuarios', 'editar')) return;
             if (!editingId && !can('usuarios', 'criar')) return;
             const username = val('userUsername').toUpperCase();
-            const password = val('userPassword');
+            const password = val('userPassword').toUpperCase();
             const nome = val('userNome');
             const role = val('userRole');
             const active = document.getElementById('userActive').checked;
@@ -2045,6 +2299,7 @@
                 else if (role === 'aluno') { existing.permissions = {}; }
                 else { existing.permissions = collectPermissions(); }
                 if (currentUser && currentUser.id === editingId) { currentUser = existing; }
+                logAction('Editar Usuário', `Usuário ${username} editado`, 'usuarios');
             } else {
                 if (!password) { toast('A senha é obrigatória para novo usuário.', 'error'); return; }
                 if (state.users.some(u => u.username.toUpperCase() === username)) {
@@ -2053,6 +2308,7 @@
                 }
                 const newUser = { id: genId(), username, password, nome, role, active, permissions: role === 'admin' || role === 'aluno' ? {} : collectPermissions() };
                 state.users.push(newUser);
+                logAction('Criar Usuário', `Usuário ${username} criado`, 'usuarios');
             }
             saveState(); closeModal('userModal'); renderUsers(); renderNav();
             if (currentUser) {
@@ -2065,6 +2321,8 @@
             if (!can('usuarios', 'excluir')) { toast('Sem permissão para excluir.', 'error'); return; }
             if (id === currentUser.id) { toast('Você não pode excluir seu próprio usuário.', 'error'); return; }
             if (!confirmAdminDeletion()) return;
+            const user = state.users.find(u => u.id === id);
+            if (user) logAction('Excluir Usuário', `Usuário ${user.username} excluído`, 'usuarios');
             state.users = state.users.filter(u => u.id !== id);
             saveState(); renderUsers(); toast('Usuário excluído.', 'warning');
         }
@@ -2085,22 +2343,161 @@
             tbody.innerHTML = html || '<tr><td colspan="5">Nenhum usuário cadastrado.</td></tr>';
         }
 
-        // ==================== MODAL HELPERS ====================
-        function openModal(id) { document.getElementById(id).classList.add('show'); }
-        function closeModal(id) { document.getElementById(id).classList.remove('show'); }
-        document.querySelectorAll('.modal').forEach(m => {
-            m.addEventListener('click', function (e) { if (e.target === this) closeModal(this.id); });
-        });
-        document.getElementById('userRole').addEventListener('change', function () {
-            const userId = editingId;
-            const u = userId ? state.users.find(u => u.id === userId) : null;
-            renderPermissionMatrix(u);
-        });
+        // ==================== AUDITORIA ====================
+        function renderAuditoria() {
+            const tbody = document.getElementById('auditLogsTableBody');
+            if (!tbody) return;
+            const logs = [...(state.auditLogs || [])].sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+            let html = '';
+            logs.forEach(log => {
+                html += `<tr>
+                    <td class="log-time">${formatDateTime(log.timestamp)}</td>
+                    <td>${esc(log.user || 'Sistema')}</td>
+                    <td>${esc(log.action || '-')}</td>
+                    <td>${esc(log.module || '-')}</td>
+                    <td>${esc(log.details || '-')}</td>
+                </tr>`;
+            });
+            tbody.innerHTML = html || '<tr><td colspan="5">Nenhum registro de auditoria encontrado.</td></tr>';
+        }
+        function clearAuditLogs() {
+            if (!can('auditoria', 'excluir')) { toast('Sem permissão para limpar logs.', 'error'); return; }
+            if (!confirm('Tem certeza que deseja limpar todos os registros de auditoria?')) return;
+            const userIdentifier = currentUser ? currentUser.username : 'Sistema';
+            // Mantém apenas o registro da limpeza
+            state.auditLogs = [{
+                id: genId(),
+                timestamp: new Date().toISOString(),
+                user: userIdentifier,
+                action: 'Limpar Logs',
+                module: 'auditoria',
+                details: 'Todos os registros anteriores foram removidos'
+            }];
+            saveState();
+            renderAuditoria();
+            toast('Logs de auditoria limpos.', 'warning');
+        }
+
+        // ==================== AGENDA GRADE ====================
+        function setAgendaView(view) {
+            const listContainer = document.getElementById('agendaListContainer');
+            const gradeContainer = document.getElementById('agendaGradeContainer');
+            const btnList = document.getElementById('btnAgendaViewList');
+            const btnGrade = document.getElementById('btnAgendaViewGrade');
+            if (view === 'list') {
+                listContainer.classList.remove('hidden');
+                gradeContainer.classList.add('hidden');
+                btnList.classList.add('active');
+                btnGrade.classList.remove('active');
+            } else {
+                listContainer.classList.add('hidden');
+                gradeContainer.classList.remove('hidden');
+                btnList.classList.remove('active');
+                btnGrade.classList.add('active');
+                // Preencher data inicial com segunda-feira da semana atual
+                const today = new Date();
+                const dayOfWeek = today.getDay(); // 0=Dom, 1=Seg, ...
+                const diff = (dayOfWeek === 0 ? -6 : 1 - dayOfWeek); // ajustar para segunda
+                const monday = new Date(today);
+                monday.setDate(today.getDate() + diff);
+                document.getElementById('gradeWeekStart').value = formatDateInput(monday);
+            }
+        }
+
+        function generateAvailabilityGrid() {
+            const weekStart = val('gradeWeekStart');
+            const startTime = val('gradeStartTime');
+            const endTime = val('gradeEndTime');
+            const duration = parseInt(val('gradeDuration'));
+            if (!weekStart || !startTime || !endTime || !duration || duration <= 0) {
+                toast('Preencha todos os campos corretamente.', 'error');
+                return;
+            }
+            // Converte hora para minutos
+            function timeToMinutes(timeStr) {
+                const [h, m] = timeStr.split(':').map(Number);
+                return h * 60 + m;
+            }
+            const startMin = timeToMinutes(startTime);
+            const endMin = timeToMinutes(endTime);
+            if (startMin >= endMin) {
+                toast('Hora inicial deve ser menor que a final.', 'error');
+                return;
+            }
+            if ((endMin - startMin) % duration !== 0) {
+                toast('A diferença de tempo deve ser múltipla da duração.', 'warning');
+                // ajustar endTime para múltiplo de duração
+                const totalSlots = Math.ceil((endMin - startMin) / duration);
+                endMin = startMin + totalSlots * duration;
+                // atualizar campo endTime
+                const endH = Math.floor(endMin / 60);
+                const endM = endMin % 60;
+                document.getElementById('gradeEndTime').value = `${String(endH).padStart(2,'0')}:${String(endM).padStart(2,'0')}`;
+            }
+
+            const days = ['Segunda-feira', 'Terça-feira', 'Quarta-feira', 'Quinta-feira', 'Sexta-feira', 'Sábado', 'Domingo'];
+            const weekStartDate = new Date(weekStart + 'T00:00:00');
+            // Calcula a data de cada dia da semana (Seg=0, Ter=1, ..., Dom=6) baseado em weekStart (que deve ser segunda)
+            // Se weekStart não for segunda, ajustar? Vamos assumir que o usuário selecionou a segunda. Mas podemos verificar.
+            const jsDay = weekStartDate.getDay(); // 0=Dom, 1=Seg, ...
+            // Se não for segunda (1), avisar e usar o dia selecionado como início da semana (segunda a domingo)
+            if (jsDay !== 1) {
+                toast('A data inicial deve ser uma segunda-feira. Usando a data fornecida como início da semana.', 'warning');
+            }
+            // Gerar grade: linhas são horários, colunas são dias
+            let html = '<table class="availability-grid-table">';
+            html += '<thead><tr><th>Horário</th>';
+            days.forEach(day => {
+                html += `<th>${day}</th>`;
+            });
+            html += '</tr></thead><tbody>';
+
+            let slotStart = startMin;
+            while (slotStart < endMin) {
+                const slotEnd = slotStart + duration;
+                const slotStartStr = `${String(Math.floor(slotStart/60)).padStart(2,'0')}:${String(slotStart%60).padStart(2,'0')}`;
+                const slotEndStr = `${String(Math.floor(slotEnd/60)).padStart(2,'0')}:${String(slotEnd%60).padStart(2,'0')}`;
+                html += `<tr><td>${slotStartStr} - ${slotEndStr}</td>`;
+
+                // Para cada dia da semana, calcular data correspondente
+                for (let i = 0; i < 7; i++) {
+                    // i=0 corresponde a Segunda-feira, i=6 a Domingo
+                    // Precisamos calcular a data real: se weekStart é segunda, basta adicionar i dias.
+                    // Mas se não for segunda, a diferença é (weekStartDate.getDay() - 1). Vamos calcular offset.
+                    const offset = (i + (jsDay === 1 ? 0 : (1 - jsDay + 7) % 7)) % 7; // ajuste para alinhar com Segunda
+                    const currentDate = new Date(weekStartDate);
+                    currentDate.setDate(weekStartDate.getDate() + i);
+                    const dateStr = formatDateInput(currentDate);
+
+                    // Verificar se existe alguma aula agendada nessa data que ocupa esse slot
+                    const occupiedClasses = state.schedule.filter(a => {
+                        if (a.data !== dateStr) return false;
+                        if (a.status === 'Cancelada') return false; // considerar apenas agendadas e concluídas? Vamos incluir todas menos canceladas.
+                        const classTime = timeToMinutes(a.hora);
+                        return classTime >= slotStart && classTime < slotEnd;
+                    });
+                    if (occupiedClasses.length > 0) {
+                        const details = occupiedClasses.map(a => {
+                            const aluno = state.students.find(s => s.id === a.alunoId);
+                            return `${aluno ? aluno.nome : '?'} (${a.hora})`;
+                        }).join(', ');
+                        html += `<td class="ocupado" title="${esc(details)}">Ocupado</td>`;
+                    } else {
+                        html += '<td class="livre">Livre</td>';
+                    }
+                }
+                html += '</tr>';
+                slotStart = slotEnd;
+            }
+            html += '</tbody></table>';
+            document.getElementById('availabilityGridContainer').innerHTML = html;
+        }
 
         // ==================== INICIALIZAÇÃO ====================
         loadState();
         renderNav();
         renderDashboard();
+        setAgendaView('list'); // garante que a lista é exibida por padrão
 
         document.addEventListener('keydown', function(e) {
             if (e.key === 'Escape') closeLightbox();
