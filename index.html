@@ -505,7 +505,10 @@
                 <div class="card">
                     <div class="card-header">
                         <h3>📅 Contas a Pagar e Receber (Futuras)</h3>
-                        <button class="btn btn-primary" id="btnAddConta" onclick="openContaForm()">+ Nova Conta</button>
+                        <div style="display: flex; gap: 8px; align-items: center;">
+                            <button class="btn btn-outline" id="btnGerarMensalidades" onclick="gerarMensalidades()">Gerar Mensalidades</button>
+                            <button class="btn btn-primary" id="btnAddConta" onclick="openContaForm()">+ Nova Conta</button>
+                        </div>
                     </div>
                     <div class="table-container">
                         <table>
@@ -1257,6 +1260,8 @@
             if (btnCashflow) btnCashflow.style.display = can('fluxocaixa', 'criar') ? '' : 'none';
             const btnConta = document.getElementById('btnAddConta');
             if (btnConta) btnConta.style.display = can('fluxocaixa', 'criar') ? '' : 'none';
+            const btnGerarMensalidades = document.getElementById('btnGerarMensalidades');
+            if (btnGerarMensalidades) btnGerarMensalidades.style.display = can('fluxocaixa', 'criar') ? '' : 'none';
             const btnUser = document.getElementById('btnAddUser');
             if (btnUser) btnUser.style.display = can('usuarios', 'criar') ? '' : 'none';
             const btnWorkout = document.getElementById('btnAddWorkout');
@@ -2253,6 +2258,56 @@
                 </tr>`;
             });
             tbody.innerHTML = html || '<tr><td colspan="6">Nenhuma conta futura cadastrada.</td></tr>';
+        }
+
+        // ==================== GERAR MENSALIDADES ====================
+        function gerarMensalidades() {
+            if (!can('fluxocaixa', 'criar')) { toast('Sem permissão para gerar mensalidades.', 'error'); return; }
+            const hoje = new Date();
+            const hojeStr = formatDateInput(hoje);
+            let geradas = 0;
+            let ignoradas = 0;
+
+            // Agrupa aulas futuras não canceladas por aluno e mês
+            const agrupadas = {};
+            state.schedule.forEach(a => {
+                if (a.status === 'Cancelada') return;
+                if (a.data < hojeStr) return; // somente futuras
+                const aluno = state.students.find(s => s.id === a.alunoId);
+                if (!aluno) return;
+                const chave = aluno.id + '|' + a.data.slice(0,7); // YYYY-MM
+                if (!agrupadas[chave]) agrupadas[chave] = { aluno, mes: a.data.slice(0,7), count: 0 };
+                agrupadas[chave].count++;
+            });
+
+            Object.values(agrupadas).forEach(({ aluno, mes, count }) => {
+                const valorAula = parseFloat(aluno.valorAula) || 0;
+                if (valorAula <= 0) { ignoradas++; return; }
+                const [ano, numMes] = mes.split('-').map(Number);
+                const diaCadastro = parseInt(aluno.dataCadastro ? aluno.dataCadastro.slice(8,10) : String(hoje.getDate()).padStart(2,'0'));
+                const lastDay = new Date(ano, numMes, 0).getDate();
+                const diaVenc = Math.min(diaCadastro, lastDay);
+                const vencimento = `${ano}-${String(numMes).padStart(2,'0')}-${String(diaVenc).padStart(2,'0')}`;
+                if (vencimento < hojeStr) { ignoradas++; return; } // só futuras
+                const valorTotal = count * valorAula;
+                const descricao = `Mensalidade de ${aluno.nome} - ${String(numMes).padStart(2,'0')}/${ano}`;
+                const jaExiste = state.contasFuturas.some(c => c.descricao === descricao && c.tipo === 'Receber');
+                if (jaExiste) { ignoradas++; return; }
+                state.contasFuturas.push({
+                    id: genId(),
+                    descricao,
+                    tipo: 'Receber',
+                    valor: valorTotal,
+                    vencimento,
+                    status: 'Pendente'
+                });
+                geradas++;
+            });
+
+            saveState();
+            renderContasFuturas();
+            logAction('Gerar Mensalidades', `Geradas ${geradas} mensalidades, ${ignoradas} ignoradas`, 'fluxocaixa');
+            toast(`Mensalidades geradas: ${geradas} | Ignoradas: ${ignoradas}`, geradas > 0 ? 'success' : 'warning');
         }
 
         // ==================== FILTRO ====================
