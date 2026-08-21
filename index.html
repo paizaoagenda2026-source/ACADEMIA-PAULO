@@ -385,7 +385,7 @@
                     <div class="card-header"><h3>👥 Alunos</h3><button class="btn btn-primary" id="btnAddStudent" onclick="openStudentForm()">+ Novo Aluno</button></div>
                     <div class="table-container">
                         <table>
-                            <thead><tr><th>Foto</th><th>Nome</th><th>Academia</th><th>CPF</th><th>Celular</th><th>Valor/Aula</th><th>Ações</th></tr></thead>
+                            <thead><tr><th>Foto</th><th>Nome</th><th>Academia</th><th>CPF</th><th>Celular</th><th>Data Cadastro</th><th>Valor/Aula</th><th>Ações</th></tr></thead>
                             <tbody id="studentsTableBody"></tbody>
                         </table>
                     </div>
@@ -1540,6 +1540,7 @@
                     <td>${esc(academia ? academia.nome : '-')}</td>
                     <td>${esc(s.cpf || '-')}</td>
                     <td>${esc(s.telefone || '-')}</td>
+                    <td>${formatDate(s.dataCadastro || '')}</td>
                     <td>${formatCurrency(s.valorAula)}</td>
                     <td>
                         <button class="btn btn-sm btn-outline" onclick="openStudentForm('${s.id}')" ${can('alunos', 'editar') ? '' : 'disabled'}>✏️</button>
@@ -1547,7 +1548,7 @@
                     </td>
                 </tr>`;
             });
-            tbody.innerHTML = html || '<tr><td colspan="7">Nenhum aluno cadastrado.</td></tr>';
+            tbody.innerHTML = html || '<tr><td colspan="8">Nenhum aluno cadastrado.</td></tr>';
         }
 
         // ==================== ACADEMIAS ====================
