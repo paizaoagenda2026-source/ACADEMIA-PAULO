@@ -160,6 +160,10 @@
         .badge-agendada { background: #e0f2fe; color: #0284c7; }
         .badge-concluida { background: #d1fae5; color: #059669; }
         .badge-cancelada { background: #fee2e2; color: #dc2626; }
+        .badge-pendente { background: #fef3c7; color: #d97706; }
+        .badge-pago { background: #d1fae5; color: #059669; }
+        .badge-recebido { background: #d1fae5; color: #059669; }
+        .badge-vencido { background: #fee2e2; color: #dc2626; }
         .badge-admin { background: #fef3c7; color: #d97706; }
         .badge-padrao { background: #e2e8f0; color: #475569; }
         .badge-aluno { background: #e0e7ff; color: #4f46e5; }
@@ -496,6 +500,29 @@
                         </table>
                     </div>
                 </div>
+
+                <!-- Contas a Pagar e Receber (Futuras) -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3>📅 Contas a Pagar e Receber (Futuras)</h3>
+                        <button class="btn btn-primary" id="btnAddConta" onclick="openContaForm()">+ Nova Conta</button>
+                    </div>
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Descrição</th>
+                                    <th>Tipo</th>
+                                    <th>Valor</th>
+                                    <th>Vencimento</th>
+                                    <th>Status</th>
+                                    <th>Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody id="contasFuturasTableBody"></tbody>
+                        </table>
+                    </div>
+                </div>
             </section>
 
             <!-- Filtro -->
@@ -615,7 +642,8 @@
                         <button type="button" class="btn btn-outline" onclick="document.getElementById('studentFoto').click()">📷 Adicionar Foto</button>
                     </div>
                     <div class="form-group"><label>Nome *</label><input type="text" id="studentNome" required placeholder="Nome do aluno" onkeydown="if(event.key==='Enter'){event.preventDefault(); document.getElementById('studentCpf').focus();}"></div>
-                    <div class="form-group"><label>CPF</label><input type="text" id="studentCpf" placeholder="000.000.000-00" onkeydown="if(event.key==='Enter'){event.preventDefault(); document.getElementById('studentAcademia').focus();}"></div>
+                    <div class="form-group"><label>CPF</label><input type="text" id="studentCpf" placeholder="000.000.000-00" onkeydown="if(event.key==='Enter'){event.preventDefault(); document.getElementById('studentDataCadastro').focus();}"></div>
+                    <div class="form-group"><label>Data do Cadastro</label><input type="date" id="studentDataCadastro" onkeydown="if(event.key==='Enter'){event.preventDefault(); document.getElementById('studentAcademia').focus();}"></div>
                     <div class="form-group"><label>Academia</label><select id="studentAcademia" onkeydown="if(event.key==='Enter'){event.preventDefault(); document.getElementById('studentObjetivo').focus();}"></select></div>
                     <div class="form-group"><label>Objetivo</label><input type="text" id="studentObjetivo" placeholder="Ex: Hipertrofia, Emagrecimento..." onkeydown="if(event.key==='Enter'){event.preventDefault(); document.getElementById('studentTelefone').focus();}"></div>
                     <div class="form-group"><label>Celular</label><input type="text" id="studentTelefone" placeholder="(00) 00000-0000" onkeydown="if(event.key==='Enter'){event.preventDefault(); document.getElementById('studentEmail').focus();}"></div>
@@ -706,6 +734,46 @@
                     <div class="form-group"><label>Forma de Pagamento</label><select id="cashflowFormaPgto" onkeydown="if(event.key==='Enter'){event.preventDefault(); document.getElementById('cashflowModal').querySelector('button[type=submit]').focus();}"><option value="Dinheiro">Dinheiro</option><option value="Pix">Pix</option><option value="Cartão de Crédito">Cartão de Crédito</option><option value="Cartão de Débito">Cartão de Débito</option><option value="Transferência">Transferência</option><option value="Outro">Outro</option></select></div>
                 </div>
                 <div class="modal-footer"><button type="button" class="btn btn-outline" onclick="closeModal('cashflowModal')">Cancelar</button><button type="submit" class="btn btn-success">Salvar</button></div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal para Contas a Pagar e Receber -->
+    <div class="modal" id="contaModal">
+        <div class="modal-content">
+            <div class="modal-header"><h3>Conta a Pagar/Receber</h3><button class="modal-close" onclick="closeModal('contaModal')">&times;</button></div>
+            <form id="contaForm" onsubmit="saveConta(event)">
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label>Descrição *</label>
+                        <input type="text" id="contaDescricao" required placeholder="Ex: Aluguel, Mensalidade de aluno..." onkeydown="if(event.key==='Enter'){event.preventDefault(); document.getElementById('contaTipo').focus();}">
+                    </div>
+                    <div class="form-group">
+                        <label>Tipo *</label>
+                        <select id="contaTipo" required onkeydown="if(event.key==='Enter'){event.preventDefault(); document.getElementById('contaValor').focus();}">
+                            <option value="Pagar">Pagar</option>
+                            <option value="Receber">Receber</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Valor (R$) *</label>
+                        <input type="number" id="contaValor" step="0.01" min="0" required placeholder="0.00" onkeydown="if(event.key==='Enter'){event.preventDefault(); document.getElementById('contaVencimento').focus();}">
+                    </div>
+                    <div class="form-group">
+                        <label>Data de Vencimento *</label>
+                        <input type="date" id="contaVencimento" required onkeydown="if(event.key==='Enter'){event.preventDefault(); document.getElementById('contaStatus').focus();}">
+                    </div>
+                    <div class="form-group">
+                        <label>Status</label>
+                        <select id="contaStatus" onkeydown="if(event.key==='Enter'){event.preventDefault(); document.getElementById('contaModal').querySelector('button[type=submit]').focus();}">
+                            <option value="Pendente">Pendente</option>
+                            <option value="Pago">Pago</option>
+                            <option value="Recebido">Recebido</option>
+                            <option value="Vencido">Vencido</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer"><button type="button" class="btn btn-outline" onclick="closeModal('contaModal')">Cancelar</button><button type="submit" class="btn btn-success">Salvar</button></div>
             </form>
         </div>
     </div>
@@ -809,6 +877,7 @@
             workouts: [],
             album: [],
             cashflow: [],
+            contasFuturas: [],
             auditLogs: []
         };
         let currentUser = null;
@@ -854,7 +923,6 @@
                 module: moduleKey,
                 details: details || ''
             });
-            // Limitar a 500 registros
             if (state.auditLogs.length > 500) {
                 state.auditLogs = state.auditLogs.slice(-500);
             }
@@ -872,14 +940,13 @@
                     if (!state.workouts || !Array.isArray(state.workouts)) state.workouts = [];
                     if (!state.album || !Array.isArray(state.album)) state.album = [];
                     if (!state.cashflow || !Array.isArray(state.cashflow)) state.cashflow = [];
+                    if (!state.contasFuturas || !Array.isArray(state.contasFuturas)) state.contasFuturas = [];
                     if (!state.auditLogs || !Array.isArray(state.auditLogs)) state.auditLogs = [];
-                    // Normalização para MAIÚSCULAS
                     state.users.forEach(u => {
                         if (u.username) u.username = u.username.toUpperCase();
                         if (u.password) u.password = u.password.toUpperCase();
                     });
                     state.students.forEach(s => { if (!s.evolucaoFotos) s.evolucaoFotos = []; });
-                    // Normalização de workouts: converter diaSemana antigo para diasSemana (array)
                     state.workouts.forEach(w => {
                         if (!w.diasSemana && w.diaSemana !== undefined) {
                             w.diasSemana = [w.diaSemana];
@@ -901,11 +968,11 @@
             state.workouts = [];
             state.album = [];
             state.cashflow = [];
+            state.contasFuturas = [];
             state.auditLogs = [];
             saveState();
         }
 
-        // Função para garantir que cada aluno tenha um usuário vinculado
         function ensureStudentUsers() {
             state.students.forEach(student => {
                 if (!state.users.some(u => u.alunoId === student.id)) {
@@ -1176,7 +1243,7 @@
 
             const btnAluno = document.getElementById('btnAddStudent');
             if (btnAluno) btnAluno.style.display = can('alunos', 'criar') ? '' : 'none';
-            const btnAcademia = document.getElementById('btnAddAcademia');
+            const btnAcademia = document.getElementById('btnAddAcademy');
             if (btnAcademia) btnAcademia.style.display = can('academias', 'criar') ? '' : 'none';
             const btnSchedule = document.getElementById('btnAddSchedule');
             if (btnSchedule) btnSchedule.style.display = can('agenda', 'criar') ? '' : 'none';
@@ -1188,6 +1255,8 @@
             if (btnAlbum) btnAlbum.style.display = can('album', 'criar') ? '' : 'none';
             const btnCashflow = document.getElementById('btnAddCashflow');
             if (btnCashflow) btnCashflow.style.display = can('fluxocaixa', 'criar') ? '' : 'none';
+            const btnConta = document.getElementById('btnAddConta');
+            if (btnConta) btnConta.style.display = can('fluxocaixa', 'criar') ? '' : 'none';
             const btnUser = document.getElementById('btnAddUser');
             if (btnUser) btnUser.style.display = can('usuarios', 'criar') ? '' : 'none';
             const btnWorkout = document.getElementById('btnAddWorkout');
@@ -1201,7 +1270,7 @@
             if (section === 'agenda') renderSchedule();
             if (section === 'treinos') renderWorkouts();
             if (section === 'album') renderAlbum();
-            if (section === 'fluxocaixa') renderCashflow();
+            if (section === 'fluxocaixa') { renderCashflow(); renderContasFuturas(); }
             if (section === 'filtro') { fillFiltroAcademia(); }
             if (section === 'usuarios') { renderUsers(); renderPermissionMatrix(null); }
             if (section === 'auditoria') renderAuditoria();
@@ -1305,7 +1374,7 @@
                 img.src = e.target.result;
             };
             reader.readAsDataURL(file);
-            event.target.value = ''; // Reset para permitir selecionar a mesma foto novamente
+            event.target.value = '';
         }
 
         function handleEvolutionPhoto(event) {
@@ -1367,11 +1436,13 @@
             studentEvolucaoFotos = [];
             document.getElementById('evolutionThumbs').innerHTML = '<p style="color:#64748b;">Nenhuma foto adicionada.</p>';
             fillAcademiaSelect('studentAcademia');
+            document.getElementById('studentDataCadastro').value = formatDateInput(new Date());
             if (id) {
                 const s = state.students.find(s => s.id === id);
                 if (!s) return;
                 document.getElementById('studentNome').value = s.nome;
                 document.getElementById('studentCpf').value = s.cpf || '';
+                document.getElementById('studentDataCadastro').value = s.dataCadastro || formatDateInput(new Date());
                 document.getElementById('studentAcademia').value = s.academiaId || '';
                 document.getElementById('studentObjetivo').value = s.objetivo || '';
                 document.getElementById('studentTelefone').value = s.telefone || '';
@@ -1392,6 +1463,7 @@
             const nome = val('studentNome');
             if (!nome) { toast('Informe o nome do aluno.', 'error'); return; }
             const cpf = val('studentCpf');
+            const dataCadastro = val('studentDataCadastro') || formatDateInput(new Date());
             const academiaId = val('studentAcademia');
             const objetivo = val('studentObjetivo');
             const telefone = val('studentTelefone');
@@ -1404,7 +1476,7 @@
             if (editingId) {
                 const idx = state.students.findIndex(s => s.id === editingId);
                 if (idx > -1) {
-                    state.students[idx] = { ...state.students[idx], nome, cpf, academiaId, objetivo, telefone, email, valorAula, observacoes, foto, evolucaoFotos };
+                    state.students[idx] = { ...state.students[idx], nome, cpf, dataCadastro, academiaId, objetivo, telefone, email, valorAula, observacoes, foto, evolucaoFotos };
                     updateUserForStudent(state.students[idx]);
                     logAction('Editar Aluno', `Aluno ${nome} editado`, 'alunos');
                 }
@@ -1414,7 +1486,7 @@
                 fillStudentSelect('workoutAluno');
                 toast('Aluno salvo com sucesso!');
             } else {
-                const newStudent = { id: genId(), nome, cpf, academiaId, objetivo, telefone, email, valorAula, observacoes, foto, evolucaoFotos };
+                const newStudent = { id: genId(), nome, cpf, dataCadastro, academiaId, objetivo, telefone, email, valorAula, observacoes, foto, evolucaoFotos };
                 state.students.push(newStudent);
                 const user = createUserForStudent(newStudent);
                 logAction('Criar Aluno', `Aluno ${nome} criado. Usuário: ${user.username}`, 'alunos');
@@ -1438,12 +1510,16 @@
         }
 
         function confirmAdminDeletion() {
+            return confirmAdminAction('Digite a senha do Administrador para excluir este registro:');
+        }
+
+        function confirmAdminAction(message) {
             const admin = state.users.find(u => u.role === 'admin');
             if (!admin) {
                 toast('Nenhum administrador encontrado no sistema.', 'error');
                 return false;
             }
-            const senha = window.prompt("🔐 Confirmação de Segurança\nDigite a senha do Administrador para excluir este registro:");
+            const senha = window.prompt(`🔐 Confirmação de Segurança\n${message}`);
             if (senha === null) return false;
             if (senha.toUpperCase() !== admin.password.toUpperCase()) {
                 toast('Senha do administrador incorreta!', 'error');
@@ -1518,7 +1594,6 @@
             const academia = state.academias.find(a => a.id === id);
             if (academia) logAction('Excluir Academia', `Academia ${academia.nome} excluída`, 'academias');
             state.academias = state.academias.filter(a => a.id !== id);
-            // Atualizar workouts que referenciavam essa academia
             state.workouts.forEach(w => { if (w.academiaId === id) w.academiaId = null; });
             saveState(); renderAcademies(); renderWorkouts(); toast('Academia excluída.', 'warning');
         }
@@ -1703,7 +1778,6 @@
             else { if (!can('treinos', 'criar')) { toast('Sem permissão para criar.', 'error'); return; } }
             editingId = id || null;
             document.getElementById('workoutForm').reset();
-            // Limpar checkboxes de dias
             document.querySelectorAll('#workoutDiasContainer input[type="checkbox"]').forEach(cb => cb.checked = false);
             fillWorkoutAlunoSelect(null);
             fillWorkoutAcademiaSelect(null);
@@ -1714,7 +1788,6 @@
                 document.getElementById('workoutGrupo').value = w.grupo;
                 document.getElementById('workoutHorario').value = w.horario || '';
                 document.getElementById('workoutAcademia').value = w.academiaId || '';
-                // Marcar dias
                 const dias = w.diasSemana || (w.diaSemana !== undefined ? [w.diaSemana] : []);
                 document.querySelectorAll('#workoutDiasContainer input[type="checkbox"]').forEach(cb => {
                     cb.checked = dias.includes(parseInt(cb.value));
@@ -1864,7 +1937,6 @@
                 html += '</div>';
             });
 
-            // Galeria de evolução
             html += '<h3 style="margin-top: 32px;">📸 Minhas Fotos de Evolução</h3>';
             const evolucaoFotos = currentStudent.evolucaoFotos || [];
             if (evolucaoFotos.length === 0) {
@@ -1910,7 +1982,7 @@
                 img.src = e.target.result;
             };
             reader.readAsDataURL(file);
-            event.target.value = ''; // Reset para permitir selecionar a mesma foto novamente
+            event.target.value = '';
         }
         function openAlbumForm(id) {
             if (id) { if (!can('album', 'editar')) { toast('Sem permissão para editar.', 'error'); return; } }
@@ -2059,6 +2131,127 @@
                 </td></tr>`;
             });
             tbody.innerHTML = html || '<tr><td colspan="6">Nenhum lançamento registrado.</td></tr>';
+        }
+
+        // ==================== CONTAS A PAGAR E RECEBER (FUTURAS) ====================
+        function openContaForm(id) {
+            if (id) { if (!can('fluxocaixa', 'editar')) { toast('Sem permissão para editar.', 'error'); return; } }
+            else { if (!can('fluxocaixa', 'criar')) { toast('Sem permissão para criar.', 'error'); return; } }
+            editingId = id || null;
+            document.getElementById('contaForm').reset();
+            document.getElementById('contaStatus').value = 'Pendente';
+            if (id) {
+                const c = state.contasFuturas.find(c => c.id === id);
+                if (!c) return;
+                document.getElementById('contaDescricao').value = c.descricao;
+                document.getElementById('contaTipo').value = c.tipo;
+                document.getElementById('contaValor').value = c.valor;
+                document.getElementById('contaVencimento').value = c.vencimento;
+                document.getElementById('contaStatus').value = c.status;
+            }
+            openModal('contaModal');
+        }
+        function saveConta(e) {
+            e.preventDefault();
+            if (editingId && !can('fluxocaixa', 'editar')) return;
+            if (!editingId && !can('fluxocaixa', 'criar')) return;
+            const descricao = val('contaDescricao');
+            const tipo = val('contaTipo');
+            const valor = parseFloat(val('contaValor')) || 0;
+            const vencimento = val('contaVencimento');
+            const status = val('contaStatus');
+            if (!descricao || !tipo || valor <= 0 || !vencimento) { toast('Preencha todos os campos obrigatórios.', 'error'); return; }
+            if (editingId) {
+                const idx = state.contasFuturas.findIndex(c => c.id === editingId);
+                if (idx > -1) {
+                    state.contasFuturas[idx] = { ...state.contasFuturas[idx], descricao, tipo, valor, vencimento, status };
+                    logAction('Editar Conta', `Conta ${descricao} editada`, 'fluxocaixa');
+                }
+            } else {
+                const nova = { id: genId(), descricao, tipo, valor, vencimento, status };
+                state.contasFuturas.push(nova);
+                logAction('Criar Conta', `Conta ${descricao} criada`, 'fluxocaixa');
+            }
+            saveState(); closeModal('contaModal'); renderContasFuturas(); toast('Conta salva com sucesso!');
+        }
+        function deleteConta(id) {
+            if (!can('fluxocaixa', 'excluir')) { toast('Sem permissão para excluir.', 'error'); return; }
+            if (!confirmAdminDeletion()) return;
+            const conta = state.contasFuturas.find(c => c.id === id);
+            if (conta) logAction('Excluir Conta', `Conta ${conta.descricao} excluída`, 'fluxocaixa');
+            state.contasFuturas = state.contasFuturas.filter(c => c.id !== id);
+            saveState(); renderContasFuturas(); toast('Conta excluída.', 'warning');
+        }
+        function marcarContaComoPaga(id) {
+            if (!can('fluxocaixa', 'editar') || !can('fluxocaixa', 'criar')) {
+                toast('Sem permissão para realizar esta operação.', 'error');
+                return;
+            }
+            const conta = state.contasFuturas.find(c => c.id === id);
+            if (!conta) {
+                toast('Conta não encontrada.', 'error');
+                return;
+            }
+            if (conta.status === 'Pago') {
+                toast('Esta conta já está marcada como PAGA.', 'warning');
+                return;
+            }
+            if (!confirmAdminAction(`Digite a senha do Administrador para marcar a conta "${conta.descricao}" como PAGA e lançar no fluxo de caixa:`)) return;
+            const dataHoje = formatDateInput(new Date());
+            const valor = parseFloat(conta.valor) || 0;
+            const descricao = conta.descricao;
+            const formaPgto = 'Dinheiro';
+            if (conta.tipo === 'Pagar') {
+                state.cashflow.push({
+                    id: genId(),
+                    data: dataHoje,
+                    descricao: `Pagamento: ${descricao}`,
+                    entrada: 0,
+                    saida: valor,
+                    forma_pgto: formaPgto
+                });
+            } else if (conta.tipo === 'Receber') {
+                state.cashflow.push({
+                    id: genId(),
+                    data: dataHoje,
+                    descricao: `Recebimento: ${descricao}`,
+                    entrada: valor,
+                    saida: 0,
+                    forma_pgto: formaPgto
+                });
+            }
+            conta.status = 'Pago';
+            logAction('Conta Paga', `Conta ${descricao} marcada como paga e lançada no fluxo de caixa`, 'fluxocaixa');
+            saveState();
+            renderContasFuturas();
+            renderCashflow();
+            toast(`Conta "${descricao}" marcada como PAGA e lançada no fluxo de caixa!`);
+        }
+        function renderContasFuturas() {
+            const tbody = document.getElementById('contasFuturasTableBody');
+            const sorted = [...state.contasFuturas].sort((a, b) => a.vencimento.localeCompare(b.vencimento) || a.descricao.localeCompare(b.descricao));
+            let html = '';
+            sorted.forEach(c => {
+                let badgeClass = 'badge-pendente';
+                if (c.status === 'Pago') badgeClass = 'badge-pago';
+                else if (c.status === 'Recebido') badgeClass = 'badge-recebido';
+                else if (c.status === 'Vencido') badgeClass = 'badge-vencido';
+                const isPago = c.status === 'Pago';
+                const canMarkPago = can('fluxocaixa', 'editar') && can('fluxocaixa', 'criar') && !isPago;
+                html += `<tr>
+                    <td>${esc(c.descricao)}</td>
+                    <td>${esc(c.tipo)}</td>
+                    <td>${formatCurrency(c.valor)}</td>
+                    <td>${formatDate(c.vencimento)}</td>
+                    <td><span class="badge ${badgeClass}">${esc(c.status)}</span></td>
+                    <td>
+                        <button class="btn btn-sm btn-outline" onclick="openContaForm('${c.id}')" ${can('fluxocaixa', 'editar') ? '' : 'disabled'}>✏️</button>
+                        <button class="btn btn-sm btn-success" onclick="marcarContaComoPaga('${c.id}')" ${canMarkPago ? '' : 'disabled'}>PAGO</button>
+                        <button class="btn btn-sm btn-danger" onclick="deleteConta('${c.id}')" ${can('fluxocaixa', 'excluir') ? '' : 'disabled'}>🗑️</button>
+                    </td>
+                </tr>`;
+            });
+            tbody.innerHTML = html || '<tr><td colspan="6">Nenhuma conta futura cadastrada.</td></tr>';
         }
 
         // ==================== FILTRO ====================
@@ -2376,7 +2569,6 @@
             if (!can('auditoria', 'excluir')) { toast('Sem permissão para limpar logs.', 'error'); return; }
             if (!confirm('Tem certeza que deseja limpar todos os registros de auditoria?')) return;
             const userIdentifier = currentUser ? currentUser.username : 'Sistema';
-            // Mantém apenas o registro da limpeza
             state.auditLogs = [{
                 id: genId(),
                 timestamp: new Date().toISOString(),
@@ -2406,10 +2598,9 @@
                 gradeContainer.classList.remove('hidden');
                 btnList.classList.remove('active');
                 btnGrade.classList.add('active');
-                // Preencher data inicial com segunda-feira da semana atual
                 const today = new Date();
-                const dayOfWeek = today.getDay(); // 0=Dom, 1=Seg, ...
-                const diff = (dayOfWeek === 0 ? -6 : 1 - dayOfWeek); // ajustar para segunda
+                const dayOfWeek = today.getDay();
+                const diff = (dayOfWeek === 0 ? -6 : 1 - dayOfWeek);
                 const monday = new Date(today);
                 monday.setDate(today.getDate() + diff);
                 document.getElementById('gradeWeekStart').value = formatDateInput(monday);
@@ -2425,7 +2616,6 @@
                 toast('Preencha todos os campos corretamente.', 'error');
                 return;
             }
-            // Converte hora para minutos
             function timeToMinutes(timeStr) {
                 const [h, m] = timeStr.split(':').map(Number);
                 return h * 60 + m;
@@ -2438,10 +2628,8 @@
             }
             if ((endMin - startMin) % duration !== 0) {
                 toast('A diferença de tempo deve ser múltipla da duração.', 'warning');
-                // ajustar endTime para múltiplo de duração
                 const totalSlots = Math.ceil((endMin - startMin) / duration);
                 endMin = startMin + totalSlots * duration;
-                // atualizar campo endTime
                 const endH = Math.floor(endMin / 60);
                 const endM = endMin % 60;
                 document.getElementById('gradeEndTime').value = `${String(endH).padStart(2,'0')}:${String(endM).padStart(2,'0')}`;
@@ -2449,14 +2637,11 @@
 
             const days = ['Segunda-feira', 'Terça-feira', 'Quarta-feira', 'Quinta-feira', 'Sexta-feira', 'Sábado', 'Domingo'];
             const weekStartDate = new Date(weekStart + 'T00:00:00');
-            // Calcula a data de cada dia da semana (Seg=0, Ter=1, ..., Dom=6) baseado em weekStart (que deve ser segunda)
-            // Se weekStart não for segunda, ajustar? Vamos assumir que o usuário selecionou a segunda. Mas podemos verificar.
-            const jsDay = weekStartDate.getDay(); // 0=Dom, 1=Seg, ...
-            // Se não for segunda (1), avisar e usar o dia selecionado como início da semana (segunda a domingo)
+            const jsDay = weekStartDate.getDay();
             if (jsDay !== 1) {
                 toast('A data inicial deve ser uma segunda-feira. Usando a data fornecida como início da semana.', 'warning');
             }
-            // Gerar grade: linhas são horários, colunas são dias
+
             let html = '<table class="availability-grid-table">';
             html += '<thead><tr><th>Horário</th>';
             days.forEach(day => {
@@ -2471,19 +2656,14 @@
                 const slotEndStr = `${String(Math.floor(slotEnd/60)).padStart(2,'0')}:${String(slotEnd%60).padStart(2,'0')}`;
                 html += `<tr><td>${slotStartStr} - ${slotEndStr}</td>`;
 
-                // Para cada dia da semana, calcular data correspondente
                 for (let i = 0; i < 7; i++) {
-                    // i=0 corresponde a Segunda-feira, i=6 a Domingo
-                    // Precisamos calcular a data real: se weekStart é segunda, basta adicionar i dias.
-                    // Mas se não for segunda, a diferença é (weekStartDate.getDay() - 1). Vamos calcular offset.
                     const currentDate = new Date(weekStartDate);
                     currentDate.setDate(weekStartDate.getDate() + i);
                     const dateStr = formatDateInput(currentDate);
 
-                    // Verificar se existe alguma aula agendada nessa data que ocupa esse slot
                     const occupiedClasses = state.schedule.filter(a => {
                         if (a.data !== dateStr) return false;
-                        if (a.status === 'Cancelada') return false; // considerar apenas agendadas e concluídas? Vamos incluir todas menos canceladas.
+                        if (a.status === 'Cancelada') return false;
                         const classTime = timeToMinutes(a.hora);
                         return classTime >= slotStart && classTime < slotEnd;
                     });
@@ -2508,7 +2688,7 @@
         loadState();
         renderNav();
         renderDashboard();
-        setAgendaView('list'); // garante que a lista é exibida por padrão
+        setAgendaView('list');
 
         document.addEventListener('keydown', function(e) {
             if (e.key === 'Escape') closeLightbox();
