@@ -6,7 +6,6 @@
     <title>Mestre Paulo - Personal Trainer Pro</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
-        /* ... (TODO O CSS ORIGINAL PERMANECE IGUAL) ... */
         :root {
             --primary: #1e293b;
             --primary-dark: #0f172a;
@@ -535,22 +534,439 @@
         </div>
     </div>
 
-    <!-- Modais (todos permanecem iguais) -->
-    <div class="modal" id="studentModal"> ... </div>
-    <div class="modal" id="academyModal"> ... </div>
-    <div class="modal" id="scheduleModal"> ... </div>
-    <div class="modal" id="recurringScheduleModal"> ... </div>
-    <div class="modal" id="cashflowModal"> ... </div>
-    <div class="modal" id="contaModal"> ... </div>
-    <div class="modal" id="userModal"> ... </div>
-    <div class="modal" id="albumModal"> ... </div>
-    <div class="modal" id="workoutModal"> ... </div>
+    <!-- Modais -->
+    <!-- Modal Aluno -->
+    <div class="modal" id="studentModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>👤 Cadastro de Aluno</h3>
+                <button class="modal-close" onclick="closeModal('studentModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="studentForm" onsubmit="saveStudent(event)">
+                    <div class="photo-upload">
+                        <img class="photo-preview" id="studentFotoPreview" src="" alt="Foto do aluno">
+                        <label class="btn btn-outline" style="cursor:pointer;">
+                            📷 Adicionar Foto
+                            <input type="file" id="studentFotoInput" accept="image/*" style="display:none;" onchange="handleStudentPhoto(event)">
+                        </label>
+                    </div>
+                    <div class="form-group">
+                        <label>Nome Completo *</label>
+                        <input type="text" id="studentNome" required>
+                    </div>
+                    <div class="form-group">
+                        <label>CPF</label>
+                        <input type="text" id="studentCpf" placeholder="000.000.000-00">
+                    </div>
+                    <div class="form-group">
+                        <label>Data de Cadastro</label>
+                        <input type="date" id="studentDataCadastro">
+                    </div>
+                    <div class="form-group">
+                        <label>Academia</label>
+                        <select id="studentAcademia"></select>
+                    </div>
+                    <div class="form-group">
+                        <label>Objetivo</label>
+                        <input type="text" id="studentObjetivo" placeholder="Ex: Hipertrofia, Emagrecimento...">
+                    </div>
+                    <div class="form-group">
+                        <label>Telefone</label>
+                        <input type="text" id="studentTelefone" placeholder="(00) 00000-0000">
+                    </div>
+                    <div class="form-group">
+                        <label>E-mail</label>
+                        <input type="email" id="studentEmail" placeholder="email@exemplo.com">
+                    </div>
+                    <div class="form-group">
+                        <label>Valor por Aula (R$)</label>
+                        <input type="number" id="studentValorAula" step="0.01" min="0">
+                    </div>
+                    <div class="form-group">
+                        <label>Observações</label>
+                        <textarea id="studentObservacoes" rows="3"></textarea>
+                    </div>
+                    <div class="evolution-section">
+                        <h4>📸 Fotos de Evolução</h4>
+                        <label class="btn btn-outline" style="cursor:pointer;">
+                            ➕ Adicionar Foto de Evolução
+                            <input type="file" id="evolutionPhotoInput" accept="image/*" style="display:none;" onchange="handleEvolutionPhoto(event)">
+                        </label>
+                        <div class="evolution-thumbs" id="evolutionThumbs"></div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline" onclick="closeModal('studentModal')">Cancelar</button>
+                <button type="submit" form="studentForm" class="btn btn-primary">Salvar Aluno</button>
+            </div>
+        </div>
+    </div>
 
+    <!-- Modal Academia -->
+    <div class="modal" id="academyModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>🏋️ Cadastro de Academia</h3>
+                <button class="modal-close" onclick="closeModal('academyModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="academyForm" onsubmit="saveAcademy(event)">
+                    <div class="form-group">
+                        <label>Nome *</label>
+                        <input type="text" id="academyNome" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Endereço</label>
+                        <input type="text" id="academyEndereco">
+                    </div>
+                    <div class="form-group">
+                        <label>Telefone</label>
+                        <input type="text" id="academyTelefone" placeholder="(00) 00000-0000">
+                    </div>
+                    <div class="form-group">
+                        <label>Responsável</label>
+                        <input type="text" id="academyResponsavel">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline" onclick="closeModal('academyModal')">Cancelar</button>
+                <button type="submit" form="academyForm" class="btn btn-primary">Salvar Academia</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Aula -->
+    <div class="modal" id="scheduleModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>📅 Agendar Aula</h3>
+                <button class="modal-close" onclick="closeModal('scheduleModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="scheduleForm" onsubmit="saveSchedule(event)">
+                    <div class="form-group">
+                        <label>Data *</label>
+                        <input type="date" id="scheduleData" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Hora *</label>
+                        <input type="time" id="scheduleHora" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Aluno *</label>
+                        <select id="scheduleAluno" required></select>
+                    </div>
+                    <div class="form-group">
+                        <label>Academia *</label>
+                        <select id="scheduleAcademia" required></select>
+                    </div>
+                    <div class="form-group">
+                        <label>Status</label>
+                        <select id="scheduleStatus">
+                            <option value="Agendada">Agendada</option>
+                            <option value="Concluída">Concluída</option>
+                            <option value="Cancelada">Cancelada</option>
+                        </select>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline" onclick="closeModal('scheduleModal')">Cancelar</button>
+                <button type="submit" form="scheduleForm" class="btn btn-primary">Salvar Aula</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Aulas Recorrentes -->
+    <div class="modal" id="recurringScheduleModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>🔄 Aulas Recorrentes</h3>
+                <button class="modal-close" onclick="closeModal('recurringScheduleModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="recurringScheduleForm" onsubmit="saveRecurringSchedule(event)">
+                    <div class="form-group">
+                        <label>Aluno *</label>
+                        <select id="recurringAluno" required></select>
+                    </div>
+                    <div class="form-group">
+                        <label>Academia *</label>
+                        <select id="recurringAcademia" required></select>
+                    </div>
+                    <div class="form-group">
+                        <label>Hora *</label>
+                        <input type="time" id="recurringHora" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Data Inicial *</label>
+                        <input type="date" id="recurringStartDate" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Data Final *</label>
+                        <input type="date" id="recurringEndDate" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Status</label>
+                        <select id="recurringStatus">
+                            <option value="Agendada">Agendada</option>
+                            <option value="Concluída">Concluída</option>
+                            <option value="Cancelada">Cancelada</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Dias da Semana *</label>
+                        <div style="display:flex; flex-wrap:wrap; gap:10px;">
+                            <label><input type="checkbox" value="1"> Seg</label>
+                            <label><input type="checkbox" value="2"> Ter</label>
+                            <label><input type="checkbox" value="3"> Qua</label>
+                            <label><input type="checkbox" value="4"> Qui</label>
+                            <label><input type="checkbox" value="5"> Sex</label>
+                            <label><input type="checkbox" value="6"> Sáb</label>
+                            <label><input type="checkbox" value="0"> Dom</label>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline" onclick="closeModal('recurringScheduleModal')">Cancelar</button>
+                <button type="submit" form="recurringScheduleForm" class="btn btn-primary">Gerar Aulas</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Lançamento Fluxo de Caixa -->
+    <div class="modal" id="cashflowModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>💰 Lançamento no Fluxo de Caixa</h3>
+                <button class="modal-close" onclick="closeModal('cashflowModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="cashflowForm" onsubmit="saveCashflow(event)">
+                    <div class="form-group">
+                        <label>Data *</label>
+                        <input type="date" id="cashflowData" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Descrição *</label>
+                        <input type="text" id="cashflowDescricao" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Entrada (R$)</label>
+                        <input type="number" id="cashflowEntrada" step="0.01" min="0">
+                    </div>
+                    <div class="form-group">
+                        <label>Saída (R$)</label>
+                        <input type="number" id="cashflowSaida" step="0.01" min="0">
+                    </div>
+                    <div class="form-group">
+                        <label>Forma de Pagamento</label>
+                        <select id="cashflowFormaPgto">
+                            <option value="Dinheiro">Dinheiro</option>
+                            <option value="Pix">Pix</option>
+                            <option value="Cartão de Crédito">Cartão de Crédito</option>
+                            <option value="Cartão de Débito">Cartão de Débito</option>
+                            <option value="Transferência">Transferência</option>
+                            <option value="Boleto">Boleto</option>
+                        </select>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline" onclick="closeModal('cashflowModal')">Cancelar</button>
+                <button type="submit" form="cashflowForm" class="btn btn-primary">Salvar Lançamento</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Conta Futura -->
+    <div class="modal" id="contaModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>📅 Conta a Pagar/Receber</h3>
+                <button class="modal-close" onclick="closeModal('contaModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="contaForm" onsubmit="saveConta(event)">
+                    <div class="form-group">
+                        <label>Descrição *</label>
+                        <input type="text" id="contaDescricao" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Tipo *</label>
+                        <select id="contaTipo" required>
+                            <option value="Pagar">Pagar</option>
+                            <option value="Receber">Receber</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Valor (R$) *</label>
+                        <input type="number" id="contaValor" step="0.01" min="0" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Vencimento *</label>
+                        <input type="date" id="contaVencimento" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Status</label>
+                        <select id="contaStatus">
+                            <option value="Pendente">Pendente</option>
+                            <option value="Pago">Pago</option>
+                            <option value="Recebido">Recebido</option>
+                            <option value="Vencido">Vencido</option>
+                        </select>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline" onclick="closeModal('contaModal')">Cancelar</button>
+                <button type="submit" form="contaForm" class="btn btn-primary">Salvar Conta</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Usuário -->
+    <div class="modal" id="userModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>🔐 Usuário e Permissões</h3>
+                <button class="modal-close" onclick="closeModal('userModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="userForm" onsubmit="saveUser(event)">
+                    <div class="form-group">
+                        <label>Usuário *</label>
+                        <input type="text" id="userUsername" required oninput="this.value = this.value.toUpperCase()">
+                    </div>
+                    <div class="form-group">
+                        <label>Senha</label>
+                        <input type="password" id="userPassword" oninput="this.value = this.value.toUpperCase()">
+                        <small id="userPasswordHint" class="note-helper">*</small>
+                    </div>
+                    <div class="form-group">
+                        <label>Nome Completo</label>
+                        <input type="text" id="userNome">
+                    </div>
+                    <div class="form-group">
+                        <label>Perfil</label>
+                        <select id="userRole" onchange="renderPermissionMatrix(null)">
+                            <option value="padrao">Padrão</option>
+                            <option value="admin">Administrador</option>
+                            <option value="aluno">Aluno</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label><input type="checkbox" id="userActive" checked> Ativo</label>
+                    </div>
+                    <div class="permissions-container" id="permissionsContainer"></div>
+                    <p class="permissions-updated" id="permissionsUpdatedAt">Permissões atualizadas: nunca</p>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline" onclick="closeModal('userModal')">Cancelar</button>
+                <button type="submit" form="userForm" class="btn btn-primary">Salvar Usuário</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Álbum -->
+    <div class="modal" id="albumModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>🖼️ Foto do Álbum</h3>
+                <button class="modal-close" onclick="closeModal('albumModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="albumForm" onsubmit="saveAlbum(event)">
+                    <div class="photo-upload">
+                        <img class="photo-preview" id="albumFotoPreview" src="" alt="Prévia da foto">
+                        <label class="btn btn-outline" style="cursor:pointer;">
+                            📷 Selecionar Foto
+                            <input type="file" id="albumFotoInput" accept="image/*" style="display:none;" onchange="handleAlbumPhoto(event)">
+                        </label>
+                    </div>
+                    <div class="form-group">
+                        <label>Título</label>
+                        <input type="text" id="albumTitulo" placeholder="Ex: Treino de pernas">
+                    </div>
+                    <div class="form-group">
+                        <label>Descrição</label>
+                        <textarea id="albumDescricao" rows="3" placeholder="Descreva a foto..."></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline" onclick="closeModal('albumModal')">Cancelar</button>
+                <button type="submit" form="albumForm" class="btn btn-primary">Salvar Foto</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Treino -->
+    <div class="modal" id="workoutModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>📋 Treino</h3>
+                <button class="modal-close" onclick="closeModal('workoutModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="workoutForm" onsubmit="saveWorkout(event)">
+                    <div class="form-group">
+                        <label>Nome do Treino *</label>
+                        <input type="text" id="workoutNome" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Grupo Muscular *</label>
+                        <input type="text" id="workoutGrupo" required placeholder="Ex: Peito, Costas...">
+                    </div>
+                    <div class="form-group">
+                        <label>Horário</label>
+                        <input type="time" id="workoutHorario">
+                    </div>
+                    <div class="form-group">
+                        <label>Academia</label>
+                        <select id="workoutAcademia"></select>
+                    </div>
+                    <div class="form-group">
+                        <label>Aluno Destinado</label>
+                        <select id="workoutAluno"></select>
+                    </div>
+                    <div class="form-group">
+                        <label>Dias da Semana *</label>
+                        <div id="workoutDiasContainer" style="display:flex; flex-wrap:wrap; gap:10px;">
+                            <label><input type="checkbox" value="1"> Seg</label>
+                            <label><input type="checkbox" value="2"> Ter</label>
+                            <label><input type="checkbox" value="3"> Qua</label>
+                            <label><input type="checkbox" value="4"> Qui</label>
+                            <label><input type="checkbox" value="5"> Sex</label>
+                            <label><input type="checkbox" value="6"> Sáb</label>
+                            <label><input type="checkbox" value="0"> Dom</label>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Exercícios</label>
+                        <textarea id="workoutExercicios" rows="5" placeholder="Descreva os exercícios, séries, repetições..."></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline" onclick="closeModal('workoutModal')">Cancelar</button>
+                <button type="submit" form="workoutForm" class="btn btn-primary">Salvar Treino</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lightbox -->
     <div id="lightbox" class="lightbox hidden" onclick="closeLightbox()">
         <span class="lightbox-close" onclick="closeLightbox()">&times;</span>
         <img id="lightboxImage" src="" alt="Foto ampliada" onclick="event.stopPropagation();">
     </div>
 
+    <!-- Toast Container -->
     <div class="toast-container" id="toastContainer"></div>
 
     <!-- Firebase SDK (compat) -->
