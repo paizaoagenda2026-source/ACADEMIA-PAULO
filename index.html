@@ -853,10 +853,38 @@
 
     <div class="toast-container" id="toastContainer"></div>
 
-    <script>
-        // ==================== DADOS E CONFIG ====================
-        const STORAGE_KEY = 'mestrePauloPersonalTrainer_v1';
+    <!-- Firebase SDK (compat) -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
 
+    <script>
+        // ==================== FIREBASE INIT ====================
+        const firebaseConfig = {
+            apiKey: "AIzaSyDDb7XbCKRfXa44OPTJpyhcj0cOq9Sr7Bs",
+            authDomain: "personal-paulo-71c32.firebaseapp.com",
+            projectId: "personal-paulo-71c32",
+            storageBucket: "personal-paulo-71c32.firebasestorage.app",
+            messagingSenderId: "516752212329",
+            appId: "1:516752212329:web:1434dc0eafdb5fa041fdf8",
+            measurementId: "G-FFM36G7F1D"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+
+        // Coleções
+        const COLLECTIONS = {
+            users: 'usuarios',
+            students: 'alunos',
+            academias: 'academias',
+            schedule: 'agenda',
+            workouts: 'treinos',
+            album: 'album',
+            cashflow: 'fluxocaixa',
+            contasFuturas: 'contasFuturas',
+            auditLogs: 'auditoria'
+        };
+
+        // ==================== DADOS E CONFIG ====================
         const MODULES = [
             { key: 'dashboard', label: 'Dashboard', icon: '📊', actions: ['ver'] },
             { key: 'alunos', label: 'Alunos', icon: '👥', actions: ['ver', 'criar', 'editar', 'excluir'] },
@@ -914,25 +942,97 @@
             container.appendChild(el);
             setTimeout(() => el.remove(), 4000);
         }
-        function saveState() { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
-        function logAction(action, details, moduleKey) {
-            if (!state.auditLogs) state.auditLogs = [];
-            const userIdentifier = currentUser ? currentUser.username : (currentStudent ? currentStudent.nome : 'Sistema');
-            state.auditLogs.push({
-                id: genId(),
-                timestamp: new Date().toISOString(),
-                user: userIdentifier,
-                action: action,
-                module: moduleKey,
-                details: details || ''
-            });
-            if (state.auditLogs.length > 500) {
-                state.auditLogs = state.auditLogs.slice(-500);
+
+        // ==================== FIRESTORE HELPERS ====================
+        async function addToFirestore(collectionName, data) {
+            try {
+                const docRef = await db.collection(collectionName).add(data);
+                return docRef.id;
+            } catch (error) {
+                console.error(`Erro ao adicionar em ${collectionName}:`, error);
+                toast(`Erro ao salvar dados na nuvem: ${error.message}`, 'error');
+                throw error;
             }
-            saveState();
         }
-        function loadState() {
-            const raw = localStorage.getItem(STORAGE_KEY);
+
+        async function updateInFirestore(collectionName, id, data) {
+            try {
+                await db.collection(collectionName).doc(id).update(data);
+            } catch (error) {
+                console.error(`Erro ao atualizar ${collectionName}/${id}:`, error);
+                toast(`Erro ao atualizar dados na nuvem: ${error.message}`, 'error');
+                throw error;
+            }
+        }
+
+        async function deleteFromFirestore(collectionName, id) {
+            try {
+                await db.collection(collectionName).doc(id).delete();
+            } catch (error) {
+                console.error(`Erro ao deletar ${collectionName}/${id}:`, error);
+                toast(`Erro ao excluir dados na nuvem: ${error.message}`, 'error');
+                throw error;
+            }
+        }
+
+        async function loadAllFromFirestore() {
+            try {
+                const collectionsToLoad = [
+                    COLLECTIONS.users,
+                    COLLECTIONS.students,
+                    COLLECTIONS.academias,
+                    COLLECTIONS.schedule,
+                    COLLECTIONS.workouts,
+                    COLLECTIONS.album,
+                    COLLECTIONS.cashflow,
+                    COLLECTIONS.contasFuturas,
+                    COLLECTIONS.auditLogs
+                ];
+                const snapshots = {};
+                for (const col of collectionsToLoad) {
+                    const querySnapshot = await db.collection(col).get();
+                    snapshots[col] = [];
+                    querySnapshot.forEach(doc => {
+                        const data = doc.data();
+                        data.id = doc.id; // Ensure id is set
+                        snapshots[col].push(data);
+                    });
+                }
+                state.users = snapshots[COLLECTIONS.users] || [];
+                state.students = snapshots[COLLECTIONS.students] || [];
+                state.academias = snapshots[COLLECTIONS.academias] || [];
+                state.schedule = snapshots[COLLECTIONS.schedule] || [];
+                state.workouts = snapshots[COLLECTIONS.workouts] || [];
+                state.album = snapshots[COLLECTIONS.album] || [];
+                state.cashflow = snapshots[COLLECTIONS.cashflow] || [];
+                state.contasFuturas = snapshots[COLLECTIONS.contasFuturas] || [];
+                state.auditLogs = snapshots[COLLECTIONS.auditLogs] || [];
+
+                // Normalizações
+                state.users.forEach(u => {
+                    if (u.username) u.username = u.username.toUpperCase();
+                    if (u.password) u.password = u.password.toUpperCase();
+                });
+                state.students.forEach(s => { if (!s.evolucaoFotos) s.evolucaoFotos = []; });
+                state.workouts.forEach(w => {
+                    if (!w.diasSemana && w.diaSemana !== undefined) {
+                        w.diasSemana = [w.diaSemana];
+                    }
+                    if (!w.diasSemana) w.diasSemana = [];
+                    if (w.horario === undefined) w.horario = '';
+                    if (w.academiaId === undefined) w.academiaId = null;
+                });
+                ensureStudentUsers();
+            } catch (error) {
+                console.error('Erro ao carregar dados do Firestore:', error);
+                toast('Erro ao carregar dados do servidor. Verifique a conexão.', 'error');
+                // Se falhar, tenta carregar do localStorage (fallback)
+                loadFromLocalStorageFallback();
+            }
+        }
+
+        function loadFromLocalStorageFallback() {
+            const raw = localStorage.getItem('mestrePauloPersonalTrainer_v1');
             if (raw) {
                 try {
                     state = JSON.parse(raw);
@@ -961,8 +1061,8 @@
                     ensureStudentUsers();
                 } catch (e) { seedData(); }
             } else { seedData(); }
-            if (state.users.length === 0) seedData();
         }
+
         function seedData() {
             state.users = [{ id: genId(), username: 'SERGIO', password: '080888', nome: 'Sérgio', role: 'admin', active: true, permissions: {} }];
             state.academias = [{ id: genId(), nome: 'Academia Exemplo', endereco: 'Rua das Flores, 123', telefone: '(11) 99999-0000', responsavel: 'Carlos' }];
@@ -973,7 +1073,22 @@
             state.cashflow = [];
             state.contasFuturas = [];
             state.auditLogs = [];
-            saveState();
+            // Optionally, save seed data to Firestore
+            saveSeedDataToFirestore();
+        }
+
+        async function saveSeedDataToFirestore() {
+            try {
+                // Add admin user
+                const adminUser = state.users[0];
+                await addToFirestore(COLLECTIONS.users, adminUser);
+                // Add example academy
+                const academy = state.academias[0];
+                await addToFirestore(COLLECTIONS.academias, academy);
+                console.log('Dados iniciais salvos no Firestore.');
+            } catch (e) {
+                console.error('Erro ao salvar dados iniciais no Firestore:', e);
+            }
         }
 
         function ensureStudentUsers() {
@@ -982,7 +1097,6 @@
                     createUserForStudent(student);
                 }
             });
-            saveState();
         }
 
         function slugify(text) {
@@ -1010,7 +1124,7 @@
             return digits;
         }
 
-        function createUserForStudent(student) {
+        async function createUserForStudent(student) {
             const username = generateStudentUsername(student.nome, state.users, student.id ? null : undefined);
             const password = getPhoneWithoutDDD(student.telefone).toUpperCase();
             const newUser = {
@@ -1024,10 +1138,15 @@
                 alunoId: student.id
             };
             state.users.push(newUser);
+            try {
+                await addToFirestore(COLLECTIONS.users, newUser);
+            } catch (e) {
+                console.error('Erro ao criar usuário do aluno no Firestore:', e);
+            }
             return newUser;
         }
 
-        function updateUserForStudent(student) {
+        async function updateUserForStudent(student) {
             const user = state.users.find(u => u.alunoId === student.id);
             if (user) {
                 const newPassword = getPhoneWithoutDDD(student.telefone).toUpperCase();
@@ -1036,6 +1155,11 @@
                 }
                 if (user.nome !== student.nome) {
                     user.nome = student.nome;
+                }
+                try {
+                    await updateInFirestore(COLLECTIONS.users, user.id, user);
+                } catch (e) {
+                    console.error('Erro ao atualizar usuário do aluno no Firestore:', e);
                 }
             }
         }
@@ -1461,7 +1585,7 @@
             }
             openModal('studentModal');
         }
-        function saveStudent(e) {
+        async function saveStudent(e) {
             e.preventDefault();
             if (editingId && !can('alunos', 'editar')) return;
             if (!editingId && !can('alunos', 'criar')) return;
@@ -1482,28 +1606,25 @@
                 const idx = state.students.findIndex(s => s.id === editingId);
                 if (idx > -1) {
                     state.students[idx] = { ...state.students[idx], nome, cpf, dataCadastro, academiaId, objetivo, telefone, email, valorAula, observacoes, foto, evolucaoFotos };
-                    updateUserForStudent(state.students[idx]);
+                    const updatedStudent = state.students[idx];
+                    await updateUserForStudent(updatedStudent);
+                    await updateInFirestore(COLLECTIONS.students, editingId, updatedStudent);
                     logAction('Editar Aluno', `Aluno ${nome} editado`, 'alunos');
                 }
-                saveState();
-                closeModal('studentModal');
-                renderStudents();
-                fillStudentSelect('workoutAluno');
-                toast('Aluno salvo com sucesso!');
             } else {
                 const newStudent = { id: genId(), nome, cpf, dataCadastro, academiaId, objetivo, telefone, email, valorAula, observacoes, foto, evolucaoFotos };
                 state.students.push(newStudent);
-                const user = createUserForStudent(newStudent);
+                const user = await createUserForStudent(newStudent);
+                await addToFirestore(COLLECTIONS.students, newStudent);
                 logAction('Criar Aluno', `Aluno ${nome} criado. Usuário: ${user.username}`, 'alunos');
-                saveState();
-                closeModal('studentModal');
-                renderStudents();
-                fillStudentSelect('workoutAluno');
-                toast(`Aluno salvo! Usuário: ${user.username} | Senha: ${user.password}`, 'success');
             }
+            closeModal('studentModal');
+            renderStudents();
+            fillStudentSelect('workoutAluno');
+            toast('Aluno salvo com sucesso!');
         }
 
-        function deleteStudent(id) {
+        async function deleteStudent(id) {
             if (!can('alunos', 'excluir')) { toast('Sem permissão para excluir.', 'error'); return; }
             if (!confirmAdminDeletion()) return;
             const student = state.students.find(s => s.id === id);
@@ -1511,7 +1632,16 @@
             state.students = state.students.filter(s => s.id !== id);
             state.workouts = state.workouts.filter(w => w.alunoId !== id);
             state.users = state.users.filter(u => u.alunoId !== id);
-            saveState(); renderStudents(); renderWorkouts(); fillStudentSelect('workoutAluno'); renderUsers(); toast('Aluno excluído.', 'warning');
+            await deleteFromFirestore(COLLECTIONS.students, id);
+            // Delete related workouts and user
+            for (const w of state.workouts.filter(w => w.alunoId === id)) {
+                await deleteFromFirestore(COLLECTIONS.workouts, w.id);
+            }
+            for (const u of state.users.filter(u => u.alunoId === id)) {
+                await deleteFromFirestore(COLLECTIONS.users, u.id);
+            }
+            renderStudents(); renderWorkouts(); fillStudentSelect('workoutAluno'); renderUsers();
+            toast('Aluno excluído.', 'warning');
         }
 
         function confirmAdminDeletion() {
@@ -1572,7 +1702,7 @@
             }
             openModal('academyModal');
         }
-        function saveAcademy(e) {
+        async function saveAcademy(e) {
             e.preventDefault();
             if (editingId && !can('academias', 'editar')) return;
             if (!editingId && !can('academias', 'criar')) return;
@@ -1585,23 +1715,28 @@
                 const idx = state.academias.findIndex(a => a.id === editingId);
                 if (idx > -1) {
                     state.academias[idx] = { ...state.academias[idx], nome, endereco, telefone, responsavel };
+                    await updateInFirestore(COLLECTIONS.academias, editingId, state.academias[idx]);
                     logAction('Editar Academia', `Academia ${nome} editada`, 'academias');
                 }
             } else {
                 const nova = { id: genId(), nome, endereco, telefone, responsavel };
                 state.academias.push(nova);
+                await addToFirestore(COLLECTIONS.academias, nova);
                 logAction('Criar Academia', `Academia ${nome} criada`, 'academias');
             }
-            saveState(); closeModal('academyModal'); renderAcademies(); toast('Academia salva com sucesso!');
+            closeModal('academyModal'); renderAcademies();
+            toast('Academia salva com sucesso!');
         }
-        function deleteAcademy(id) {
+        async function deleteAcademy(id) {
             if (!can('academias', 'excluir')) { toast('Sem permissão para excluir.', 'error'); return; }
             if (!confirmAdminDeletion()) return;
             const academia = state.academias.find(a => a.id === id);
             if (academia) logAction('Excluir Academia', `Academia ${academia.nome} excluída`, 'academias');
             state.academias = state.academias.filter(a => a.id !== id);
             state.workouts.forEach(w => { if (w.academiaId === id) w.academiaId = null; });
-            saveState(); renderAcademies(); renderWorkouts(); toast('Academia excluída.', 'warning');
+            await deleteFromFirestore(COLLECTIONS.academias, id);
+            renderAcademies(); renderWorkouts();
+            toast('Academia excluída.', 'warning');
         }
         function renderAcademies() {
             const tbody = document.getElementById('academiesTableBody');
@@ -1636,7 +1771,7 @@
             }
             openModal('scheduleModal');
         }
-        function saveSchedule(e) {
+        async function saveSchedule(e) {
             e.preventDefault();
             if (editingId && !can('agenda', 'editar')) return;
             if (!editingId && !can('agenda', 'criar')) return;
@@ -1650,42 +1785,48 @@
                 const idx = state.schedule.findIndex(a => a.id === editingId);
                 if (idx > -1) {
                     state.schedule[idx] = { ...state.schedule[idx], data, hora, alunoId, academiaId, status };
+                    await updateInFirestore(COLLECTIONS.schedule, editingId, state.schedule[idx]);
                     logAction('Editar Aula', `Aula ${data} ${hora} editada`, 'agenda');
                 }
             } else {
                 const nova = { id: genId(), data, hora, alunoId, academiaId, status };
                 state.schedule.push(nova);
+                await addToFirestore(COLLECTIONS.schedule, nova);
                 logAction('Criar Aula', `Aula ${data} ${hora} criada`, 'agenda');
             }
-            saveState(); closeModal('scheduleModal'); renderSchedule(); toast('Aula agendada com sucesso!');
+            closeModal('scheduleModal'); renderSchedule();
+            toast('Aula agendada com sucesso!');
         }
-        function deleteSchedule(id) {
+        async function deleteSchedule(id) {
             if (!can('agenda', 'excluir')) { toast('Sem permissão para excluir.', 'error'); return; }
             if (!confirmAdminDeletion()) return;
             const aula = state.schedule.find(a => a.id === id);
             if (aula) logAction('Excluir Aula', `Aula ${aula.data} ${aula.hora} excluída`, 'agenda');
             state.schedule = state.schedule.filter(a => a.id !== id);
-            saveState(); renderSchedule(); toast('Agendamento excluído.', 'warning');
+            await deleteFromFirestore(COLLECTIONS.schedule, id);
+            renderSchedule();
+            toast('Agendamento excluído.', 'warning');
         }
         function toggleSelectAllSchedule() {
             const selectAll = document.getElementById('selectAllSchedule');
             const checkboxes = document.querySelectorAll('#scheduleTableBody input[type="checkbox"][data-id]');
             checkboxes.forEach(cb => cb.checked = selectAll.checked);
         }
-        function deleteSelectedSchedule() {
+        async function deleteSelectedSchedule() {
             if (!can('agenda', 'excluir')) { toast('Sem permissão para excluir.', 'error'); return; }
             const checkboxes = document.querySelectorAll('#scheduleTableBody input[type="checkbox"]:checked[data-id]');
             if (checkboxes.length === 0) { toast('Nenhuma aula selecionada.', 'warning'); return; }
             if (!confirmAdminDeletion()) return;
             const idsToDelete = [];
             checkboxes.forEach(cb => idsToDelete.push(cb.getAttribute('data-id')));
-            const deletedCount = idsToDelete.length;
             const aulas = state.schedule.filter(a => idsToDelete.includes(a.id));
             aulas.forEach(a => logAction('Excluir Aula (seleção)', `Aula ${a.data} ${a.hora} excluída`, 'agenda'));
             state.schedule = state.schedule.filter(a => !idsToDelete.includes(a.id));
-            saveState();
+            for (const id of idsToDelete) {
+                await deleteFromFirestore(COLLECTIONS.schedule, id);
+            }
             renderSchedule();
-            toast(`${deletedCount} aula(s) excluída(s) com sucesso!`, 'warning');
+            toast(`${idsToDelete.length} aula(s) excluída(s) com sucesso!`, 'warning');
         }
         function renderSchedule() {
             const tbody = document.getElementById('scheduleTableBody');
@@ -1732,7 +1873,7 @@
             document.getElementById('recurringStatus').value = 'Agendada';
             openModal('recurringScheduleModal');
         }
-        function saveRecurringSchedule(e) {
+        async function saveRecurringSchedule(e) {
             e.preventDefault();
             if (!can('agenda', 'criar')) { toast('Sem permissão para criar.', 'error'); return; }
             const alunoId = val('recurringAluno');
@@ -1761,8 +1902,11 @@
             }
             if (newEntries.length === 0) { toast('Nenhum dia selecionado dentro do período.', 'warning'); return; }
             state.schedule.push(...newEntries);
+            for (const nova of newEntries) {
+                await addToFirestore(COLLECTIONS.schedule, nova);
+            }
             logAction('Aulas Recorrentes', `Geradas ${newEntries.length} aulas recorrentes`, 'agenda');
-            saveState(); closeModal('recurringScheduleModal'); renderSchedule();
+            closeModal('recurringScheduleModal'); renderSchedule();
             toast(`Geradas ${newEntries.length} aulas recorrentes!`);
         }
 
@@ -1808,7 +1952,7 @@
             }
             openModal('workoutModal');
         }
-        function saveWorkout(e) {
+        async function saveWorkout(e) {
             e.preventDefault();
             if (editingId && !can('treinos', 'editar')) return;
             if (!editingId && !can('treinos', 'criar')) return;
@@ -1826,22 +1970,27 @@
                 const idx = state.workouts.findIndex(w => w.id === editingId);
                 if (idx > -1) {
                     state.workouts[idx] = { ...state.workouts[idx], nome, grupo, horario, academiaId, diasSemana, alunoId, exercicios };
+                    await updateInFirestore(COLLECTIONS.workouts, editingId, state.workouts[idx]);
                     logAction('Editar Treino', `Treino ${nome} editado`, 'treinos');
                 }
             } else {
                 const novo = { id: genId(), nome, grupo, horario, academiaId, diasSemana, alunoId, exercicios };
                 state.workouts.push(novo);
+                await addToFirestore(COLLECTIONS.workouts, novo);
                 logAction('Criar Treino', `Treino ${nome} criado`, 'treinos');
             }
-            saveState(); closeModal('workoutModal'); renderWorkouts(); toast('Treino salvo com sucesso!');
+            closeModal('workoutModal'); renderWorkouts();
+            toast('Treino salvo com sucesso!');
         }
-        function deleteWorkout(id) {
+        async function deleteWorkout(id) {
             if (!can('treinos', 'excluir')) { toast('Sem permissão para excluir.', 'error'); return; }
             if (!confirmAdminDeletion()) return;
             const treino = state.workouts.find(w => w.id === id);
             if (treino) logAction('Excluir Treino', `Treino ${treino.nome} excluído`, 'treinos');
             state.workouts = state.workouts.filter(w => w.id !== id);
-            saveState(); renderWorkouts(); toast('Treino excluído.', 'warning');
+            await deleteFromFirestore(COLLECTIONS.workouts, id);
+            renderWorkouts();
+            toast('Treino excluído.', 'warning');
         }
         function renderWorkouts() {
             const tbody = document.getElementById('workoutsTableBody');
@@ -2007,7 +2156,7 @@
             }
             openModal('albumModal');
         }
-        function saveAlbum(e) {
+        async function saveAlbum(e) {
             e.preventDefault();
             if (editingId && !can('album', 'editar')) return;
             if (!editingId && !can('album', 'criar')) return;
@@ -2019,25 +2168,27 @@
                 const idx = state.album.findIndex(item => item.id === editingId);
                 if (idx > -1) {
                     state.album[idx] = { ...state.album[idx], titulo, descricao, foto };
+                    await updateInFirestore(COLLECTIONS.album, editingId, state.album[idx]);
                     logAction('Editar Foto Álbum', `Foto ${titulo || 'sem título'} editada`, 'album');
                 }
             } else {
                 const nova = { id: genId(), titulo, descricao, foto, data: new Date().toISOString() };
                 state.album.push(nova);
+                await addToFirestore(COLLECTIONS.album, nova);
                 logAction('Adicionar Foto Álbum', `Foto ${titulo || 'sem título'} adicionada`, 'album');
             }
-            saveState();
-            closeModal('albumModal');
-            renderAlbum();
+            closeModal('albumModal'); renderAlbum();
             toast('Foto salva no álbum com sucesso!');
         }
-        function deleteAlbum(id) {
+        async function deleteAlbum(id) {
             if (!can('album', 'excluir')) { toast('Sem permissão para excluir.', 'error'); return; }
             if (!confirmAdminDeletion()) return;
             const item = state.album.find(i => i.id === id);
             if (item) logAction('Excluir Foto Álbum', `Foto ${item.titulo || 'sem título'} excluída`, 'album');
             state.album = state.album.filter(item => item.id !== id);
-            saveState(); renderAlbum(); toast('Foto excluída do álbum.', 'warning');
+            await deleteFromFirestore(COLLECTIONS.album, id);
+            renderAlbum();
+            toast('Foto excluída do álbum.', 'warning');
         }
         function renderAlbum() {
             const grid = document.getElementById('albumGrid');
@@ -2094,7 +2245,7 @@
             }
             openModal('cashflowModal');
         }
-        function saveCashflow(e) {
+        async function saveCashflow(e) {
             e.preventDefault();
             if (editingId && !can('fluxocaixa', 'editar')) return;
             if (!editingId && !can('fluxocaixa', 'criar')) return;
@@ -2109,22 +2260,27 @@
                 const idx = state.cashflow.findIndex(c => c.id === editingId);
                 if (idx > -1) {
                     state.cashflow[idx] = { ...state.cashflow[idx], data, descricao, entrada, saida, forma_pgto };
+                    await updateInFirestore(COLLECTIONS.cashflow, editingId, state.cashflow[idx]);
                     logAction('Editar Lançamento', `Lançamento ${descricao} editado`, 'fluxocaixa');
                 }
             } else {
                 const novo = { id: genId(), data, descricao, entrada, saida, forma_pgto };
                 state.cashflow.push(novo);
+                await addToFirestore(COLLECTIONS.cashflow, novo);
                 logAction('Criar Lançamento', `Lançamento ${descricao} criado`, 'fluxocaixa');
             }
-            saveState(); closeModal('cashflowModal'); renderCashflow(); toast('Lançamento salvo com sucesso!');
+            closeModal('cashflowModal'); renderCashflow();
+            toast('Lançamento salvo com sucesso!');
         }
-        function deleteCashflow(id) {
+        async function deleteCashflow(id) {
             if (!can('fluxocaixa', 'excluir')) { toast('Sem permissão para excluir.', 'error'); return; }
             if (!confirmAdminDeletion()) return;
             const lanc = state.cashflow.find(c => c.id === id);
             if (lanc) logAction('Excluir Lançamento', `Lançamento ${lanc.descricao} excluído`, 'fluxocaixa');
             state.cashflow = state.cashflow.filter(c => c.id !== id);
-            saveState(); renderCashflow(); toast('Lançamento excluído.', 'warning');
+            await deleteFromFirestore(COLLECTIONS.cashflow, id);
+            renderCashflow();
+            toast('Lançamento excluído.', 'warning');
         }
         function renderCashflow() {
             const tbody = document.getElementById('cashflowTableBody');
@@ -2157,7 +2313,7 @@
             }
             openModal('contaModal');
         }
-        function saveConta(e) {
+        async function saveConta(e) {
             e.preventDefault();
             if (editingId && !can('fluxocaixa', 'editar')) return;
             if (!editingId && !can('fluxocaixa', 'criar')) return;
@@ -2171,24 +2327,29 @@
                 const idx = state.contasFuturas.findIndex(c => c.id === editingId);
                 if (idx > -1) {
                     state.contasFuturas[idx] = { ...state.contasFuturas[idx], descricao, tipo, valor, vencimento, status };
+                    await updateInFirestore(COLLECTIONS.contasFuturas, editingId, state.contasFuturas[idx]);
                     logAction('Editar Conta', `Conta ${descricao} editada`, 'fluxocaixa');
                 }
             } else {
                 const nova = { id: genId(), descricao, tipo, valor, vencimento, status };
                 state.contasFuturas.push(nova);
+                await addToFirestore(COLLECTIONS.contasFuturas, nova);
                 logAction('Criar Conta', `Conta ${descricao} criada`, 'fluxocaixa');
             }
-            saveState(); closeModal('contaModal'); renderContasFuturas(); toast('Conta salva com sucesso!');
+            closeModal('contaModal'); renderContasFuturas();
+            toast('Conta salva com sucesso!');
         }
-        function deleteConta(id) {
+        async function deleteConta(id) {
             if (!can('fluxocaixa', 'excluir')) { toast('Sem permissão para excluir.', 'error'); return; }
             if (!confirmAdminDeletion()) return;
             const conta = state.contasFuturas.find(c => c.id === id);
             if (conta) logAction('Excluir Conta', `Conta ${conta.descricao} excluída`, 'fluxocaixa');
             state.contasFuturas = state.contasFuturas.filter(c => c.id !== id);
-            saveState(); renderContasFuturas(); toast('Conta excluída.', 'warning');
+            await deleteFromFirestore(COLLECTIONS.contasFuturas, id);
+            renderContasFuturas();
+            toast('Conta excluída.', 'warning');
         }
-        function marcarContaComoPaga(id) {
+        async function marcarContaComoPaga(id) {
             if (!can('fluxocaixa', 'editar') || !can('fluxocaixa', 'criar')) {
                 toast('Sem permissão para realizar esta operação.', 'error');
                 return;
@@ -2208,27 +2369,17 @@
             const descricao = conta.descricao;
             const formaPgto = 'Dinheiro';
             if (conta.tipo === 'Pagar') {
-                state.cashflow.push({
-                    id: genId(),
-                    data: dataHoje,
-                    descricao: `Pagamento: ${descricao}`,
-                    entrada: 0,
-                    saida: valor,
-                    forma_pgto: formaPgto
-                });
+                const novoLanc = { id: genId(), data: dataHoje, descricao: `Pagamento: ${descricao}`, entrada: 0, saida: valor, forma_pgto: formaPgto };
+                state.cashflow.push(novoLanc);
+                await addToFirestore(COLLECTIONS.cashflow, novoLanc);
             } else if (conta.tipo === 'Receber') {
-                state.cashflow.push({
-                    id: genId(),
-                    data: dataHoje,
-                    descricao: `Recebimento: ${descricao}`,
-                    entrada: valor,
-                    saida: 0,
-                    forma_pgto: formaPgto
-                });
+                const novoLanc = { id: genId(), data: dataHoje, descricao: `Recebimento: ${descricao}`, entrada: valor, saida: 0, forma_pgto: formaPgto };
+                state.cashflow.push(novoLanc);
+                await addToFirestore(COLLECTIONS.cashflow, novoLanc);
             }
             conta.status = 'Pago';
+            await updateInFirestore(COLLECTIONS.contasFuturas, id, conta);
             logAction('Conta Paga', `Conta ${descricao} marcada como paga e lançada no fluxo de caixa`, 'fluxocaixa');
-            saveState();
             renderContasFuturas();
             renderCashflow();
             toast(`Conta "${descricao}" marcada como PAGA e lançada no fluxo de caixa!`);
@@ -2261,50 +2412,43 @@
         }
 
         // ==================== GERAR MENSALIDADES ====================
-        function gerarMensalidades() {
+        async function gerarMensalidades() {
             if (!can('fluxocaixa', 'criar')) { toast('Sem permissão para gerar mensalidades.', 'error'); return; }
             const hoje = new Date();
             const hojeStr = formatDateInput(hoje);
             let geradas = 0;
             let ignoradas = 0;
 
-            // Agrupa aulas futuras não canceladas por aluno e mês
             const agrupadas = {};
             state.schedule.forEach(a => {
                 if (a.status === 'Cancelada') return;
-                if (a.data < hojeStr) return; // somente futuras
+                if (a.data < hojeStr) return;
                 const aluno = state.students.find(s => s.id === a.alunoId);
                 if (!aluno) return;
-                const chave = aluno.id + '|' + a.data.slice(0,7); // YYYY-MM
+                const chave = aluno.id + '|' + a.data.slice(0,7);
                 if (!agrupadas[chave]) agrupadas[chave] = { aluno, mes: a.data.slice(0,7), count: 0 };
                 agrupadas[chave].count++;
             });
 
-            Object.values(agrupadas).forEach(({ aluno, mes, count }) => {
+            for (const { aluno, mes, count } of Object.values(agrupadas)) {
                 const valorAula = parseFloat(aluno.valorAula) || 0;
-                if (valorAula <= 0) { ignoradas++; return; }
+                if (valorAula <= 0) { ignoradas++; continue; }
                 const [ano, numMes] = mes.split('-').map(Number);
                 const diaCadastro = parseInt(aluno.dataCadastro ? aluno.dataCadastro.slice(8,10) : String(hoje.getDate()).padStart(2,'0'));
                 const lastDay = new Date(ano, numMes, 0).getDate();
                 const diaVenc = Math.min(diaCadastro, lastDay);
                 const vencimento = `${ano}-${String(numMes).padStart(2,'0')}-${String(diaVenc).padStart(2,'0')}`;
-                if (vencimento < hojeStr) { ignoradas++; return; } // só futuras
+                if (vencimento < hojeStr) { ignoradas++; continue; }
                 const valorTotal = count * valorAula;
                 const descricao = `Mensalidade de ${aluno.nome} - ${String(numMes).padStart(2,'0')}/${ano}`;
                 const jaExiste = state.contasFuturas.some(c => c.descricao === descricao && c.tipo === 'Receber');
-                if (jaExiste) { ignoradas++; return; }
-                state.contasFuturas.push({
-                    id: genId(),
-                    descricao,
-                    tipo: 'Receber',
-                    valor: valorTotal,
-                    vencimento,
-                    status: 'Pendente'
-                });
+                if (jaExiste) { ignoradas++; continue; }
+                const novaConta = { id: genId(), descricao, tipo: 'Receber', valor: valorTotal, vencimento, status: 'Pendente' };
+                state.contasFuturas.push(novaConta);
+                await addToFirestore(COLLECTIONS.contasFuturas, novaConta);
                 geradas++;
-            });
+            }
 
-            saveState();
             renderContasFuturas();
             logAction('Gerar Mensalidades', `Geradas ${geradas} mensalidades, ${ignoradas} ignoradas`, 'fluxocaixa');
             toast(`Mensalidades geradas: ${geradas} | Ignoradas: ${ignoradas}`, geradas > 0 ? 'success' : 'warning');
@@ -2532,7 +2676,7 @@
             }
             openModal('userModal');
         }
-        function saveUser(e) {
+        async function saveUser(e) {
             e.preventDefault();
             if (editingId && !can('usuarios', 'editar')) return;
             if (!editingId && !can('usuarios', 'criar')) return;
@@ -2560,6 +2704,7 @@
                 else if (role === 'aluno') { existing.permissions = {}; }
                 else { existing.permissions = collectPermissions(); }
                 if (currentUser && currentUser.id === editingId) { currentUser = existing; }
+                await updateInFirestore(COLLECTIONS.users, editingId, existing);
                 logAction('Editar Usuário', `Usuário ${username} editado`, 'usuarios');
             } else {
                 if (!password) { toast('A senha é obrigatória para novo usuário.', 'error'); return; }
@@ -2569,23 +2714,26 @@
                 }
                 const newUser = { id: genId(), username, password, nome, role, active, permissions: role === 'admin' || role === 'aluno' ? {} : collectPermissions() };
                 state.users.push(newUser);
+                await addToFirestore(COLLECTIONS.users, newUser);
                 logAction('Criar Usuário', `Usuário ${username} criado`, 'usuarios');
             }
-            saveState(); closeModal('userModal'); renderUsers(); renderNav();
+            closeModal('userModal'); renderUsers(); renderNav();
             if (currentUser) {
                 document.getElementById('loggedUserName').textContent = currentUser.nome || currentUser.username;
                 document.getElementById('loggedUserRole').textContent = currentUser.role === 'admin' ? 'Administrador' : currentUser.role === 'aluno' ? 'Aluno' : 'Usuário Padrão';
             }
             toast('Usuário salvo com sucesso!');
         }
-        function deleteUser(id) {
+        async function deleteUser(id) {
             if (!can('usuarios', 'excluir')) { toast('Sem permissão para excluir.', 'error'); return; }
             if (id === currentUser.id) { toast('Você não pode excluir seu próprio usuário.', 'error'); return; }
             if (!confirmAdminDeletion()) return;
             const user = state.users.find(u => u.id === id);
             if (user) logAction('Excluir Usuário', `Usuário ${user.username} excluído`, 'usuarios');
             state.users = state.users.filter(u => u.id !== id);
-            saveState(); renderUsers(); toast('Usuário excluído.', 'warning');
+            await deleteFromFirestore(COLLECTIONS.users, id);
+            renderUsers();
+            toast('Usuário excluído.', 'warning');
         }
         function renderUsers() {
             const tbody = document.getElementById('usersTableBody');
@@ -2605,6 +2753,25 @@
         }
 
         // ==================== AUDITORIA ====================
+        async function logAction(action, details, moduleKey) {
+            const entry = {
+                id: genId(),
+                timestamp: new Date().toISOString(),
+                user: currentUser ? currentUser.username : (currentStudent ? currentStudent.nome : 'Sistema'),
+                action: action,
+                module: moduleKey,
+                details: details || ''
+            };
+            state.auditLogs.push(entry);
+            if (state.auditLogs.length > 500) {
+                state.auditLogs = state.auditLogs.slice(-500);
+            }
+            try {
+                await addToFirestore(COLLECTIONS.auditLogs, entry);
+            } catch (e) {
+                console.error('Erro ao registrar auditoria:', e);
+            }
+        }
         function renderAuditoria() {
             const tbody = document.getElementById('auditLogsTableBody');
             if (!tbody) return;
@@ -2621,7 +2788,7 @@
             });
             tbody.innerHTML = html || '<tr><td colspan="5">Nenhum registro de auditoria encontrado.</td></tr>';
         }
-        function clearAuditLogs() {
+        async function clearAuditLogs() {
             if (!can('auditoria', 'excluir')) { toast('Sem permissão para limpar logs.', 'error'); return; }
             if (!confirm('Tem certeza que deseja limpar todos os registros de auditoria?')) return;
             const userIdentifier = currentUser ? currentUser.username : 'Sistema';
@@ -2633,7 +2800,13 @@
                 module: 'auditoria',
                 details: 'Todos os registros anteriores foram removidos'
             }];
-            saveState();
+            // Delete all audit logs from Firestore (batch)
+            const snapshot = await db.collection(COLLECTIONS.auditLogs).get();
+            const batch = db.batch();
+            snapshot.forEach(doc => batch.delete(doc.ref));
+            await batch.commit();
+            // Add new entry
+            await addToFirestore(COLLECTIONS.auditLogs, state.auditLogs[0]);
             renderAuditoria();
             toast('Logs de auditoria limpos.', 'warning');
         }
@@ -2677,7 +2850,7 @@
                 return h * 60 + m;
             }
             const startMin = timeToMinutes(startTime);
-            const endMin = timeToMinutes(endTime);
+            let endMin = timeToMinutes(endTime);
             if (startMin >= endMin) {
                 toast('Hora inicial deve ser menor que a final.', 'error');
                 return;
@@ -2741,13 +2914,20 @@
         }
 
         // ==================== INICIALIZAÇÃO ====================
-        loadState();
-        renderNav();
-        renderDashboard();
-        setAgendaView('list');
+        async function initApp() {
+            await loadAllFromFirestore();
+            renderNav();
+            renderDashboard();
+            setAgendaView('list');
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape') closeLightbox();
+            });
+        }
 
-        document.addEventListener('keydown', function(e) {
-            if (e.key === 'Escape') closeLightbox();
+        // Inicializa o aplicativo
+        initApp().catch(error => {
+            console.error('Falha na inicialização:', error);
+            toast('Erro ao inicializar o aplicativo. Verifique a conexão com o Firebase.', 'error');
         });
     </script>
 </body>
