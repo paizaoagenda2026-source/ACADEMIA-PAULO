@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Mestre Paulo - Personal Trainer Pro</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     
     <!-- Firebase Compat Scripts -->
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
@@ -12,27 +13,31 @@
     
     <style>
         :root {
-            --primary: #1e293b;
-            --primary-dark: #0f172a;
-            --accent: #3b82f6;
-            --accent-hover: #2563eb;
+            --primary: #1a1a2e;
+            --primary-dark: #16213e;
+            --accent: #0f3460;
+            --accent-hover: #1a4f8b;
             --success: #10b981;
             --danger: #ef4444;
             --warning: #f59e0b;
-            --bg: #f1f5f9;
+            --info: #3b82f6;
+            --bg: #f0f2f5;
             --card-bg: #ffffff;
-            --text: #1e293b;
+            --text: #1a1a2e;
             --text-light: #64748b;
             --border: #e2e8f0;
-            --shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-            --shadow-lg: 0 10px 30px rgba(0, 0, 0, 0.1);
-            --radius: 16px;
-            --radius-sm: 10px;
-            --sidebar-width: 280px;
-            --transition: all 0.3s ease;
-            --gradient-primary: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
-            --gradient-accent: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
+            --shadow-lg: 0 10px 25px rgba(0, 0, 0, 0.1);
+            --shadow-xl: 0 20px 40px rgba(0, 0, 0, 0.15);
+            --radius: 20px;
+            --radius-sm: 12px;
+            --sidebar-width: 300px;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --gradient-primary: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            --gradient-accent: linear-gradient(135deg, #0f3460 0%, #1a4f8b 100%);
             --gradient-success: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            --gradient-danger: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            --gradient-warning: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
         }
 
         * {
@@ -54,7 +59,7 @@
         #loginScreen {
             position: fixed;
             inset: 0;
-            background: var(--gradient-primary);
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -65,10 +70,10 @@
         .login-box {
             background: var(--card-bg);
             padding: 50px 40px;
-            border-radius: var(--radius);
-            box-shadow: var(--shadow-lg);
+            border-radius: 24px;
+            box-shadow: var(--shadow-xl);
             width: 100%;
-            max-width: 420px;
+            max-width: 440px;
             animation: slideUp 0.6s;
             position: relative;
             overflow: hidden;
@@ -80,9 +85,9 @@
             left: 0;
             right: 0;
             height: 6px;
-            background: var(--gradient-accent);
+            background: linear-gradient(90deg, #667eea, #764ba2, #f093fb);
         }
-        .login-box h1 { font-size: 28px; text-align: center; margin-bottom: 4px; color: var(--primary); font-weight: 700; letter-spacing: -0.5px; }
+        .login-box h1 { font-size: 32px; text-align: center; margin-bottom: 4px; color: var(--primary); font-weight: 700; letter-spacing: -0.5px; }
         .login-box p { text-align: center; color: var(--text-light); margin-bottom: 32px; font-size: 14px; font-weight: 400; }
 
         .form-group { margin-bottom: 20px; }
@@ -92,23 +97,41 @@
             font-size: 14px; background: #f8fafc; transition: var(--transition);
         }
         .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
-            outline: none; border-color: var(--accent); background: #fff; box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+            outline: none; border-color: #667eea; background: #fff; box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
         }
 
         .btn {
             padding: 12px 20px; border: none; border-radius: var(--radius-sm); font-weight: 600; font-size: 14px;
             cursor: pointer; transition: var(--transition); display: inline-flex; align-items: center; gap: 8px;
-            letter-spacing: 0.3px;
+            letter-spacing: 0.3px; position: relative; overflow: hidden;
         }
-        .btn-primary { background: var(--gradient-accent); color: #fff; box-shadow: 0 4px 14px rgba(59, 130, 246, 0.3); }
-        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4); }
+        .btn::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+        .btn:active::after {
+            width: 300px;
+            height: 300px;
+        }
+        .btn-primary { background: var(--gradient-accent); color: #fff; box-shadow: 0 4px 14px rgba(15, 52, 96, 0.3); }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(15, 52, 96, 0.4); }
         .btn-success { background: var(--gradient-success); color: #fff; box-shadow: 0 4px 14px rgba(16, 185, 129, 0.3); }
         .btn-success:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4); }
-        .btn-danger { background: #ef4444; color: #fff; box-shadow: 0 4px 14px rgba(239, 68, 68, 0.3); }
+        .btn-danger { background: var(--gradient-danger); color: #fff; box-shadow: 0 4px 14px rgba(239, 68, 68, 0.3); }
         .btn-danger:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(239, 68, 68, 0.4); }
-        .btn-sm { padding: 8px 12px; font-size: 12px; border-radius: 8px; }
+        .btn-warning { background: var(--gradient-warning); color: #fff; box-shadow: 0 4px 14px rgba(245, 158, 11, 0.3); }
+        .btn-warning:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(245, 158, 11, 0.4); }
+        .btn-sm { padding: 8px 14px; font-size: 12px; border-radius: 8px; }
         .btn-outline { background: transparent; border: 2px solid var(--border); color: var(--text); }
-        .btn-outline:hover { background: #f8fafc; border-color: #cbd5e1; }
+        .btn-outline:hover { background: #f8fafc; border-color: #cbd5e1; transform: translateY(-2px); }
         .login-btn { width: 100%; padding: 14px; font-size: 16px; margin-top: 12px; justify-content: center; }
 
         .login-error { background: #fef2f2; color: var(--danger); padding: 12px; border-radius: 8px; font-size: 13px; margin-bottom: 20px; text-align: center; border-left: 4px solid var(--danger); }
@@ -119,24 +142,38 @@
         .sidebar {
             width: var(--sidebar-width); background: var(--gradient-primary); color: #f1f5f9;
             display: flex; flex-direction: column; position: fixed; top: 0; left: 0; bottom: 0; z-index: 100;
-            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: 4px 0 20px rgba(0,0,0,0.1);
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: 4px 0 20px rgba(0,0,0,0.15);
         }
-        .sidebar-brand { padding: 28px 24px; font-size: 22px; font-weight: 700; border-bottom: 1px solid rgba(255, 255, 255, 0.08); display: flex; align-items: center; gap: 12px; letter-spacing: -0.5px; }
-        .sidebar-nav { flex: 1; padding: 24px 12px; overflow-y: auto; }
+        .sidebar-brand { 
+            padding: 30px 24px; font-size: 24px; font-weight: 700; border-bottom: 1px solid rgba(255, 255, 255, 0.1); 
+            display: flex; align-items: center; gap: 12px; letter-spacing: -0.5px;
+            background: linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0) 100%);
+        }
+        .sidebar-brand i { font-size: 32px; color: #f093fb; }
+        .sidebar-nav { flex: 1; padding: 20px 12px; overflow-y: auto; }
         .nav-item {
             display: flex; align-items: center; gap: 14px; padding: 14px 18px; background: transparent; border: none;
             color: #cbd5e1; font-size: 14px; font-weight: 500; cursor: pointer; transition: var(--transition);
-            width: 100%; text-align: left; border-left: 4px solid transparent; border-radius: 10px; margin-bottom: 4px;
+            width: 100%; text-align: left; border-left: 4px solid transparent; border-radius: 12px; margin-bottom: 6px;
+            position: relative;
         }
-        .nav-item:hover { background: rgba(255, 255, 255, 0.06); color: #fff; }
-        .nav-item.active { background: rgba(59, 130, 246, 0.2); color: #fff; border-left-color: var(--accent); }
-        .sidebar-footer { padding: 20px 24px; border-top: 1px solid rgba(255, 255, 255, 0.08); display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+        .nav-item i { font-size: 20px; width: 24px; text-align: center; }
+        .nav-item:hover { background: rgba(255, 255, 255, 0.08); color: #fff; transform: translateX(4px); }
+        .nav-item.active { 
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.3) 0%, rgba(118, 75, 162, 0.3) 100%); 
+            color: #fff; border-left-color: #f093fb; 
+        }
+        .sidebar-footer { padding: 20px 24px; border-top: 1px solid rgba(255, 255, 255, 0.1); display: flex; align-items: center; justify-content: space-between; gap: 10px; }
         .sidebar-footer .user-info { font-size: 13px; font-weight: 600; }
         .sidebar-footer .user-info span { display: block; color: #94a3b8; font-weight: 400; font-size: 11px; }
 
         .main-content { flex: 1; margin-left: var(--sidebar-width); display: flex; flex-direction: column; min-height: 100vh; }
-        .topbar { background: rgba(255,255,255,0.9); backdrop-filter: blur(10px); padding: 20px 32px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; box-shadow: 0 2px 10px rgba(0,0,0,0.03); position: sticky; top: 0; z-index: 50; }
-        .topbar h2 { font-size: 24px; font-weight: 700; letter-spacing: -0.5px; }
+        .topbar { 
+            background: rgba(255,255,255,0.95); backdrop-filter: blur(10px); padding: 20px 32px; 
+            border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; 
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05); position: sticky; top: 0; z-index: 50;
+        }
+        .topbar h2 { font-size: 26px; font-weight: 700; letter-spacing: -0.5px; background: linear-gradient(135deg, #667eea, #764ba2); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
 
         .section {
             display: none;
@@ -151,14 +188,19 @@
         @keyframes fadeIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
         @keyframes slideUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
 
-        .card { background: var(--card-bg); border-radius: var(--radius); box-shadow: var(--shadow); padding: 28px; margin-bottom: 28px; position: relative; z-index: 1; transition: var(--transition); border: 1px solid rgba(0,0,0,0.02); }
+        .card { 
+            background: var(--card-bg); border-radius: var(--radius); box-shadow: var(--shadow); 
+            padding: 28px; margin-bottom: 28px; position: relative; z-index: 1; transition: var(--transition); 
+            border: 1px solid rgba(0,0,0,0.02);
+        }
         .card:hover { box-shadow: var(--shadow-lg); }
         .card-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; flex-wrap: wrap; gap: 12px; }
-        .card-header h3 { font-size: 20px; font-weight: 700; letter-spacing: -0.3px; }
+        .card-header h3 { font-size: 22px; font-weight: 700; letter-spacing: -0.3px; }
         .table-container { overflow-x: auto; border-radius: var(--radius-sm); }
         table { width: 100%; border-collapse: collapse; font-size: 14px; }
         table th, table td { padding: 16px 18px; text-align: left; border-bottom: 1px solid var(--border); }
-        table th { background: #f8fafc; font-weight: 700; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-light); }
+        table th { background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%); font-weight: 700; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-light); }
+        table tr { transition: var(--transition); }
         table tr:hover td { background: #f8fafc; }
 
         .badge { padding: 5px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; display: inline-block; }
@@ -175,18 +217,42 @@
 
         .thumb { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; background: #e2e8f0; display: flex; align-items: center; justify-content: center; font-size: 18px; }
 
-        .dashboard-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 24px; margin-bottom: 28px; }
-        .stat-card { background: var(--card-bg); border-radius: var(--radius); box-shadow: var(--shadow); padding: 24px; display: flex; align-items: center; gap: 18px; position: relative; z-index: 1; transition: var(--transition); border: 1px solid rgba(0,0,0,0.02); }
+        .dashboard-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 24px; margin-bottom: 28px; }
+        .stat-card { 
+            background: var(--card-bg); border-radius: var(--radius); box-shadow: var(--shadow); 
+            padding: 24px; display: flex; align-items: center; gap: 18px; position: relative; z-index: 1; 
+            transition: var(--transition); border: 1px solid rgba(0,0,0,0.02); overflow: hidden;
+        }
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--gradient-accent);
+        }
         .stat-card:hover { transform: translateY(-5px); box-shadow: var(--shadow-lg); }
-        .stat-icon { width: 56px; height: 56px; border-radius: 16px; background: var(--gradient-accent); display: flex; align-items: center; justify-content: center; font-size: 28px; color: #fff; flex-shrink: 0; }
+        .stat-icon { 
+            width: 56px; height: 56px; border-radius: 16px; 
+            background: var(--gradient-accent); display: flex; align-items: center; justify-content: center; 
+            font-size: 28px; color: #fff; flex-shrink: 0;
+        }
         .stat-info h4 { font-size: 28px; font-weight: 700; line-height: 1.2; }
         .stat-info p { color: var(--text-light); font-size: 13px; font-weight: 500; }
 
-        .modal { display: none; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.6); z-index: 200; align-items: center; justify-content: center; padding: 20px; backdrop-filter: blur(4px); }
+        .modal { display: none; position: fixed; inset: 0; background: rgba(0, 0, 0, 0.7); z-index: 200; align-items: center; justify-content: center; padding: 20px; backdrop-filter: blur(8px); }
         .modal.show { display: flex; }
-        .modal-content { background: #fff; border-radius: var(--radius); width: 100%; max-width: 650px; max-height: 90vh; overflow-y: auto; box-shadow: 0 25px 60px rgba(0, 0, 0, 0.2); animation: slideUp 0.3s; }
-        .modal-header { padding: 24px 28px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; background: #fff; border-radius: var(--radius) var(--radius) 0 0; z-index: 10; }
-        .modal-header h3 { font-size: 20px; font-weight: 700; }
+        .modal-content { 
+            background: #fff; border-radius: var(--radius); width: 100%; max-width: 650px; max-height: 90vh; 
+            overflow-y: auto; box-shadow: var(--shadow-xl); animation: slideUp 0.3s;
+        }
+        .modal-header { 
+            padding: 24px 28px; border-bottom: 1px solid var(--border); display: flex; align-items: center; 
+            justify-content: space-between; position: sticky; top: 0; background: #fff; border-radius: var(--radius) var(--radius) 0 0; 
+            z-index: 10;
+        }
+        .modal-header h3 { font-size: 22px; font-weight: 700; }
         .modal-close { background: none; border: none; font-size: 32px; cursor: pointer; color: var(--text-light); line-height: 1; transition: var(--transition); }
         .modal-close:hover { color: var(--text); transform: rotate(90deg); }
         .modal-body { padding: 28px; }
@@ -216,10 +282,13 @@
         .evolution-thumb .remove-evo { position: absolute; top: 4px; right: 4px; background: rgba(239,68,68,0.9); color: #fff; border: none; border-radius: 50%; width: 22px; height: 22px; font-size: 12px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
         .evolution-thumb .remove-evo:hover { background: #dc2626; }
 
-        .album-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 24px; margin-top: 10px; }
-        .album-item { background: var(--card-bg); border-radius: var(--radius); overflow: hidden; box-shadow: var(--shadow); transition: var(--transition); border: 1px solid var(--border); }
+        .album-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 24px; margin-top: 10px; }
+        .album-item { 
+            background: var(--card-bg); border-radius: var(--radius); overflow: hidden; box-shadow: var(--shadow); 
+            transition: var(--transition); border: 1px solid var(--border);
+        }
         .album-item:hover { transform: translateY(-6px); box-shadow: var(--shadow-lg); }
-        .album-item img { width: 100%; height: 180px; object-fit: cover; background: #f0f2f5; display: block; cursor: pointer; }
+        .album-item img { width: 100%; height: 200px; object-fit: cover; background: #f0f2f5; display: block; cursor: pointer; }
         .album-item-info { padding: 16px; }
         .album-item-info h4 { font-size: 15px; margin-bottom: 4px; color: var(--text); font-weight: 600; }
         .album-item-info p { font-size: 13px; color: var(--text-light); margin-bottom: 12px; }
@@ -232,10 +301,13 @@
         .lightbox-close:hover { color: #ddd; }
 
         .toast-container { position: fixed; bottom: 24px; right: 24px; z-index: 300; display: flex; flex-direction: column; gap: 8px; }
-        .toast { background: var(--primary-dark); color: #fff; padding: 16px 20px; border-radius: 12px; font-size: 14px; font-weight: 500; box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2); animation: slideIn 0.3s; }
-        .toast.success { background: #059669; }
-        .toast.error { background: #dc2626; }
-        .toast.warning { background: #d97706; }
+        .toast { 
+            background: var(--primary-dark); color: #fff; padding: 16px 20px; border-radius: 12px; 
+            font-size: 14px; font-weight: 500; box-shadow: var(--shadow-lg); animation: slideIn 0.3s;
+        }
+        .toast.success { background: linear-gradient(135deg, #10b981, #059669); }
+        .toast.error { background: linear-gradient(135deg, #ef4444, #dc2626); }
+        .toast.warning { background: linear-gradient(135deg, #f59e0b, #d97706); }
         @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
 
         .permissions-container { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 8px; }
@@ -245,9 +317,12 @@
         .perm-check { display: flex; align-items: center; gap: 6px; font-size: 13px; }
         .permissions-updated { font-size: 12px; color: var(--text-light); margin-top: 12px; text-align: right; }
 
-        .weekly-schedule { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; margin-top: 16px; }
-        .day-card { border: 1px solid var(--border); border-radius: 12px; padding: 16px; background: #f8fafc; transition: var(--transition); }
-        .day-card:hover { background: #fff; box-shadow: var(--shadow); }
+        .weekly-schedule { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-top: 16px; }
+        .day-card { 
+            border: 1px solid var(--border); border-radius: 12px; padding: 16px; background: #f8fafc; 
+            transition: var(--transition);
+        }
+        .day-card:hover { background: #fff; box-shadow: var(--shadow); transform: translateY(-4px); }
         .day-card h4 { font-size: 16px; margin-bottom: 12px; color: var(--text); font-weight: 600; }
         .workout-item { background: #fff; border: 1px solid var(--border); border-radius: 8px; padding: 10px; margin-bottom: 8px; }
         .workout-item strong { display: block; font-size: 14px; }
@@ -264,7 +339,7 @@
         .student-area .evolution-card .evo-info p { font-size: 12px; color: var(--text-light); margin-bottom: 4px; }
         .student-area .evolution-card .evo-info small { font-size: 11px; color: #94a3b8; }
 
-        .student-avatar { width: 60px; height: 60px; border-radius: 50%; object-fit: cover; border: 3px solid var(--accent); }
+        .student-avatar { width: 60px; height: 60px; border-radius: 50%; object-fit: cover; border: 3px solid #667eea; }
 
         .note-helper { font-size: 12px; color: var(--text-light); font-style: italic; margin-top: 6px; }
 
@@ -298,6 +373,8 @@
             .login-box { padding: 30px 20px; }
             .student-avatar { width: 50px; height: 50px; }
             .grade-filter { flex-direction: column; align-items: stretch; }
+            .dashboard-cards { grid-template-columns: 1fr; }
+            .sidebar { width: 100%; }
         }
     </style>
 </head>
@@ -311,20 +388,20 @@
             <div id="loginError" class="login-error hidden"></div>
             <form onsubmit="handleLogin(event)">
                 <div class="form-group">
-                    <label>Usuário</label>
+                    <label><i class="fas fa-user"></i> Usuário</label>
                     <input type="text" id="loginUsername" placeholder="Digite seu usuário" required autocomplete="off"
                            autofocus oninput="this.value = this.value.toUpperCase()"
                            onkeydown="if(event.key==='Enter'){event.preventDefault(); document.getElementById('loginPassword').focus();}">
                 </div>
                 <div class="form-group">
-                    <label>Senha</label>
+                    <label><i class="fas fa-lock"></i> Senha</label>
                     <input type="password" id="loginPassword" placeholder="Digite sua senha" required autocomplete="off"
                            oninput="this.value = this.value.toUpperCase()"
                            onkeydown="if(event.key==='Enter'){event.preventDefault(); document.getElementById('loginScreen').querySelector('form').requestSubmit();}">
                 </div>
-                <button type="submit" class="btn btn-primary login-btn">Entrar</button>
+                <button type="submit" class="btn btn-primary login-btn"><i class="fas fa-sign-in-alt"></i> Entrar</button>
             </form>
-            <button class="btn btn-outline login-btn" style="margin-top:10px;" onclick="showStudentLogin()">Sou Aluno</button>
+            <button class="btn btn-outline login-btn" style="margin-top:10px;" onclick="showStudentLogin()"><i class="fas fa-graduation-cap"></i> Sou Aluno</button>
         </div>
 
         <div class="login-box hidden" id="loginStudentBox">
@@ -333,48 +410,48 @@
             <div id="studentLoginError" class="login-error hidden"></div>
             <form onsubmit="handleStudentLogin(event)">
                 <div class="form-group">
-                    <label>Usuário</label>
+                    <label><i class="fas fa-user"></i> Usuário</label>
                     <input type="text" id="studentLoginUsername" placeholder="Seu nome de usuário" required autocomplete="off"
                            autofocus oninput="this.value = this.value.toUpperCase()"
                            onkeydown="if(event.key==='Enter'){event.preventDefault(); document.getElementById('studentLoginPassword').focus();}">
                 </div>
                 <div class="form-group">
-                    <label>Senha</label>
+                    <label><i class="fas fa-lock"></i> Senha</label>
                     <input type="password" id="studentLoginPassword" placeholder="Telefone sem DDD" required autocomplete="off"
                            oninput="this.value = this.value.toUpperCase()"
                            onkeydown="if(event.key==='Enter'){event.preventDefault(); document.getElementById('loginStudentBox').querySelector('form').requestSubmit();}">
                 </div>
-                <button type="submit" class="btn btn-primary login-btn">Entrar</button>
+                <button type="submit" class="btn btn-primary login-btn"><i class="fas fa-sign-in-alt"></i> Entrar</button>
             </form>
-            <button class="btn btn-outline login-btn" style="margin-top:10px;" onclick="showPersonalLogin()">Voltar ao Login do Personal</button>
+            <button class="btn btn-outline login-btn" style="margin-top:10px;" onclick="showPersonalLogin()"><i class="fas fa-arrow-left"></i> Voltar ao Login do Personal</button>
         </div>
     </div>
 
     <!-- Aplicativo -->
     <div id="app" class="hidden">
         <div class="sidebar" id="sidebar">
-            <div class="sidebar-brand">💪 Mestre Paulo</div>
+            <div class="sidebar-brand"><i class="fas fa-dumbbell"></i> Mestre Paulo</div>
             <div class="sidebar-nav" id="sidebarNav"></div>
             <div class="sidebar-footer">
                 <div class="user-info">
                     <span id="loggedUserName"></span>
                     <span id="loggedUserRole"></span>
                 </div>
-                <button class="btn btn-sm btn-outline" style="color:#fff;border-color:rgba(255,255,255,0.3);" onclick="logout()">Sair</button>
+                <button class="btn btn-sm btn-outline" style="color:#fff;border-color:rgba(255,255,255,0.3);" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Sair</button>
             </div>
         </div>
 
         <div class="main-content">
             <div class="topbar">
                 <h2 id="pageTitle">Dashboard</h2>
-                <button class="btn btn-sm btn-outline" onclick="toggleSidebar()">☰ Menu</button>
+                <button class="btn btn-sm btn-outline" onclick="toggleSidebar()"><i class="fas fa-bars"></i> Menu</button>
             </div>
 
             <!-- Dashboard -->
             <section id="section-dashboard" class="section active">
                 <div class="dashboard-cards" id="dashboardCards"></div>
                 <div class="card">
-                    <div class="card-header"><h3>Próximas Aulas</h3></div>
+                    <div class="card-header"><h3><i class="fas fa-calendar-alt"></i> Próximas Aulas</h3></div>
                     <div class="table-container">
                         <table>
                             <thead><tr><th>Data</th><th>Hora</th><th>Aluno</th><th>Academia</th><th>Status</th></tr></thead>
@@ -387,7 +464,7 @@
             <!-- Alunos -->
             <section id="section-alunos" class="section">
                 <div class="card">
-                    <div class="card-header"><h3>👥 Alunos</h3><button class="btn btn-primary" id="btnAddStudent" onclick="openStudentForm()">+ Novo Aluno</button></div>
+                    <div class="card-header"><h3><i class="fas fa-users"></i> Alunos</h3><button class="btn btn-primary" id="btnAddStudent" onclick="openStudentForm()"><i class="fas fa-plus"></i> Novo Aluno</button></div>
                     <div class="table-container">
                         <table>
                             <thead><tr><th>Foto</th><th>Nome</th><th>Academia</th><th>CPF</th><th>Celular</th><th>Data Cadastro</th><th>Valor</th><th>Ações</th></tr></thead>
@@ -400,7 +477,7 @@
             <!-- Academias -->
             <section id="section-academias" class="section">
                 <div class="card">
-                    <div class="card-header"><h3>🏋️ Academias</h3><button class="btn btn-primary" id="btnAddAcademy" onclick="openAcademyForm()">+ Nova Academia</button></div>
+                    <div class="card-header"><h3><i class="fas fa-building"></i> Academias</h3><button class="btn btn-primary" id="btnAddAcademy" onclick="openAcademyForm()"><i class="fas fa-plus"></i> Nova Academia</button></div>
                     <div class="table-container">
                         <table>
                             <thead><tr><th>Nome</th><th>Endereço</th><th>Telefone</th><th>Responsável</th><th>Ações</th></tr></thead>
@@ -414,16 +491,16 @@
             <section id="section-agenda" class="section">
                 <div class="card">
                     <div class="card-header">
-                        <h3>📅 Agenda de Aulas</h3>
+                        <h3><i class="fas fa-calendar-check"></i> Agenda de Aulas</h3>
                         <div style="display: flex; gap: 8px; align-items: center;">
-                            <button class="btn btn-outline" id="btnDeleteSelectedSchedule" onclick="deleteSelectedSchedule()" style="display:none;">Excluir Selecionados</button>
-                            <button class="btn btn-outline" id="btnAddRecurringSchedule" onclick="openRecurringScheduleForm()" style="display:none;">+ Aulas Recorrentes</button>
-                            <button class="btn btn-primary" id="btnAddSchedule" onclick="openScheduleForm()">+ Nova Aula</button>
+                            <button class="btn btn-danger" id="btnDeleteSelectedSchedule" onclick="deleteSelectedSchedule()" style="display:none;"><i class="fas fa-trash"></i> Excluir Selecionados</button>
+                            <button class="btn btn-warning" id="btnAddRecurringSchedule" onclick="openRecurringScheduleForm()" style="display:none;"><i class="fas fa-calendar-plus"></i> Aulas Recorrentes</button>
+                            <button class="btn btn-primary" id="btnAddSchedule" onclick="openScheduleForm()"><i class="fas fa-plus"></i> Nova Aula</button>
                         </div>
                     </div>
                     <div class="agenda-view-toggle">
-                        <button class="btn btn-sm btn-outline active" id="btnAgendaViewList" onclick="setAgendaView('list')">Lista de Aulas</button>
-                        <button class="btn btn-sm btn-outline" id="btnAgendaViewGrade" onclick="setAgendaView('grade')">Grade de Horários</button>
+                        <button class="btn btn-sm btn-outline active" id="btnAgendaViewList" onclick="setAgendaView('list')"><i class="fas fa-list"></i> Lista de Aulas</button>
+                        <button class="btn btn-sm btn-outline" id="btnAgendaViewGrade" onclick="setAgendaView('grade')"><i class="fas fa-table"></i> Grade de Horários</button>
                     </div>
                     <div id="agendaListContainer">
                         <div class="table-container">
@@ -462,7 +539,7 @@
                                 <label>Duração (min)</label>
                                 <input type="number" id="gradeDuration" value="60" min="15" step="15">
                             </div>
-                            <button class="btn btn-primary" onclick="generateAvailabilityGrid()">Gerar Grade</button>
+                            <button class="btn btn-primary" onclick="generateAvailabilityGrid()"><i class="fas fa-chart-bar"></i> Gerar Grade</button>
                         </div>
                         <div id="availabilityGridContainer">
                             <p style="color:#64748b;">Selecione os parâmetros e clique em "Gerar Grade".</p>
@@ -474,7 +551,7 @@
             <!-- Treinos -->
             <section id="section-treinos" class="section">
                 <div class="card">
-                    <div class="card-header"><h3>📋 Treinos Semanais</h3><button class="btn btn-primary" id="btnAddWorkout" onclick="openWorkoutForm()">+ Novo Treino</button></div>
+                    <div class="card-header"><h3><i class="fas fa-dumbbell"></i> Treinos Semanais</h3><button class="btn btn-primary" id="btnAddWorkout" onclick="openWorkoutForm()"><i class="fas fa-plus"></i> Novo Treino</button></div>
                     <div id="weeklySchedule" class="weekly-schedule"></div>
                     <hr style="margin: 24px 0; border-color: #e2e8f0;">
                     <div class="table-container">
@@ -489,7 +566,7 @@
             <!-- Álbum -->
             <section id="section-album" class="section">
                 <div class="card">
-                    <div class="card-header"><h3>🖼️ Álbum de Fotos</h3><button class="btn btn-primary" id="btnAddAlbum" onclick="openAlbumForm()">+ Nova Foto</button></div>
+                    <div class="card-header"><h3><i class="fas fa-images"></i> Álbum de Fotos</h3><button class="btn btn-primary" id="btnAddAlbum" onclick="openAlbumForm()"><i class="fas fa-plus"></i> Nova Foto</button></div>
                     <div id="albumGrid" class="album-grid"></div>
                 </div>
             </section>
@@ -497,7 +574,7 @@
             <!-- Fluxo de Caixa -->
             <section id="section-fluxocaixa" class="section">
                 <div class="card">
-                    <div class="card-header"><h3>💰 Fluxo de Caixa</h3><button class="btn btn-primary" id="btnAddCashflow" onclick="openCashflowForm()">+ Novo Lançamento</button></div>
+                    <div class="card-header"><h3><i class="fas fa-money-bill-wave"></i> Fluxo de Caixa</h3><button class="btn btn-primary" id="btnAddCashflow" onclick="openCashflowForm()"><i class="fas fa-plus"></i> Novo Lançamento</button></div>
                     <div class="table-container">
                         <table>
                             <thead><tr><th>Data</th><th>Descrição</th><th>Entrada</th><th>Saída</th><th>Forma de Pagamento</th><th>Ações</th></tr></thead>
@@ -509,10 +586,10 @@
                 <!-- Contas a Pagar e Receber (Futuras) -->
                 <div class="card">
                     <div class="card-header">
-                        <h3>📅 Contas a Pagar e Receber (Futuras)</h3>
+                        <h3><i class="fas fa-file-invoice-dollar"></i> Contas a Pagar e Receber (Futuras)</h3>
                         <div style="display: flex; gap: 8px; align-items: center;">
-                            <button class="btn btn-outline" id="btnGerarMensalidades" onclick="gerarMensalidades()">Gerar Mensalidades</button>
-                            <button class="btn btn-primary" id="btnAddConta" onclick="openContaForm()">+ Nova Conta</button>
+                            <button class="btn btn-warning" id="btnGerarMensalidades" onclick="gerarMensalidades()"><i class="fas fa-cogs"></i> Gerar Mensalidades</button>
+                            <button class="btn btn-primary" id="btnAddConta" onclick="openContaForm()"><i class="fas fa-plus"></i> Nova Conta</button>
                         </div>
                     </div>
                     <div class="table-container">
@@ -536,7 +613,7 @@
             <!-- Filtro -->
             <section id="section-filtro" class="section">
                 <div class="card">
-                    <div class="card-header"><h3>🔍 Filtro Avançado</h3></div>
+                    <div class="card-header"><h3><i class="fas fa-search"></i> Filtro Avançado</h3></div>
                     <div class="form-group" style="display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px;">
                         <div>
                             <label>Filtrar em (Módulo)</label>
@@ -583,7 +660,7 @@
                             <input type="text" id="filtroDescricao" placeholder="Parte da descrição">
                         </div>
                     </div>
-                    <button class="btn btn-primary" onclick="aplicarFiltro()">Pesquisar</button>
+                    <button class="btn btn-primary" onclick="aplicarFiltro()"><i class="fas fa-search"></i> Pesquisar</button>
                     <hr style="margin: 20px 0; border-color: #e2e8f0;">
                     <div class="table-container">
                         <table>
@@ -597,7 +674,7 @@
             <!-- Usuários -->
             <section id="section-usuarios" class="section">
                 <div class="card">
-                    <div class="card-header"><h3>🔐 Usuários e Permissões</h3><button class="btn btn-primary" id="btnAddUser" onclick="openUserForm()">+ Novo Usuário</button></div>
+                    <div class="card-header"><h3><i class="fas fa-user-cog"></i> Usuários e Permissões</h3><button class="btn btn-primary" id="btnAddUser" onclick="openUserForm()"><i class="fas fa-plus"></i> Novo Usuário</button></div>
                     <div class="table-container">
                         <table>
                             <thead><tr><th>Usuário</th><th>Nome</th><th>Perfil</th><th>Ativo</th><th>Ações</th></tr></thead>
@@ -611,8 +688,8 @@
             <section id="section-auditoria" class="section">
                 <div class="card">
                     <div class="card-header">
-                        <h3>🕵️ Auditoria de Usuários</h3>
-                        <button class="btn btn-danger" id="btnClearAuditLogs" onclick="clearAuditLogs()" style="display:none;">Limpar Logs</button>
+                        <h3><i class="fas fa-history"></i> Auditoria de Usuários</h3>
+                        <button class="btn btn-danger" id="btnClearAuditLogs" onclick="clearAuditLogs()" style="display:none;"><i class="fas fa-trash"></i> Limpar Logs</button>
                     </div>
                     <div class="table-container">
                         <table class="audit-log-table">
@@ -647,7 +724,7 @@
                     <div class="photo-upload">
                         <img id="studentFotoPreview" class="photo-preview" src="" alt="Foto" style="background:#e2e8f0;">
                         <input type="file" id="studentFoto" accept="image/*" onchange="handleStudentPhoto(event)" style="display:none;">
-                        <button type="button" class="btn btn-outline" onclick="document.getElementById('studentFoto').click()">📷 Adicionar Foto</button>
+                        <button type="button" class="btn btn-outline" onclick="document.getElementById('studentFoto').click()"><i class="fas fa-camera"></i> Adicionar Foto</button>
                     </div>
                     <div class="form-group"><label>Nome *</label><input type="text" id="studentNome" required placeholder="Nome do aluno" onkeydown="if(event.key==='Enter'){event.preventDefault(); document.getElementById('studentCpf').focus();}"></div>
                     <div class="form-group"><label>CPF</label><input type="text" id="studentCpf" placeholder="000.000.000-00" onkeydown="if(event.key==='Enter'){event.preventDefault(); document.getElementById('studentDataCadastro').focus();}"></div>
@@ -663,13 +740,13 @@
                     <!-- Seção de Fotos de Evolução -->
                     <div class="evolution-section">
                         <h4 style="margin-bottom: 12px; font-size: 16px; font-weight: 600;">📸 Fotos do Aluno (Evolução)</h4>
-                        <button type="button" class="btn btn-outline btn-sm" onclick="document.getElementById('evolutionFotoInput').click()">+ Adicionar Foto</button>
+                        <button type="button" class="btn btn-outline btn-sm" onclick="document.getElementById('evolutionFotoInput').click()"><i class="fas fa-plus"></i> Adicionar Foto</button>
                         <input type="file" id="evolutionFotoInput" accept="image/*" style="display:none;" onchange="handleEvolutionPhoto(event)">
                         <div id="evolutionThumbs" class="evolution-thumbs"></div>
                         <p class="note-helper">Estas fotos ficarão visíveis para o aluno quando ele entrar na área dele.</p>
                     </div>
                 </div>
-                <div class="modal-footer"><button type="button" class="btn btn-outline" onclick="closeModal('studentModal')">Cancelar</button><button type="submit" class="btn btn-success">Salvar</button></div>
+                <div class="modal-footer"><button type="button" class="btn btn-outline" onclick="closeModal('studentModal')"><i class="fas fa-times"></i> Cancelar</button><button type="submit" class="btn btn-success"><i class="fas fa-save"></i> Salvar</button></div>
             </form>
         </div>
     </div>
@@ -684,7 +761,7 @@
                     <div class="form-group"><label>Telefone</label><input type="text" id="academyTelefone" placeholder="(00) 00000-0000" onkeydown="if(event.key==='Enter'){event.preventDefault(); document.getElementById('academyResponsavel').focus();}"></div>
                     <div class="form-group"><label>Responsável</label><input type="text" id="academyResponsavel" placeholder="Nome do responsável" onkeydown="if(event.key==='Enter'){event.preventDefault(); document.getElementById('academyModal').querySelector('button[type=submit]').focus();}"></div>
                 </div>
-                <div class="modal-footer"><button type="button" class="btn btn-outline" onclick="closeModal('academyModal')">Cancelar</button><button type="submit" class="btn btn-success">Salvar</button></div>
+                <div class="modal-footer"><button type="button" class="btn btn-outline" onclick="closeModal('academyModal')"><i class="fas fa-times"></i> Cancelar</button><button type="submit" class="btn btn-success"><i class="fas fa-save"></i> Salvar</button></div>
             </form>
         </div>
     </div>
@@ -700,7 +777,7 @@
                     <div class="form-group"><label>Academia *</label><select id="scheduleAcademia" required onkeydown="if(event.key==='Enter'){event.preventDefault(); document.getElementById('scheduleStatus').focus();}"></select></div>
                     <div class="form-group"><label>Status</label><select id="scheduleStatus" onkeydown="if(event.key==='Enter'){event.preventDefault(); document.getElementById('scheduleModal').querySelector('button[type=submit]').focus();}"><option value="Agendada">Agendada</option><option value="Concluída">Concluída</option><option value="Cancelada">Cancelada</option></select></div>
                 </div>
-                <div class="modal-footer"><button type="button" class="btn btn-outline" onclick="closeModal('scheduleModal')">Cancelar</button><button type="submit" class="btn btn-success">Salvar</button></div>
+                <div class="modal-footer"><button type="button" class="btn btn-outline" onclick="closeModal('scheduleModal')"><i class="fas fa-times"></i> Cancelar</button><button type="submit" class="btn btn-success"><i class="fas fa-save"></i> Salvar</button></div>
             </form>
         </div>
     </div>
@@ -726,7 +803,7 @@
                     </div></div>
                     <div class="form-group"><label>Status</label><select id="recurringStatus" onkeydown="if(event.key==='Enter'){event.preventDefault(); document.getElementById('recurringScheduleModal').querySelector('button[type=submit]').focus();}"><option value="Agendada">Agendada</option><option value="Concluída">Concluída</option><option value="Cancelada">Cancelada</option></select></div>
                 </div>
-                <div class="modal-footer"><button type="button" class="btn btn-outline" onclick="closeModal('recurringScheduleModal')">Cancelar</button><button type="submit" class="btn btn-success">Gerar Aulas</button></div>
+                <div class="modal-footer"><button type="button" class="btn btn-outline" onclick="closeModal('recurringScheduleModal')"><i class="fas fa-times"></i> Cancelar</button><button type="submit" class="btn btn-success"><i class="fas fa-save"></i> Gerar Aulas</button></div>
             </form>
         </div>
     </div>
@@ -742,7 +819,7 @@
                     <div class="form-group"><label>Saída (R$)</label><input type="number" id="cashflowSaida" step="0.01" min="0" placeholder="0.00" onkeydown="if(event.key==='Enter'){event.preventDefault(); document.getElementById('cashflowFormaPgto').focus();}"></div>
                     <div class="form-group"><label>Forma de Pagamento</label><select id="cashflowFormaPgto" onkeydown="if(event.key==='Enter'){event.preventDefault(); document.getElementById('cashflowModal').querySelector('button[type=submit]').focus();}"><option value="Dinheiro">Dinheiro</option><option value="Pix">Pix</option><option value="Cartão de Crédito">Cartão de Crédito</option><option value="Cartão de Débito">Cartão de Débito</option><option value="Transferência">Transferência</option><option value="Outro">Outro</option></select></div>
                 </div>
-                <div class="modal-footer"><button type="button" class="btn btn-outline" onclick="closeModal('cashflowModal')">Cancelar</button><button type="submit" class="btn btn-success">Salvar</button></div>
+                <div class="modal-footer"><button type="button" class="btn btn-outline" onclick="closeModal('cashflowModal')"><i class="fas fa-times"></i> Cancelar</button><button type="submit" class="btn btn-success"><i class="fas fa-save"></i> Salvar</button></div>
             </form>
         </div>
     </div>
@@ -782,7 +859,7 @@
                         </select>
                     </div>
                 </div>
-                <div class="modal-footer"><button type="button" class="btn btn-outline" onclick="closeModal('contaModal')">Cancelar</button><button type="submit" class="btn btn-success">Salvar</button></div>
+                <div class="modal-footer"><button type="button" class="btn btn-outline" onclick="closeModal('contaModal')"><i class="fas fa-times"></i> Cancelar</button><button type="submit" class="btn btn-success"><i class="fas fa-save"></i> Salvar</button></div>
             </form>
         </div>
     </div>
@@ -799,7 +876,7 @@
                     <div class="form-group"><label><input type="checkbox" id="userActive" checked onkeydown="if(event.key==='Enter'){event.preventDefault(); document.getElementById('userModal').querySelector('button[type=submit]').focus();}"> Usuário ativo</label></div>
                     <div class="form-group"><label>Permissões de Acesso <span style="font-weight:400;color:#64748b;">(gerado automaticamente)</span></label><div id="permissionsContainer" class="permissions-container"></div><div class="permissions-updated">Atualizado em: <span id="permissionsUpdatedAt"></span></div></div>
                 </div>
-                <div class="modal-footer"><button type="button" class="btn btn-outline" onclick="closeModal('userModal')">Cancelar</button><button type="submit" class="btn btn-success">Salvar</button></div>
+                <div class="modal-footer"><button type="button" class="btn btn-outline" onclick="closeModal('userModal')"><i class="fas fa-times"></i> Cancelar</button><button type="submit" class="btn btn-success"><i class="fas fa-save"></i> Salvar</button></div>
             </form>
         </div>
     </div>
@@ -812,12 +889,12 @@
                     <div class="photo-upload" style="flex-direction: column; align-items: center; gap: 10px;">
                         <img id="albumFotoPreview" class="photo-preview" src="" alt="Foto" style="width: 100%; height: 200px; border-radius: 8px; object-fit: contain; background:#e2e8f0;">
                         <input type="file" id="albumFoto" accept="image/*" onchange="handleAlbumPhoto(event)" style="display:none;">
-                        <button type="button" class="btn btn-outline" onclick="document.getElementById('albumFoto').click()">📷 Selecionar Foto</button>
+                        <button type="button" class="btn btn-outline" onclick="document.getElementById('albumFoto').click()"><i class="fas fa-camera"></i> Selecionar Foto</button>
                     </div>
                     <div class="form-group"><label>Título</label><input type="text" id="albumTitulo" placeholder="Título da foto" onkeydown="if(event.key==='Enter'){event.preventDefault(); document.getElementById('albumDescricao').focus();}"></div>
                     <div class="form-group"><label>Descrição</label><textarea id="albumDescricao" rows="2" placeholder="Descrição da foto" onkeydown="if(event.key==='Enter' && !event.shiftKey){event.preventDefault(); document.getElementById('albumModal').querySelector('button[type=submit]').focus();}"></textarea></div>
                 </div>
-                <div class="modal-footer"><button type="button" class="btn btn-outline" onclick="closeModal('albumModal')">Cancelar</button><button type="submit" class="btn btn-success">Salvar</button></div>
+                <div class="modal-footer"><button type="button" class="btn btn-outline" onclick="closeModal('albumModal')"><i class="fas fa-times"></i> Cancelar</button><button type="submit" class="btn btn-success"><i class="fas fa-save"></i> Salvar</button></div>
             </form>
         </div>
     </div>
@@ -847,7 +924,7 @@
                     <div class="form-group"><label>Aluno Destinado (opcional)</label><select id="workoutAluno" onkeydown="if(event.key==='Enter'){event.preventDefault(); document.getElementById('workoutExercicios').focus();}"></select></div>
                     <div class="form-group"><label>Exercícios / Descrição</label><textarea id="workoutExercicios" rows="4" placeholder="Lista de exercícios, séries, repetições..." onkeydown="if(event.key==='Enter' && !event.shiftKey){event.preventDefault(); document.getElementById('workoutModal').querySelector('button[type=submit]').focus();}"></textarea></div>
                 </div>
-                <div class="modal-footer"><button type="button" class="btn btn-outline" onclick="closeModal('workoutModal')">Cancelar</button><button type="submit" class="btn btn-success">Salvar</button></div>
+                <div class="modal-footer"><button type="button" class="btn btn-outline" onclick="closeModal('workoutModal')"><i class="fas fa-times"></i> Cancelar</button><button type="submit" class="btn btn-success"><i class="fas fa-save"></i> Salvar</button></div>
             </form>
         </div>
     </div>
@@ -877,16 +954,16 @@
 
         // ==================== DADOS E CONFIG ====================
         const MODULES = [
-            { key: 'dashboard', label: 'Dashboard', icon: '📊', actions: ['ver'] },
-            { key: 'alunos', label: 'Alunos', icon: '👥', actions: ['ver', 'criar', 'editar', 'excluir'] },
-            { key: 'academias', label: 'Academias', icon: '🏋️', actions: ['ver', 'criar', 'editar', 'excluir'] },
-            { key: 'agenda', label: 'Agenda', icon: '📅', actions: ['ver', 'criar', 'editar', 'excluir'] },
-            { key: 'treinos', label: 'Treinos', icon: '📋', actions: ['ver', 'criar', 'editar', 'excluir'] },
-            { key: 'album', label: 'Álbum', icon: '🖼️', actions: ['ver', 'criar', 'editar', 'excluir'] },
-            { key: 'fluxocaixa', label: 'Fluxo de Caixa', icon: '💰', actions: ['ver', 'criar', 'editar', 'excluir'] },
-            { key: 'filtro', label: 'Filtro', icon: '🔍', actions: ['ver'] },
-            { key: 'usuarios', label: 'Usuários', icon: '🔐', actions: ['ver', 'criar', 'editar', 'excluir'] },
-            { key: 'auditoria', label: 'Auditoria', icon: '🕵️', actions: ['ver', 'excluir'] }
+            { key: 'dashboard', label: 'Dashboard', icon: 'fa-chart-line', actions: ['ver'] },
+            { key: 'alunos', label: 'Alunos', icon: 'fa-users', actions: ['ver', 'criar', 'editar', 'excluir'] },
+            { key: 'academias', label: 'Academias', icon: 'fa-building', actions: ['ver', 'criar', 'editar', 'excluir'] },
+            { key: 'agenda', label: 'Agenda', icon: 'fa-calendar-check', actions: ['ver', 'criar', 'editar', 'excluir'] },
+            { key: 'treinos', label: 'Treinos', icon: 'fa-dumbbell', actions: ['ver', 'criar', 'editar', 'excluir'] },
+            { key: 'album', label: 'Álbum', icon: 'fa-images', actions: ['ver', 'criar', 'editar', 'excluir'] },
+            { key: 'fluxocaixa', label: 'Fluxo de Caixa', icon: 'fa-money-bill-wave', actions: ['ver', 'criar', 'editar', 'excluir'] },
+            { key: 'filtro', label: 'Filtro', icon: 'fa-search', actions: ['ver'] },
+            { key: 'usuarios', label: 'Usuários', icon: 'fa-user-cog', actions: ['ver', 'criar', 'editar', 'excluir'] },
+            { key: 'auditoria', label: 'Auditoria', icon: 'fa-history', actions: ['ver', 'excluir'] }
         ];
 
         const ACTION_LABELS = { ver: 'Ver', criar: 'Criar', editar: 'Editar', excluir: 'Excluir' };
@@ -1099,7 +1176,7 @@
                 html = '<p style="color:#64748b;">Usuários do tipo Aluno não possuem permissões de painel.</p>';
             } else {
                 MODULES.forEach(mod => {
-                    html += `<div class="perm-module"><strong>${mod.icon} ${mod.label}</strong><div class="perm-actions">`;
+                    html += `<div class="perm-module"><strong><i class="fas ${mod.icon}"></i> ${mod.label}</strong><div class="perm-actions">`;
                     mod.actions.forEach(action => {
                         const key = `${mod.key}:${action}`;
                         const isAdmin = role === 'admin';
@@ -1260,7 +1337,7 @@
             let html = '';
             MODULES.forEach(mod => {
                 if (can(mod.key, 'ver')) {
-                    html += `<button class="nav-item ${currentSection === mod.key ? 'active' : ''}" data-section="${mod.key}" onclick="navigate('${mod.key}')">${mod.icon} <span>${mod.label}</span></button>`;
+                    html += `<button class="nav-item ${currentSection === mod.key ? 'active' : ''}" data-section="${mod.key}" onclick="navigate('${mod.key}')"><i class="fas ${mod.icon}"></i> <span>${mod.label}</span></button>`;
                 }
             });
             nav.innerHTML = html;
@@ -1363,13 +1440,13 @@
                 }
             });
             document.getElementById('dashboardCards').innerHTML = `
-                <div class="stat-card"><div class="stat-icon">👥</div><div class="stat-info"><h4>${totalAlunos}</h4><p>Alunos Ativos</p></div></div>
-                <div class="stat-card"><div class="stat-icon">🏋️</div><div class="stat-info"><h4>${totalAcademias}</h4><p>Academias</p></div></div>
-                <div class="stat-card"><div class="stat-icon">📅</div><div class="stat-info"><h4>${totalAgendadas}</h4><p>Aulas Agendadas</p></div></div>
-                <div class="stat-card"><div class="stat-icon">📋</div><div class="stat-info"><h4>${totalTreinos}</h4><p>Treinos Cadastrados</p></div></div>
-                <div class="stat-card"><div class="stat-icon">🖼️</div><div class="stat-info"><h4>${totalFotos}</h4><p>Fotos no Álbum</p></div></div>
-                <div class="stat-card"><div class="stat-icon">💰</div><div class="stat-info"><h4>${formatCurrency(receitaMes)}</h4><p>Receita do Mês</p></div></div>
-                <div class="stat-card"><div class="stat-icon">📈</div><div class="stat-info"><h4>${formatCurrency(entradaMes - saidaMes)}</h4><p>Saldo do Mês (Caixa)</p></div></div>
+                <div class="stat-card"><div class="stat-icon"><i class="fas fa-users"></i></div><div class="stat-info"><h4>${totalAlunos}</h4><p>Alunos Ativos</p></div></div>
+                <div class="stat-card"><div class="stat-icon"><i class="fas fa-building"></i></div><div class="stat-info"><h4>${totalAcademias}</h4><p>Academias</p></div></div>
+                <div class="stat-card"><div class="stat-icon"><i class="fas fa-calendar-check"></i></div><div class="stat-info"><h4>${totalAgendadas}</h4><p>Aulas Agendadas</p></div></div>
+                <div class="stat-card"><div class="stat-icon"><i class="fas fa-dumbbell"></i></div><div class="stat-info"><h4>${totalTreinos}</h4><p>Treinos Cadastrados</p></div></div>
+                <div class="stat-card"><div class="stat-icon"><i class="fas fa-images"></i></div><div class="stat-info"><h4>${totalFotos}</h4><p>Fotos no Álbum</p></div></div>
+                <div class="stat-card"><div class="stat-icon"><i class="fas fa-money-bill-wave"></i></div><div class="stat-info"><h4>${formatCurrency(receitaMes)}</h4><p>Receita do Mês</p></div></div>
+                <div class="stat-card"><div class="stat-icon"><i class="fas fa-chart-line"></i></div><div class="stat-info"><h4>${formatCurrency(entradaMes - saidaMes)}</h4><p>Saldo do Mês (Caixa)</p></div></div>
             `;
             const sorted = [...state.schedule]
                 .filter(a => new Date(a.data + 'T' + a.hora) >= new Date())
@@ -1594,7 +1671,7 @@
             let html = '';
             state.students.forEach(s => {
                 const academia = state.academias.find(a => a.id === s.academiaId);
-                const foto = s.foto ? `<img class="thumb" src="${esc(s.foto)}" alt="Foto">` : '<div class="thumb">👤</div>';
+                const foto = s.foto ? `<img class="thumb" src="${esc(s.foto)}" alt="Foto">` : '<div class="thumb"><i class="fas fa-user"></i></div>';
                 let valorDisplay = '';
                 if (s.valorAula > 0) {
                     valorDisplay = `Aula: ${formatCurrency(s.valorAula)}`;
@@ -1612,8 +1689,8 @@
                     <td>${formatDate(s.dataCadastro || '')}</td>
                     <td>${valorDisplay}</td>
                     <td>
-                        <button class="btn btn-sm btn-outline" onclick="openStudentForm('${s.id}')" ${can('alunos', 'editar') ? '' : 'disabled'}>✏️</button>
-                        <button class="btn btn-sm btn-danger" onclick="deleteStudent('${s.id}')" ${can('alunos', 'excluir') ? '' : 'disabled'}>🗑️</button>
+                        <button class="btn btn-sm btn-outline" onclick="openStudentForm('${s.id}')" ${can('alunos', 'editar') ? '' : 'disabled'}><i class="fas fa-edit"></i></button>
+                        <button class="btn btn-sm btn-danger" onclick="deleteStudent('${s.id}')" ${can('alunos', 'excluir') ? '' : 'disabled'}><i class="fas fa-trash"></i></button>
                     </td>
                 </tr>`;
             });
@@ -1672,8 +1749,8 @@
             let html = '';
             state.academias.forEach(a => {
                 html += `<tr><td>${esc(a.nome)}</td><td>${esc(a.endereco || '-')}</td><td>${esc(a.telefone || '-')}</td><td>${esc(a.responsavel || '-')}</td><td>
-                    <button class="btn btn-sm btn-outline" onclick="openAcademyForm('${a.id}')" ${can('academias', 'editar') ? '' : 'disabled'}>✏️</button>
-                    <button class="btn btn-sm btn-danger" onclick="deleteAcademy('${a.id}')" ${can('academias', 'excluir') ? '' : 'disabled'}>🗑️</button>
+                    <button class="btn btn-sm btn-outline" onclick="openAcademyForm('${a.id}')" ${can('academias', 'editar') ? '' : 'disabled'}><i class="fas fa-edit"></i></button>
+                    <button class="btn btn-sm btn-danger" onclick="deleteAcademy('${a.id}')" ${can('academias', 'excluir') ? '' : 'disabled'}><i class="fas fa-trash"></i></button>
                 </td></tr>`;
             });
             tbody.innerHTML = html || '<tr><td colspan="5">Nenhuma academia cadastrada.</td></tr>';
@@ -1836,8 +1913,8 @@
                     <td>${esc(acad ? acad.nome : 'Academia removida')}</td>
                     <td><span class="badge ${badgeClass}">${esc(a.status)}</span></td>
                     <td>
-                        <button class="btn btn-sm btn-outline" onclick="openScheduleForm('${a.id}')" ${can('agenda', 'editar') ? '' : 'disabled'}>✏️</button>
-                        <button class="btn btn-sm btn-danger" onclick="deleteSchedule('${a.id}')" ${can('agenda', 'excluir') ? '' : 'disabled'}>🗑️</button>
+                        <button class="btn btn-sm btn-outline" onclick="openScheduleForm('${a.id}')" ${can('agenda', 'editar') ? '' : 'disabled'}><i class="fas fa-edit"></i></button>
+                        <button class="btn btn-sm btn-danger" onclick="deleteSchedule('${a.id}')" ${can('agenda', 'excluir') ? '' : 'disabled'}><i class="fas fa-trash"></i></button>
                     </td>
                 </tr>`;
             });
@@ -1999,8 +2076,8 @@
                     <td>${esc(academiaNome)}</td>
                     <td>${esc(alunoNome)}</td>
                     <td>
-                        <button class="btn btn-sm btn-outline" onclick="openWorkoutForm('${w.id}')" ${can('treinos', 'editar') ? '' : 'disabled'}>✏️</button>
-                        <button class="btn btn-sm btn-danger" onclick="deleteWorkout('${w.id}')" ${can('treinos', 'excluir') ? '' : 'disabled'}>🗑️</button>
+                        <button class="btn btn-sm btn-outline" onclick="openWorkoutForm('${w.id}')" ${can('treinos', 'editar') ? '' : 'disabled'}><i class="fas fa-edit"></i></button>
+                        <button class="btn btn-sm btn-danger" onclick="deleteWorkout('${w.id}')" ${can('treinos', 'excluir') ? '' : 'disabled'}><i class="fas fa-trash"></i></button>
                     </td>
                 </tr>`;
             });
@@ -2047,17 +2124,17 @@
             }
             html += `Olá, ${esc(currentStudent.nome)}!</h2>`;
             if (todayWorkouts.length > 0) {
-                html += `<div class="highlight"><h3>🏋️ Treino de Hoje (${getWeekdayName(today)})</h3>`;
+                html += `<div class="highlight"><h3><i class="fas fa-fire"></i> Treino de Hoje (${getWeekdayName(today)})</h3>`;
                 todayWorkouts.forEach(w => {
                     const academia = state.academias.find(a => a.id === w.academiaId);
                     const academiaNome = academia ? academia.nome : '-';
                     html += `<p><strong>${esc(w.nome)}</strong> - ${esc(w.grupo)}</p>`;
-                    html += `<small>🕒 ${esc(w.horario || 'Horário não definido')} | 🏟️ ${esc(academiaNome)}</small>`;
+                    html += `<small><i class="fas fa-clock"></i> ${esc(w.horario || 'Horário não definido')} | <i class="fas fa-building"></i> ${esc(academiaNome)}</small>`;
                     if (w.exercicios) html += `<pre style="white-space: pre-wrap; font-family: inherit; margin-top:8px;">${esc(w.exercicios)}</pre>`;
                 });
                 html += '</div>';
             } else {
-                html += `<div class="highlight"><h3>📅 Hoje é ${getWeekdayName(today)}</h3><p>Nenhum treino atribuído para hoje.</p></div>`;
+                html += `<div class="highlight"><h3><i class="fas fa-calendar"></i> Hoje é ${getWeekdayName(today)}</h3><p>Nenhum treino atribuído para hoje.</p></div>`;
             }
             html += '<h3>Treinos da Semana</h3>';
             const days = [0,1,2,3,4,5,6];
@@ -2073,7 +2150,7 @@
                     dayWorkouts.forEach(w => {
                         const academia = state.academias.find(a => a.id === w.academiaId);
                         const academiaNome = academia ? academia.nome : '-';
-                        html += `<div class="workout-item"><strong>${esc(w.nome)}</strong><small>${esc(w.grupo)} | 🕒 ${esc(w.horario || '-')} | 🏟️ ${esc(academiaNome)}</small>`;
+                        html += `<div class="workout-item"><strong>${esc(w.nome)}</strong><small>${esc(w.grupo)} | <i class="fas fa-clock"></i> ${esc(w.horario || '-')} | <i class="fas fa-building"></i> ${esc(academiaNome)}</small>`;
                         if (w.exercicios) html += `<pre style="white-space: pre-wrap; font-family: inherit; font-size:12px; margin-top:6px;">${esc(w.exercicios)}</pre>`;
                         html += `</div>`;
                     });
@@ -2081,7 +2158,7 @@
                 html += '</div>';
             });
 
-            html += '<h3 style="margin-top: 32px;">📸 Minhas Fotos de Evolução</h3>';
+            html += '<h3 style="margin-top: 32px;"><i class="fas fa-camera"></i> Minhas Fotos de Evolução</h3>';
             const evolucaoFotos = currentStudent.evolucaoFotos || [];
             if (evolucaoFotos.length === 0) {
                 html += '<p style="color:#94a3b8;">Nenhuma foto de evolução adicionada ainda.</p>';
@@ -2100,7 +2177,7 @@
                 html += '</div>';
             }
 
-            html += `<button class="btn btn-outline" onclick="logout()" style="margin-top:20px;">Sair</button>`;
+            html += `<button class="btn btn-outline" onclick="logout()" style="margin-top:20px;"><i class="fas fa-sign-out-alt"></i> Sair</button>`;
             area.innerHTML = html;
         }
 
@@ -2192,8 +2269,8 @@
                             <h4>${esc(item.titulo || 'Sem título')}</h4>
                             <p>${esc(item.descricao || 'Sem descrição')}</p>
                             <div class="album-item-actions">
-                                <button class="btn btn-sm btn-outline" onclick="openAlbumForm('${item.id}')" ${can('album', 'editar') ? '' : 'disabled'}>✏️</button>
-                                <button class="btn btn-sm btn-danger" onclick="deleteAlbum('${item.id}')" ${can('album', 'excluir') ? '' : 'disabled'}>🗑️</button>
+                                <button class="btn btn-sm btn-outline" onclick="openAlbumForm('${item.id}')" ${can('album', 'editar') ? '' : 'disabled'}><i class="fas fa-edit"></i></button>
+                                <button class="btn btn-sm btn-danger" onclick="deleteAlbum('${item.id}')" ${can('album', 'excluir') ? '' : 'disabled'}><i class="fas fa-trash"></i></button>
                             </div>
                         </div>
                     </div>`;
@@ -2270,8 +2347,8 @@
             let html = '';
             sorted.forEach(c => {
                 html += `<tr><td>${formatDate(c.data)}</td><td>${esc(c.descricao)}</td><td>${c.entrada > 0 ? formatCurrency(c.entrada) : '-'}</td><td>${c.saida > 0 ? formatCurrency(c.saida) : '-'}</td><td>${esc(c.forma_pgto || '-')}</td><td>
-                    <button class="btn btn-sm btn-outline" onclick="openCashflowForm('${c.id}')" ${can('fluxocaixa', 'editar') ? '' : 'disabled'}>✏️</button>
-                    <button class="btn btn-sm btn-danger" onclick="deleteCashflow('${c.id}')" ${can('fluxocaixa', 'excluir') ? '' : 'disabled'}>🗑️</button>
+                    <button class="btn btn-sm btn-outline" onclick="openCashflowForm('${c.id}')" ${can('fluxocaixa', 'editar') ? '' : 'disabled'}><i class="fas fa-edit"></i></button>
+                    <button class="btn btn-sm btn-danger" onclick="deleteCashflow('${c.id}')" ${can('fluxocaixa', 'excluir') ? '' : 'disabled'}><i class="fas fa-trash"></i></button>
                 </td></tr>`;
             });
             tbody.innerHTML = html || '<tr><td colspan="6">Nenhum lançamento registrado.</td></tr>';
@@ -2389,9 +2466,9 @@
                     <td>${formatDate(c.vencimento)}</td>
                     <td><span class="badge ${badgeClass}">${esc(c.status)}</span></td>
                     <td>
-                        <button class="btn btn-sm btn-outline" onclick="openContaForm('${c.id}')" ${can('fluxocaixa', 'editar') ? '' : 'disabled'}>✏️</button>
-                        <button class="btn btn-sm btn-success" onclick="marcarContaComoPaga('${c.id}')" ${canMarkPago ? '' : 'disabled'}>PAGO</button>
-                        <button class="btn btn-sm btn-danger" onclick="deleteConta('${c.id}')" ${can('fluxocaixa', 'excluir') ? '' : 'disabled'}>🗑️</button>
+                        <button class="btn btn-sm btn-outline" onclick="openContaForm('${c.id}')" ${can('fluxocaixa', 'editar') ? '' : 'disabled'}><i class="fas fa-edit"></i></button>
+                        <button class="btn btn-sm btn-success" onclick="marcarContaComoPaga('${c.id}')" ${canMarkPago ? '' : 'disabled'}><i class="fas fa-check"></i> PAGO</button>
+                        <button class="btn btn-sm btn-danger" onclick="deleteConta('${c.id}')" ${can('fluxocaixa', 'excluir') ? '' : 'disabled'}><i class="fas fa-trash"></i></button>
                     </td>
                 </tr>`;
             });
@@ -2424,12 +2501,10 @@
                 let descricao = '';
                 
                 if (mensalidadeFixa > 0) {
-                    // Aluno com mensalidade fixa - valor é a mensalidade independente do número de aulas
                     valorTotal = mensalidadeFixa;
                     const [ano, numMes] = mes.split('-').map(Number);
                     descricao = `Mensalidade Fixa de ${aluno.nome} - ${String(numMes).padStart(2,'0')}/${ano}`;
                 } else if (valorAula > 0) {
-                    // Aluno com valor por aula - valor é multiplicado pelo número de aulas
                     if (valorAula <= 0) { ignoradas++; return; }
                     valorTotal = count * valorAula;
                     const [ano, numMes] = mes.split('-').map(Number);
@@ -2808,8 +2883,8 @@
                 else perfilBadge = '<span class="badge badge-padrao">Padrão</span>';
                 const ativo = u.active !== false ? '✅' : '❌';
                 html += `<tr><td>${esc(u.username)}</td><td>${esc(u.nome || '-')}</td><td>${perfilBadge}</td><td>${ativo}</td><td>
-                    <button class="btn btn-sm btn-outline" onclick="openUserForm('${u.id}')" ${can('usuarios', 'editar') ? '' : 'disabled'}>✏️</button>
-                    <button class="btn btn-sm btn-danger" onclick="deleteUser('${u.id}')" ${can('usuarios', 'excluir') ? '' : 'disabled'}>🗑️</button>
+                    <button class="btn btn-sm btn-outline" onclick="openUserForm('${u.id}')" ${can('usuarios', 'editar') ? '' : 'disabled'}><i class="fas fa-edit"></i></button>
+                    <button class="btn btn-sm btn-danger" onclick="deleteUser('${u.id}')" ${can('usuarios', 'excluir') ? '' : 'disabled'}><i class="fas fa-trash"></i></button>
                 </td></tr>`;
             });
             tbody.innerHTML = html || '<tr><td colspan="5">Nenhum usuário cadastrado.</td></tr>';
