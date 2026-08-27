@@ -390,7 +390,7 @@
                     <div class="card-header"><h3>👥 Alunos</h3><button class="btn btn-primary" id="btnAddStudent" onclick="openStudentForm()">+ Novo Aluno</button></div>
                     <div class="table-container">
                         <table>
-                            <thead><tr><th>Foto</th><th>Nome</th><th>Academia</th><th>CPF</th><th>Celular</th><th>Data Cadastro</th><th>Valor/Aula</th><th>Ações</th></tr></thead>
+                            <thead><tr><th>Foto</th><th>Nome</th><th>Academia</th><th>CPF</th><th>Celular</th><th>Data Cadastro</th><th>Valor</th><th>Ações</th></tr></thead>
                             <tbody id="studentsTableBody"></tbody>
                         </table>
                     </div>
@@ -656,7 +656,8 @@
                     <div class="form-group"><label>Objetivo</label><input type="text" id="studentObjetivo" placeholder="Ex: Hipertrofia, Emagrecimento..." onkeydown="if(event.key==='Enter'){event.preventDefault(); document.getElementById('studentTelefone').focus();}"></div>
                     <div class="form-group"><label>Celular</label><input type="text" id="studentTelefone" placeholder="(00) 00000-0000" onkeydown="if(event.key==='Enter'){event.preventDefault(); document.getElementById('studentEmail').focus();}"></div>
                     <div class="form-group"><label>Email</label><input type="email" id="studentEmail" placeholder="email@exemplo.com" onkeydown="if(event.key==='Enter'){event.preventDefault(); document.getElementById('studentValorAula').focus();}"></div>
-                    <div class="form-group"><label>Valor por Aula (R$) *</label><input type="number" id="studentValorAula" step="0.01" min="0" required placeholder="0.00" onkeydown="if(event.key==='Enter'){event.preventDefault(); document.getElementById('studentObservacoes').focus();}"></div>
+                    <div class="form-group"><label>Valor por Aula (R$)</label><input type="text" id="studentValorAula" placeholder="0,00" onkeydown="if(event.key==='Enter'){event.preventDefault(); document.getElementById('studentMensalidadeFixa').focus();}"></div>
+                    <div class="form-group"><label>Mensalidade Fixa (R$)</label><input type="text" id="studentMensalidadeFixa" placeholder="0,00" onkeydown="if(event.key==='Enter'){event.preventDefault(); document.getElementById('studentObservacoes').focus();}"></div>
                     <div class="form-group"><label>Observações</label><textarea id="studentObservacoes" rows="3" placeholder="Anotações importantes..." onkeydown="if(event.key==='Enter' && !event.shiftKey){event.preventDefault(); document.getElementById('studentModal').querySelector('button[type=submit]').focus();}"></textarea></div>
 
                     <!-- Seção de Fotos de Evolução -->
@@ -913,6 +914,15 @@
         function genId() { return Date.now().toString(36) + Math.random().toString(36).substr(2, 5); }
         function esc(str) { return String(str ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;'); }
         function val(id) { return document.getElementById(id).value.trim(); }
+        function parseCurrency(str) {
+            let value = String(str || '').trim();
+            if (!value) return 0;
+            value = value.replace(/R\$\s?/g, '');
+            if (value.includes(',')) {
+                value = value.replace(/\./g, '').replace(',', '.');
+            }
+            return parseFloat(value) || 0;
+        }
         function formatCurrency(v) { return Number(v || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }); }
         function formatDate(dateStr) { if (!dateStr) return ''; const [y, m, d] = dateStr.split('-'); return `${d}/${m}/${y}`; }
         function formatDateTime(isoStr) {
@@ -933,7 +943,6 @@
             setTimeout(() => el.remove(), 4000);
         }
         function saveState() {
-            // Write entire state to Firestore
             db.collection(STATE_COLLECTION).doc(STATE_DOC).set(state)
                 .then(() => console.log('Estado salvo no Firestore'))
                 .catch(err => {
@@ -962,7 +971,6 @@
                 .then(doc => {
                     if (doc.exists) {
                         state = doc.data();
-                        // Ensure all fields exist
                         if (!state.users) state.users = [];
                         if (!state.students) state.students = [];
                         if (!state.academias) state.academias = [];
@@ -972,12 +980,14 @@
                         if (!state.cashflow) state.cashflow = [];
                         if (!state.contasFuturas) state.contasFuturas = [];
                         if (!state.auditLogs) state.auditLogs = [];
-                        // Normalize
                         state.users.forEach(u => {
                             if (u.username) u.username = u.username.toUpperCase();
                             if (u.password) u.password = u.password.toUpperCase();
                         });
-                        state.students.forEach(s => { if (!s.evolucaoFotos) s.evolucaoFotos = []; });
+                        state.students.forEach(s => { 
+                            if (!s.evolucaoFotos) s.evolucaoFotos = [];
+                            if (s.mensalidadeFixa === undefined) s.mensalidadeFixa = 0;
+                        });
                         state.workouts.forEach(w => {
                             if (!w.diasSemana && w.diaSemana !== undefined) {
                                 w.diasSemana = [w.diaSemana];
@@ -987,7 +997,7 @@
                             if (w.academiaId === undefined) w.academiaId = null;
                         });
                         ensureStudentUsers();
-                        saveState(); // ensure any normalization is saved back
+                        saveState();
                     } else {
                         seedData();
                         saveState();
@@ -995,7 +1005,6 @@
                 })
                 .catch(err => {
                     console.error('Erro ao carregar estado do Firestore:', err);
-                    // Fallback to seed if no connection or error
                     seedData();
                     toast('Erro ao carregar dados do Firestore. Usando dados iniciais.', 'error');
                     saveState();
@@ -1488,7 +1497,8 @@
                 document.getElementById('studentObjetivo').value = s.objetivo || '';
                 document.getElementById('studentTelefone').value = s.telefone || '';
                 document.getElementById('studentEmail').value = s.email || '';
-                document.getElementById('studentValorAula').value = s.valorAula || '';
+                document.getElementById('studentValorAula').value = s.valorAula ? s.valorAula.toString().replace('.', ',') : '';
+                document.getElementById('studentMensalidadeFixa').value = s.mensalidadeFixa ? s.mensalidadeFixa.toString().replace('.', ',') : '';
                 document.getElementById('studentObservacoes').value = s.observacoes || '';
                 studentFotoData = s.foto || '';
                 document.getElementById('studentFotoPreview').src = studentFotoData || '';
@@ -1509,15 +1519,25 @@
             const objetivo = val('studentObjetivo');
             const telefone = val('studentTelefone');
             const email = val('studentEmail');
-            const valorAula = parseFloat(val('studentValorAula')) || 0;
+            const valorAula = parseCurrency(val('studentValorAula'));
+            const mensalidadeFixa = parseCurrency(val('studentMensalidadeFixa'));
             const observacoes = val('studentObservacoes');
             const foto = studentFotoData || '';
             const evolucaoFotos = studentEvolucaoFotos;
 
+            if (valorAula > 0 && mensalidadeFixa > 0) {
+                toast('Preencha apenas uma opção: "Valor por Aula" OU "Mensalidade Fixa".', 'error');
+                return;
+            }
+            if (valorAula <= 0 && mensalidadeFixa <= 0) {
+                toast('Informe um valor maior que zero para "Valor por Aula" ou "Mensalidade Fixa".', 'error');
+                return;
+            }
+
             if (editingId) {
                 const idx = state.students.findIndex(s => s.id === editingId);
                 if (idx > -1) {
-                    state.students[idx] = { ...state.students[idx], nome, cpf, dataCadastro, academiaId, objetivo, telefone, email, valorAula, observacoes, foto, evolucaoFotos };
+                    state.students[idx] = { ...state.students[idx], nome, cpf, dataCadastro, academiaId, objetivo, telefone, email, valorAula, mensalidadeFixa, observacoes, foto, evolucaoFotos };
                     updateUserForStudent(state.students[idx]);
                     logAction('Editar Aluno', `Aluno ${nome} editado`, 'alunos');
                 }
@@ -1527,7 +1547,7 @@
                 fillStudentSelect('workoutAluno');
                 toast('Aluno salvo com sucesso!');
             } else {
-                const newStudent = { id: genId(), nome, cpf, dataCadastro, academiaId, objetivo, telefone, email, valorAula, observacoes, foto, evolucaoFotos };
+                const newStudent = { id: genId(), nome, cpf, dataCadastro, academiaId, objetivo, telefone, email, valorAula, mensalidadeFixa, observacoes, foto, evolucaoFotos };
                 state.students.push(newStudent);
                 const user = createUserForStudent(newStudent);
                 logAction('Criar Aluno', `Aluno ${nome} criado. Usuário: ${user.username}`, 'alunos');
@@ -1575,6 +1595,14 @@
             state.students.forEach(s => {
                 const academia = state.academias.find(a => a.id === s.academiaId);
                 const foto = s.foto ? `<img class="thumb" src="${esc(s.foto)}" alt="Foto">` : '<div class="thumb">👤</div>';
+                let valorDisplay = '';
+                if (s.valorAula > 0) {
+                    valorDisplay = `Aula: ${formatCurrency(s.valorAula)}`;
+                } else if (s.mensalidadeFixa > 0) {
+                    valorDisplay = `Mensal: ${formatCurrency(s.mensalidadeFixa)}`;
+                } else {
+                    valorDisplay = '-';
+                }
                 html += `<tr>
                     <td>${foto}</td>
                     <td>${esc(s.nome)}</td>
@@ -1582,7 +1610,7 @@
                     <td>${esc(s.cpf || '-')}</td>
                     <td>${esc(s.telefone || '-')}</td>
                     <td>${formatDate(s.dataCadastro || '')}</td>
-                    <td>${formatCurrency(s.valorAula)}</td>
+                    <td>${valorDisplay}</td>
                     <td>
                         <button class="btn btn-sm btn-outline" onclick="openStudentForm('${s.id}')" ${can('alunos', 'editar') ? '' : 'disabled'}>✏️</button>
                         <button class="btn btn-sm btn-danger" onclick="deleteStudent('${s.id}')" ${can('alunos', 'excluir') ? '' : 'disabled'}>🗑️</button>
@@ -1673,10 +1701,8 @@
             openModal('scheduleModal');
         }
 
-        // Função auxiliar para atualizar mensalidade de um aluno em um mês específico
         function atualizarMensalidadeAlunoMes(alunoId, anoMes) {
             if (!alunoId || !anoMes) return;
-            // Recalcula a mensalidade para o aluno naquele mês
             recalcularMensalidade(alunoId, anoMes);
         }
 
@@ -1716,17 +1742,12 @@
                 }
                 saveState();
 
-                // Recalcular para o mês antigo se mudou de mês ou de aluno
                 if (oldAlunoId && oldAnoMes && (oldAlunoId !== alunoId || oldAnoMes !== novoAnoMes)) {
                     atualizarMensalidadeAlunoMes(oldAlunoId, oldAnoMes);
                 }
-                // Recalcular para o novo mês/aluno
                 if (alunoId && novoAnoMes) {
                     atualizarMensalidadeAlunoMes(alunoId, novoAnoMes);
                 }
-                // Se o aluno não mudou mas o mês mudou, já recalculamos para o novo mês
-                // Se o aluno mudou e o mês é o mesmo, recalculamos para o novo aluno
-                // Se o aluno e mês são os mesmos, o recalculo não é necessário, mas chamamos para garantir
                 if (oldAlunoId === alunoId && oldAnoMes === novoAnoMes) {
                     atualizarMensalidadeAlunoMes(alunoId, novoAnoMes);
                 }
@@ -1736,7 +1757,6 @@
                 logAction('Criar Aula', `Aula ${data} ${hora} criada`, 'agenda');
                 saveState();
 
-                // Recalcular para o aluno/mês
                 if (alunoId && novoAnoMes) {
                     atualizarMensalidadeAlunoMes(alunoId, novoAnoMes);
                 }
@@ -1871,7 +1891,6 @@
             logAction('Aulas Recorrentes', `Geradas ${newEntries.length} aulas recorrentes`, 'agenda');
             saveState();
 
-            // Agrupar por aluno e mês e recalcular mensalidades
             const grupos = {};
             newEntries.forEach(a => {
                 const chave = a.alunoId + '|' + a.data.slice(0,7);
@@ -2400,15 +2419,33 @@
 
             Object.values(agrupadas).forEach(({ aluno, mes, count }) => {
                 const valorAula = parseFloat(aluno.valorAula) || 0;
-                if (valorAula <= 0) { ignoradas++; return; }
+                const mensalidadeFixa = parseFloat(aluno.mensalidadeFixa) || 0;
+                let valorTotal = 0;
+                let descricao = '';
+                
+                if (mensalidadeFixa > 0) {
+                    // Aluno com mensalidade fixa - valor é a mensalidade independente do número de aulas
+                    valorTotal = mensalidadeFixa;
+                    const [ano, numMes] = mes.split('-').map(Number);
+                    descricao = `Mensalidade Fixa de ${aluno.nome} - ${String(numMes).padStart(2,'0')}/${ano}`;
+                } else if (valorAula > 0) {
+                    // Aluno com valor por aula - valor é multiplicado pelo número de aulas
+                    if (valorAula <= 0) { ignoradas++; return; }
+                    valorTotal = count * valorAula;
+                    const [ano, numMes] = mes.split('-').map(Number);
+                    descricao = `Mensalidade de ${aluno.nome} - ${String(numMes).padStart(2,'0')}/${ano}`;
+                } else {
+                    ignoradas++;
+                    return;
+                }
+
                 const [ano, numMes] = mes.split('-').map(Number);
                 const diaCadastro = parseInt(aluno.dataCadastro ? aluno.dataCadastro.slice(8,10) : String(hoje.getDate()).padStart(2,'0'));
                 const lastDay = new Date(ano, numMes, 0).getDate();
                 const diaVenc = Math.min(diaCadastro, lastDay);
                 const vencimento = `${ano}-${String(numMes).padStart(2,'0')}-${String(diaVenc).padStart(2,'0')}`;
                 if (vencimento < hojeStr) { ignoradas++; return; }
-                const valorTotal = count * valorAula;
-                const descricao = `Mensalidade de ${aluno.nome} - ${String(numMes).padStart(2,'0')}/${ano}`;
+
                 const jaExiste = state.contasFuturas.some(c => c.descricao === descricao && c.tipo === 'Receber');
                 if (jaExiste) { ignoradas++; return; }
                 state.contasFuturas.push({
@@ -2435,7 +2472,6 @@
             const aluno = state.students.find(s => s.id === alunoId);
             if (!aluno) return;
 
-            // Remove mensalidades pendentes/vencidas existentes para este aluno/mês
             state.contasFuturas = state.contasFuturas.filter(c => !(c.alunoId === alunoId && c.anoMes === anoMes && c.tipo === 'Receber' && (c.status === 'Pendente' || c.status === 'Vencido')));
 
             const aulasNoMes = state.schedule.filter(a => a.alunoId === alunoId && a.status !== 'Cancelada' && a.data.slice(0,7) === anoMes).length;
@@ -2445,14 +2481,25 @@
             }
 
             const valorAula = parseFloat(aluno.valorAula) || 0;
-            const valorTotal = aulasNoMes * valorAula;
+            const mensalidadeFixa = parseFloat(aluno.mensalidadeFixa) || 0;
+            let valorTotal = 0;
+            let descricao = '';
+
+            if (mensalidadeFixa > 0) {
+                valorTotal = mensalidadeFixa;
+                const [ano, numMes] = anoMes.split('-').map(Number);
+                descricao = `Mensalidade Fixa de ${aluno.nome} - ${String(numMes).padStart(2,'0')}/${ano}`;
+            } else if (valorAula > 0) {
+                valorTotal = aulasNoMes * valorAula;
+                const [ano, numMes] = anoMes.split('-').map(Number);
+                descricao = `Mensalidade de ${aluno.nome} - ${String(numMes).padStart(2,'0')}/${ano}`;
+            }
 
             const [ano, numMes] = anoMes.split('-').map(Number);
             const diaCadastro = parseInt(aluno.dataCadastro ? aluno.dataCadastro.slice(8,10) : String(new Date().getDate()).padStart(2,'0'));
             const lastDay = new Date(ano, numMes, 0).getDate();
             const diaVenc = Math.min(diaCadastro, lastDay);
             const vencimento = `${ano}-${String(numMes).padStart(2,'0')}-${String(diaVenc).padStart(2,'0')}`;
-            const descricao = `Mensalidade de ${aluno.nome} - ${String(numMes).padStart(2,'0')}/${ano}`;
 
             state.contasFuturas.push({
                 id: genId(),
@@ -2519,12 +2566,18 @@
                         if (s.academiaId !== academiaId) match = false;
                     }
                     if (match) {
+                        let valorDisplay = '';
+                        if (s.valorAula > 0) {
+                            valorDisplay = `Aula: ${formatCurrency(s.valorAula)}`;
+                        } else if (s.mensalidadeFixa > 0) {
+                            valorDisplay = `Mensal: ${formatCurrency(s.mensalidadeFixa)}`;
+                        }
                         results.push({
                             tipo: 'Aluno',
                             data: '',
                             descricao: s.nome,
                             detalhes: `CPF: ${s.cpf || '-'} | Cel: ${s.telefone || '-'}`,
-                            valor: `Valor/aula: ${formatCurrency(s.valorAula)}`,
+                            valor: valorDisplay,
                             academia: acad ? acad.nome : '-'
                         });
                     }
@@ -2907,7 +2960,6 @@
             document.addEventListener('keydown', function(e) {
                 if (e.key === 'Escape') closeLightbox();
             });
-            // Show login screen after data loaded
             document.getElementById('loginScreen').classList.remove('hidden');
         }
         initApp();
