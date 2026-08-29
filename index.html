@@ -40,6 +40,12 @@
             font-family: 'Poppins', sans-serif;
         }
 
+        html, body {
+            width: 100%;
+            max-width: 100%;
+            overflow-x: hidden;
+        }
+
         body {
             background-color: var(--bg-dark);
             color: var(--text);
@@ -57,6 +63,7 @@
             align-items: center;
             justify-content: center;
             z-index: 9999;
+            padding: 15px;
         }
 
         .login-box {
@@ -76,6 +83,7 @@
         .form-group input, .form-group select, .form-group textarea {
             width: 100%; padding: 12px 16px; border: 1px solid var(--border); border-radius: var(--radius-sm);
             font-size: 14px; background: #2a2a2a; color: var(--text); transition: var(--transition);
+            max-width: 100%;
         }
         .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
             outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px rgba(212,175,55,0.2);
@@ -99,7 +107,7 @@
         .login-error { background: rgba(244,67,54,0.1); color: var(--danger); padding: 10px; border-radius: 6px; font-size: 13px; margin-bottom: 15px; text-align: center; border-left: 3px solid var(--danger); }
 
         /* APP */
-        #app { display: flex; min-height: 100vh; }
+        #app { display: flex; min-height: 100vh; width: 100%; }
 
         .sidebar {
             width: var(--sidebar-width);
@@ -163,6 +171,7 @@
             display: flex;
             flex-direction: column;
             min-height: 100vh;
+            min-width: 0; /* Importante para evitar overflow */
         }
         .topbar {
             background: var(--bg-card);
@@ -181,6 +190,8 @@
             display: none;
             padding: 20px;
             animation: fadeIn 0.3s;
+            width: 100%;
+            max-width: 100%;
         }
         .section.active { display: block; }
 
@@ -193,6 +204,8 @@
             padding: 20px;
             margin-bottom: 20px;
             border: 1px solid var(--border);
+            width: 100%;
+            max-width: 100%;
         }
         .card-header {
             display: flex;
@@ -204,8 +217,8 @@
         }
         .card-header h3 { font-size: 20px; font-weight: 700; color: var(--accent); }
 
-        .table-container { overflow-x: auto; border-radius: var(--radius-sm); }
-        table { width: 100%; border-collapse: collapse; font-size: 14px; }
+        .table-container { overflow-x: auto; border-radius: var(--radius-sm); max-width: 100%; }
+        table { width: 100%; border-collapse: collapse; font-size: 14px; min-width: 600px; }
         table th, table td { padding: 12px 14px; text-align: left; border-bottom: 1px solid var(--border); }
         table th { background: #2a2a2a; font-weight: 700; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--accent); }
         table tr:hover td { background: rgba(255,255,255,0.03); }
@@ -338,7 +351,7 @@
         .workout-item small { display: block; color: var(--text-light); font-size: 11px; }
 
         .student-area { background: var(--bg-card); border-radius: var(--radius); box-shadow: var(--shadow); padding: 20px; margin-bottom: 20px; border: 1px solid var(--border); }
-        .student-area h2 { margin-bottom: 15px; font-size: 24px; font-weight: 700; color: var(--accent); display: flex; align-items: center; gap: 10px; }
+        .student-area h2 { margin-bottom: 15px; font-size: 24px; font-weight: 700; color: var(--accent); display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
         .student-area .highlight { background: rgba(255,152,0,0.1); border-left: 4px solid var(--warning); padding: 15px; border-radius: 8px; margin-bottom: 20px; }
         .student-area .evolutions-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 12px; margin-top: 12px; }
         .student-area .evolution-card { background: #2a2a2a; border-radius: 8px; overflow: hidden; border: 1px solid var(--border); }
@@ -388,19 +401,70 @@
         }
         #exitFullscreenBtn:hover { background: var(--accent-hover); }
 
+        /* ========== AJUSTES PARA MOBILE ========== */
         @media (max-width: 768px) {
-            .sidebar { transform: translateX(-100%); width: 280px; }
-            .sidebar.open { transform: translateX(0); }
-            .main-content { margin-left: 0; }
-            .topbar { padding: 10px 15px; }
-            .topbar h2 { font-size: 18px; }
-            .section { padding: 10px; }
-            .dashboard-cards { grid-template-columns: 1fr; }
-            .modal-content { max-width: 100%; margin: 10px; }
-            .permissions-container { grid-template-columns: 1fr; }
-            #studentModal .photo-preview { width: 100px; height: 100px; }
-            .album-grid { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; }
-            .sidebar-brand { padding: 15px; font-size: 20px; }
+            .sidebar {
+                transform: translateX(-100%);
+                width: 280px;
+                box-shadow: 2px 0 10px rgba(0,0,0,0.5);
+            }
+            .sidebar.open {
+                transform: translateX(0);
+            }
+            .main-content {
+                margin-left: 0;
+                width: 100%;
+                max-width: 100%;
+            }
+            .topbar {
+                padding: 10px 15px;
+                gap: 10px;
+            }
+            .topbar h2 {
+                font-size: 18px;
+                flex: 1;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+            .section {
+                padding: 10px;
+                width: 100%;
+                max-width: 100%;
+            }
+            .card {
+                padding: 15px;
+            }
+            .dashboard-cards {
+                grid-template-columns: 1fr;
+            }
+            .modal-content {
+                max-width: 100%;
+                margin: 10px;
+            }
+            .permissions-container {
+                grid-template-columns: 1fr;
+            }
+            #studentModal .photo-preview {
+                width: 100px;
+                height: 100px;
+            }
+            .album-grid {
+                grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+                gap: 10px;
+            }
+            .sidebar-brand {
+                padding: 15px;
+                font-size: 20px;
+            }
+            /* Garantir que tabelas não causem overflow */
+            .table-container {
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+            }
+            table {
+                min-width: 600px; /* Mantém a tabela rolável, mas sem quebrar layout */
+            }
         }
     </style>
 </head>
@@ -514,7 +578,7 @@
                 <div class="card">
                     <div class="card-header">
                         <h3><i class="fas fa-calendar-check"></i> Agenda de Aulas</h3>
-                        <div style="display: flex; gap: 8px; align-items: center;">
+                        <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
                             <button class="btn btn-danger" id="btnDeleteSelectedSchedule" onclick="deleteSelectedSchedule()" style="display:none;"><i class="fas fa-trash"></i> Excluir Selecionados</button>
                             <button class="btn btn-warning" id="btnAddRecurringSchedule" onclick="openRecurringScheduleForm()" style="display:none;"><i class="fas fa-calendar-plus"></i> Aulas Recorrentes</button>
                             <button class="btn btn-primary" id="btnAddSchedule" onclick="openScheduleForm()"><i class="fas fa-plus"></i> Nova Aula</button>
@@ -635,7 +699,7 @@
                 <div class="card">
                     <div class="card-header">
                         <h3><i class="fas fa-file-invoice-dollar"></i> Contas a Pagar e Receber (Futuras)</h3>
-                        <div style="display: flex; gap: 8px; align-items: center;">
+                        <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
                             <button class="btn btn-warning" id="btnGerarMensalidades" onclick="gerarMensalidades()"><i class="fas fa-cogs"></i> Gerar Mensalidades</button>
                             <button class="btn btn-primary" id="btnAddConta" onclick="openContaForm()"><i class="fas fa-plus"></i> Nova Conta</button>
                         </div>
@@ -1073,7 +1137,6 @@
             if (state.auditLogs.length > 500) {
                 state.auditLogs = state.auditLogs.slice(-500);
             }
-            // Não chamar saveState aqui para evitar múltiplas gravações
         }
         function loadState() {
             return db.collection(STATE_COLLECTION).doc(STATE_DOC).get()
@@ -1362,7 +1425,19 @@
 
         // ==================== NAVEGAÇÃO ====================
         function toggleSidebar() {
-            if (!currentStudent) document.getElementById('sidebar').classList.toggle('open');
+            if (!currentStudent) {
+                const sidebar = document.getElementById('sidebar');
+                sidebar.classList.toggle('open');
+                // Fecha automaticamente ao clicar em um item de menu no mobile
+                if (sidebar.classList.contains('open') && window.innerWidth <= 768) {
+                    const navItems = document.querySelectorAll('.nav-item');
+                    navItems.forEach(item => {
+                        item.addEventListener('click', function() {
+                            sidebar.classList.remove('open');
+                        });
+                    });
+                }
+            }
         }
         function renderNav() {
             const nav = document.getElementById('sidebarNav');
@@ -1373,6 +1448,15 @@
                 }
             });
             nav.innerHTML = html;
+            // Adiciona listener para fechar sidebar ao clicar em item
+            const navItems = document.querySelectorAll('.nav-item');
+            navItems.forEach(item => {
+                item.addEventListener('click', function() {
+                    if (window.innerWidth <= 768) {
+                        document.getElementById('sidebar').classList.remove('open');
+                    }
+                });
+            });
         }
         function navigate(section) {
             if (section === 'aluno') {
