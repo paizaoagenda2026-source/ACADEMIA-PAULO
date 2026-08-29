@@ -359,6 +359,54 @@
         .availability-grid-table td.ocupado { background: #fee2e2; color: #dc2626; font-weight: 500; }
         .availability-grid-table td.livre { background: #d1fae5; color: #059669; font-weight: 500; }
 
+        /* Fluxo de Caixa - Cards de resumo */
+        .cashflow-summary {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+        .cashflow-summary-card {
+            background: #f8fafc;
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            border: 1px solid var(--border);
+            transition: var(--transition);
+        }
+        .cashflow-summary-card:hover {
+            background: #fff;
+            box-shadow: var(--shadow);
+            transform: translateY(-2px);
+        }
+        .cashflow-summary-card .label {
+            font-size: 13px;
+            color: var(--text-light);
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+        .cashflow-summary-card .value {
+            font-size: 24px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+        .cashflow-summary-card.entrada .value { color: var(--success); }
+        .cashflow-summary-card.saida .value { color: var(--danger); }
+        .cashflow-summary-card.saldo .value { color: var(--accent); }
+
+        /* Botões de filtro rápido */
+        .cashflow-filter-buttons {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-bottom: 16px;
+        }
+        .cashflow-filter-buttons .btn.active {
+            background: var(--accent);
+            color: #fff;
+            border-color: var(--accent);
+        }
+
         @media (max-width: 768px) {
             body.fullscreen .sidebar { transform: translateX(-100%); }
             body.fullscreen .sidebar.open { transform: translateX(0); }
@@ -375,6 +423,7 @@
             .grade-filter { flex-direction: column; align-items: stretch; }
             .dashboard-cards { grid-template-columns: 1fr; }
             .sidebar { width: 100%; }
+            .cashflow-summary { grid-template-columns: 1fr; }
         }
     </style>
 </head>
@@ -574,7 +623,35 @@
             <!-- Fluxo de Caixa -->
             <section id="section-fluxocaixa" class="section">
                 <div class="card">
-                    <div class="card-header"><h3><i class="fas fa-money-bill-wave"></i> Fluxo de Caixa</h3><button class="btn btn-primary" id="btnAddCashflow" onclick="openCashflowForm()"><i class="fas fa-plus"></i> Novo Lançamento</button></div>
+                    <div class="card-header">
+                        <h3><i class="fas fa-money-bill-wave"></i> Fluxo de Caixa</h3>
+                        <button class="btn btn-primary" id="btnAddCashflow" onclick="openCashflowForm()"><i class="fas fa-plus"></i> Novo Lançamento</button>
+                    </div>
+                    
+                    <!-- Cards de Resumo - Entrada, Saída e Saldo -->
+                    <div class="cashflow-summary" id="cashflowSummary">
+                        <div class="cashflow-summary-card entrada">
+                            <div class="label"><i class="fas fa-arrow-down"></i> Entradas</div>
+                            <div class="value" id="cashflowTotalEntrada">R$ 0,00</div>
+                        </div>
+                        <div class="cashflow-summary-card saida">
+                            <div class="label"><i class="fas fa-arrow-up"></i> Saídas</div>
+                            <div class="value" id="cashflowTotalSaida">R$ 0,00</div>
+                        </div>
+                        <div class="cashflow-summary-card saldo">
+                            <div class="label"><i class="fas fa-wallet"></i> Saldo</div>
+                            <div class="value" id="cashflowSaldo">R$ 0,00</div>
+                        </div>
+                    </div>
+
+                    <!-- Botões de Filtro Rápido -->
+                    <div class="cashflow-filter-buttons" id="cashflowFilterButtons">
+                        <button class="btn btn-sm btn-outline active" data-filter="todos" onclick="setCashflowFilter('todos')"><i class="fas fa-list"></i> Todos</button>
+                        <button class="btn btn-sm btn-outline" data-filter="hoje" onclick="setCashflowFilter('hoje')"><i class="fas fa-calendar-day"></i> Hoje</button>
+                        <button class="btn btn-sm btn-outline" data-filter="semana" onclick="setCashflowFilter('semana')"><i class="fas fa-calendar-week"></i> Esta Semana</button>
+                        <button class="btn btn-sm btn-outline" data-filter="mes" onclick="setCashflowFilter('mes')"><i class="fas fa-calendar"></i> Este Mês</button>
+                    </div>
+
                     <div class="table-container">
                         <table>
                             <thead><tr><th>Data</th><th>Descrição</th><th>Entrada</th><th>Saída</th><th>Forma de Pagamento</th><th>Ações</th></tr></thead>
@@ -986,6 +1063,7 @@
         let albumFotoData = '';
         let currentSection = 'dashboard';
         let studentEvolucaoFotos = [];
+        let cashflowFilter = 'todos';
 
         // ==================== UTILITÁRIOS ====================
         function genId() { return Date.now().toString(36) + Math.random().toString(36).substr(2, 5); }
@@ -1448,6 +1526,7 @@
                 <div class="stat-card"><div class="stat-icon"><i class="fas fa-money-bill-wave"></i></div><div class="stat-info"><h4>${formatCurrency(receitaMes)}</h4><p>Receita do Mês</p></div></div>
                 <div class="stat-card"><div class="stat-icon"><i class="fas fa-chart-line"></i></div><div class="stat-info"><h4>${formatCurrency(entradaMes - saidaMes)}</h4><p>Saldo do Mês (Caixa)</p></div></div>
             `;
+
             const sorted = [...state.schedule]
                 .filter(a => new Date(a.data + 'T' + a.hora) >= new Date())
                 .sort((a, b) => (a.data + 'T' + a.hora).localeCompare(b.data + 'T' + b.hora))
@@ -2290,6 +2369,57 @@
         }
 
         // ==================== FLUXO DE CAIXA ====================
+        function setCashflowFilter(filter) {
+            cashflowFilter = filter;
+            const buttons = document.querySelectorAll('#cashflowFilterButtons .btn');
+            buttons.forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.getAttribute('data-filter') === filter) {
+                    btn.classList.add('active');
+                }
+            });
+            renderCashflow();
+        }
+
+        function getFilteredCashflow() {
+            const hoje = new Date();
+            const hojeStr = formatDateInput(hoje);
+            let filtered = [...state.cashflow];
+            
+            if (cashflowFilter === 'hoje') {
+                filtered = filtered.filter(c => c.data === hojeStr);
+            } else if (cashflowFilter === 'semana') {
+                const diaSemana = hoje.getDay();
+                const diff = (diaSemana === 0 ? -6 : 1 - diaSemana);
+                const segunda = new Date(hoje);
+                segunda.setDate(hoje.getDate() + diff);
+                const segundaStr = formatDateInput(segunda);
+                const domingo = new Date(segunda);
+                domingo.setDate(segunda.getDate() + 6);
+                const domingoStr = formatDateInput(domingo);
+                filtered = filtered.filter(c => c.data >= segundaStr && c.data <= domingoStr);
+            } else if (cashflowFilter === 'mes') {
+                const mesAtual = hojeStr.slice(0, 7);
+                filtered = filtered.filter(c => c.data.slice(0, 7) === mesAtual);
+            }
+            
+            return filtered;
+        }
+
+        function updateCashflowSummary() {
+            const filtered = getFilteredCashflow();
+            let totalEntrada = 0;
+            let totalSaida = 0;
+            filtered.forEach(c => {
+                totalEntrada += parseFloat(c.entrada) || 0;
+                totalSaida += parseFloat(c.saida) || 0;
+            });
+            const saldo = totalEntrada - totalSaida;
+            document.getElementById('cashflowTotalEntrada').textContent = formatCurrency(totalEntrada);
+            document.getElementById('cashflowTotalSaida').textContent = formatCurrency(totalSaida);
+            document.getElementById('cashflowSaldo').textContent = formatCurrency(saldo);
+        }
+
         function openCashflowForm(id) {
             if (id) { if (!can('fluxocaixa', 'editar')) { toast('Sem permissão para editar.', 'error'); return; } }
             else { if (!can('fluxocaixa', 'criar')) { toast('Sem permissão para criar.', 'error'); return; } }
@@ -2343,7 +2473,8 @@
         }
         function renderCashflow() {
             const tbody = document.getElementById('cashflowTableBody');
-            const sorted = [...state.cashflow].sort((a, b) => a.data.localeCompare(b.data));
+            const filtered = getFilteredCashflow();
+            const sorted = filtered.sort((a, b) => a.data.localeCompare(b.data));
             let html = '';
             sorted.forEach(c => {
                 html += `<tr><td>${formatDate(c.data)}</td><td>${esc(c.descricao)}</td><td>${c.entrada > 0 ? formatCurrency(c.entrada) : '-'}</td><td>${c.saida > 0 ? formatCurrency(c.saida) : '-'}</td><td>${esc(c.forma_pgto || '-')}</td><td>
@@ -2352,6 +2483,7 @@
                 </td></tr>`;
             });
             tbody.innerHTML = html || '<tr><td colspan="6">Nenhum lançamento registrado.</td></tr>';
+            updateCashflowSummary();
         }
 
         // ==================== CONTAS A PAGAR E RECEBER (FUTURAS) ====================
