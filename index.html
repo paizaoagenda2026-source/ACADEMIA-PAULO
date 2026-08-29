@@ -1445,6 +1445,17 @@
             if (modal) modal.classList.remove('show');
         }
 
+        // ==================== VALIDAÇÃO DE CONFLITO DE AGENDA ====================
+        function checkScheduleConflict(alunoId, data, hora, excludeId = null) {
+            return state.schedule.some(a => 
+                a.alunoId === alunoId && 
+                a.data === data && 
+                a.hora === hora && 
+                a.status !== 'Cancelada' && 
+                a.id !== excludeId
+            );
+        }
+
         // ==================== DASHBOARD ====================
         function renderDashboard() {
             const totalAlunos = state.students.length;
@@ -1832,6 +1843,12 @@
                 return;
             }
 
+            // Verificar conflito
+            if (checkScheduleConflict(alunoId, data, hora, editingId)) {
+                toast('Aula já cadastrada para este aluno neste dia e horário!', 'error');
+                return;
+            }
+
             let oldAlunoId = null;
             let oldAnoMes = null;
             if (editingId) {
@@ -1992,16 +2009,23 @@
             const start = new Date(startDate + 'T00:00:00');
             const end = new Date(endDate + 'T00:00:00');
             if (start > end) { toast('A data final deve ser posterior à inicial.', 'error'); return; }
+            
             const newEntries = [];
             let current = new Date(start);
             while (current <= end) {
                 if (selectedDays.includes(current.getDay())) {
                     const dateStr = formatDateInput(current);
+                    // Verificar conflito individual
+                    if (checkScheduleConflict(alunoId, dateStr, hora)) {
+                        toast(`Aula já cadastrada para ${formatDate(dateStr)} às ${hora}!`, 'error');
+                        return;
+                    }
                     newEntries.push({ id: genId(), data: dateStr, hora: hora, alunoId: alunoId, academiaId: academiaId, status: status });
                 }
                 current.setDate(current.getDate() + 1);
             }
             if (newEntries.length === 0) { toast('Nenhum dia selecionado dentro do período.', 'warning'); return; }
+            
             state.schedule.push(...newEntries);
             logAction('Aulas Recorrentes', `Geradas ${newEntries.length} aulas recorrentes`, 'agenda');
 
