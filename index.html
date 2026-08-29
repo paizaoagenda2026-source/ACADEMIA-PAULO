@@ -13,434 +13,394 @@
     
     <style>
         :root {
-            --primary: #1a1a2e;
-            --primary-dark: #16213e;
-            --accent: #0f3460;
-            --accent-hover: #1a4f8b;
-            --success: #10b981;
-            --danger: #ef4444;
-            --warning: #f59e0b;
-            --info: #3b82f6;
-            --bg: #f0f2f5;
-            --card-bg: #ffffff;
-            --text: #1a1a2e;
-            --text-light: #64748b;
-            --border: #e2e8f0;
-            --shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
-            --shadow-lg: 0 10px 25px rgba(0, 0, 0, 0.1);
-            --shadow-xl: 0 20px 40px rgba(0, 0, 0, 0.15);
-            --radius: 20px;
-            --radius-sm: 12px;
-            --sidebar-width: 300px;
-            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            --gradient-primary: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
-            --gradient-accent: linear-gradient(135deg, #0f3460 0%, #1a4f8b 100%);
-            --gradient-success: linear-gradient(135deg, #10b981 0%, #059669 100%);
-            --gradient-danger: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
-            --gradient-warning: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
-            --gradient-body: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            --bg-dark: #121212;
+            --bg-card: #1e1e1e;
+            --bg-sidebar: #0a0a0a;
+            --accent: #d4af37;
+            --accent-hover: #f0c75e;
+            --text: #ffffff;
+            --text-light: #a0a0a0;
+            --border: #2a2a2a;
+            --success: #4caf50;
+            --danger: #f44336;
+            --warning: #ff9800;
+            --info: #2196f3;
+            --shadow: 0 4px 6px rgba(0,0,0,0.3);
+            --shadow-lg: 0 10px 25px rgba(0,0,0,0.5);
+            --radius: 12px;
+            --radius-sm: 8px;
+            --sidebar-width: 280px;
+            --transition: all 0.3s ease;
         }
 
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Poppins', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Poppins', sans-serif;
         }
 
         body {
-            background: var(--gradient-body);
+            background-color: var(--bg-dark);
             color: var(--text);
             min-height: 100vh;
-            background-attachment: fixed;
         }
 
         .hidden { display: none !important; }
 
-        /* ========== LOGIN ========== */
+        /* LOGIN */
         #loginScreen {
             position: fixed;
             inset: 0;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #1a1a1a 0%, #0a0a0a 100%);
             display: flex;
             align-items: center;
             justify-content: center;
             z-index: 9999;
-            animation: fadeIn 0.5s;
         }
 
         .login-box {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            padding: 50px 40px;
-            border-radius: 24px;
-            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.3);
+            background: var(--bg-card);
+            padding: 40px 30px;
+            border-radius: 20px;
+            box-shadow: 0 0 40px rgba(212,175,55,0.3);
             width: 100%;
-            max-width: 440px;
-            animation: slideUp 0.6s;
-            position: relative;
-            overflow: hidden;
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            max-width: 400px;
+            border: 1px solid var(--accent);
         }
-        .login-box::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 6px;
-            background: linear-gradient(90deg, #667eea, #764ba2, #f093fb);
-        }
-        .login-box h1 { font-size: 32px; text-align: center; margin-bottom: 4px; color: var(--primary); font-weight: 700; letter-spacing: -0.5px; }
-        .login-box p { text-align: center; color: var(--text-light); margin-bottom: 32px; font-size: 14px; font-weight: 400; }
+        .login-box h1 { font-size: 28px; text-align: center; color: var(--accent); margin-bottom: 5px; }
+        .login-box p { text-align: center; color: var(--text-light); margin-bottom: 30px; font-size: 14px; }
 
         .form-group { margin-bottom: 20px; }
         .form-group label { display: block; font-weight: 600; font-size: 13px; margin-bottom: 8px; color: var(--text); }
         .form-group input, .form-group select, .form-group textarea {
-            width: 100%; padding: 12px 16px; border: 2px solid var(--border); border-radius: var(--radius-sm);
-            font-size: 14px; background: #f8fafc; transition: var(--transition);
+            width: 100%; padding: 12px 16px; border: 1px solid var(--border); border-radius: var(--radius-sm);
+            font-size: 14px; background: #2a2a2a; color: var(--text); transition: var(--transition);
         }
         .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
-            outline: none; border-color: #667eea; background: #fff; box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+            outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px rgba(212,175,55,0.2);
         }
 
         .btn {
             padding: 12px 20px; border: none; border-radius: var(--radius-sm); font-weight: 600; font-size: 14px;
             cursor: pointer; transition: var(--transition); display: inline-flex; align-items: center; gap: 8px;
-            letter-spacing: 0.3px; position: relative; overflow: hidden;
+            letter-spacing: 0.3px;
         }
-        .btn::after {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 0;
-            height: 0;
-            border-radius: 50%;
-            background: rgba(255, 255, 255, 0.3);
-            transform: translate(-50%, -50%);
-            transition: width 0.6s, height 0.6s;
-        }
-        .btn:active::after {
-            width: 300px;
-            height: 300px;
-        }
-        .btn-primary { background: var(--gradient-accent); color: #fff; box-shadow: 0 4px 14px rgba(15, 52, 96, 0.3); }
-        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(15, 52, 96, 0.4); }
-        .btn-success { background: var(--gradient-success); color: #fff; box-shadow: 0 4px 14px rgba(16, 185, 129, 0.3); }
-        .btn-success:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4); }
-        .btn-danger { background: var(--gradient-danger); color: #fff; box-shadow: 0 4px 14px rgba(239, 68, 68, 0.3); }
-        .btn-danger:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(239, 68, 68, 0.4); }
-        .btn-warning { background: var(--gradient-warning); color: #fff; box-shadow: 0 4px 14px rgba(245, 158, 11, 0.3); }
-        .btn-warning:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(245, 158, 11, 0.4); }
-        .btn-sm { padding: 8px 14px; font-size: 12px; border-radius: 8px; }
-        .btn-outline { background: transparent; border: 2px solid var(--border); color: var(--text); }
-        .btn-outline:hover { background: #f8fafc; border-color: #cbd5e1; transform: translateY(-2px); }
-        .login-btn { width: 100%; padding: 14px; font-size: 16px; margin-top: 12px; justify-content: center; }
+        .btn-primary { background: var(--accent); color: #000; }
+        .btn-primary:hover { background: var(--accent-hover); transform: translateY(-2px); box-shadow: 0 6px 15px rgba(212,175,55,0.4); }
+        .btn-success { background: var(--success); color: #fff; }
+        .btn-danger { background: var(--danger); color: #fff; }
+        .btn-warning { background: var(--warning); color: #fff; }
+        .btn-sm { padding: 8px 14px; font-size: 12px; border-radius: 6px; }
+        .btn-outline { background: transparent; border: 1px solid var(--border); color: var(--text); }
+        .btn-outline:hover { border-color: var(--accent); color: var(--accent); }
+        .login-btn { width: 100%; padding: 14px; font-size: 16px; justify-content: center; }
 
-        .login-error { background: #fef2f2; color: var(--danger); padding: 12px; border-radius: 8px; font-size: 13px; margin-bottom: 20px; text-align: center; border-left: 4px solid var(--danger); }
+        .login-error { background: rgba(244,67,54,0.1); color: var(--danger); padding: 10px; border-radius: 6px; font-size: 13px; margin-bottom: 15px; text-align: center; border-left: 3px solid var(--danger); }
 
-        /* ========== APP LAYOUT ========== */
+        /* APP */
         #app { display: flex; min-height: 100vh; }
 
         .sidebar {
-            width: var(--sidebar-width); background: var(--gradient-primary); color: #f1f5f9;
-            display: flex; flex-direction: column; position: fixed; top: 0; left: 0; bottom: 0; z-index: 100;
-            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: 4px 0 20px rgba(0,0,0,0.15);
+            width: var(--sidebar-width);
+            background: var(--bg-sidebar);
+            color: var(--text);
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            top: 0; left: 0; bottom: 0;
+            z-index: 100;
+            transition: transform 0.3s;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.5);
         }
-        .sidebar-brand { 
-            padding: 30px 24px; font-size: 24px; font-weight: 700; border-bottom: 1px solid rgba(255, 255, 255, 0.1); 
-            display: flex; align-items: center; gap: 12px; letter-spacing: -0.5px;
-            background: linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0) 100%);
+        .sidebar-brand {
+            padding: 20px;
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--accent);
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
-        .sidebar-brand i { font-size: 32px; color: #f093fb; animation: pulse 2s infinite; }
-        .sidebar-nav { flex: 1; padding: 20px 12px; overflow-y: auto; }
+        .sidebar-brand i { color: var(--accent); }
+        .sidebar-nav { flex: 1; padding: 15px 10px; overflow-y: auto; }
         .nav-item {
-            display: flex; align-items: center; gap: 14px; padding: 14px 18px; background: transparent; border: none;
-            color: #cbd5e1; font-size: 14px; font-weight: 500; cursor: pointer; transition: var(--transition);
-            width: 100%; text-align: left; border-left: 4px solid transparent; border-radius: 12px; margin-bottom: 6px;
-            position: relative;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 15px;
+            background: transparent;
+            border: none;
+            color: var(--text-light);
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition);
+            width: 100%;
+            text-align: left;
+            border-radius: 8px;
+            margin-bottom: 4px;
         }
-        .nav-item i { font-size: 20px; width: 24px; text-align: center; transition: transform 0.3s; }
-        .nav-item:hover { background: rgba(255, 255, 255, 0.08); color: #fff; transform: translateX(4px); }
-        .nav-item:hover i { transform: scale(1.2); }
-        .nav-item.active { 
-            background: linear-gradient(135deg, rgba(102, 126, 234, 0.3) 0%, rgba(118, 75, 162, 0.3) 100%); 
-            color: #fff; border-left-color: #f093fb; 
+        .nav-item i { font-size: 18px; width: 24px; text-align: center; color: var(--accent); }
+        .nav-item:hover { background: rgba(212,175,55,0.1); color: var(--accent); }
+        .nav-item.active { background: var(--accent); color: #000; font-weight: 600; }
+        .nav-item.active i { color: #000; }
+        .sidebar-footer {
+            padding: 15px 20px;
+            border-top: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
         }
-        .sidebar-footer { padding: 20px 24px; border-top: 1px solid rgba(255, 255, 255, 0.1); display: flex; align-items: center; justify-content: space-between; gap: 10px; }
-        .sidebar-footer .user-info { font-size: 13px; font-weight: 600; }
-        .sidebar-footer .user-info span { display: block; color: #94a3b8; font-weight: 400; font-size: 11px; }
+        .user-info { font-size: 13px; font-weight: 600; }
+        .user-info span { display: block; color: var(--text-light); font-weight: 400; font-size: 11px; }
 
-        .main-content { flex: 1; margin-left: var(--sidebar-width); display: flex; flex-direction: column; min-height: 100vh; }
-        .topbar { 
-            background: rgba(255,255,255,0.9); backdrop-filter: blur(10px); padding: 20px 32px; 
-            border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; 
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05); position: sticky; top: 0; z-index: 50;
+        .main-content {
+            flex: 1;
+            margin-left: var(--sidebar-width);
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
         }
-        .topbar h2 { font-size: 26px; font-weight: 700; letter-spacing: -0.5px; background: linear-gradient(135deg, #667eea, #764ba2); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .topbar {
+            background: var(--bg-card);
+            padding: 15px 20px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 50;
+        }
+        .topbar h2 { font-size: 22px; font-weight: 700; color: var(--accent); }
 
         .section {
             display: none;
-            padding: 32px;
-            position: relative;
-            background: transparent;
-            z-index: 0;
-            animation: fadeIn 0.4s;
+            padding: 20px;
+            animation: fadeIn 0.3s;
         }
         .section.active { display: block; }
 
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
-        @keyframes slideUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.1); }
-            100% { transform: scale(1); }
-        }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        .card { 
-            background: rgba(255, 255, 255, 0.85);
-            backdrop-filter: blur(10px);
-            border-radius: var(--radius); box-shadow: var(--shadow); 
-            padding: 28px; margin-bottom: 28px; position: relative; z-index: 1; transition: var(--transition); 
-            border: 1px solid rgba(255, 255, 255, 0.3);
+        .card {
+            background: var(--bg-card);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            padding: 20px;
+            margin-bottom: 20px;
+            border: 1px solid var(--border);
         }
-        .card:hover { box-shadow: var(--shadow-lg); }
-        .card-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; flex-wrap: wrap; gap: 12px; }
-        .card-header h3 { font-size: 22px; font-weight: 700; letter-spacing: -0.3px; }
+        .card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .card-header h3 { font-size: 20px; font-weight: 700; color: var(--accent); }
+
         .table-container { overflow-x: auto; border-radius: var(--radius-sm); }
         table { width: 100%; border-collapse: collapse; font-size: 14px; }
-        table th, table td { padding: 16px 18px; text-align: left; border-bottom: 1px solid var(--border); }
-        table th { background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%); font-weight: 700; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-light); }
-        table tr { transition: var(--transition); }
-        table tr:hover td { background: rgba(248, 250, 252, 0.8); }
+        table th, table td { padding: 12px 14px; text-align: left; border-bottom: 1px solid var(--border); }
+        table th { background: #2a2a2a; font-weight: 700; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--accent); }
+        table tr:hover td { background: rgba(255,255,255,0.03); }
 
-        .badge { padding: 5px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; display: inline-block; }
-        .badge-agendada { background: #e0f2fe; color: #0284c7; }
-        .badge-concluida { background: #d1fae5; color: #059669; }
-        .badge-cancelada { background: #fee2e2; color: #dc2626; }
-        .badge-pendente { background: #fef3c7; color: #d97706; }
-        .badge-pago { background: #d1fae5; color: #059669; }
-        .badge-recebido { background: #d1fae5; color: #059669; }
-        .badge-vencido { background: #fee2e2; color: #dc2626; }
-        .badge-admin { background: #fef3c7; color: #d97706; }
-        .badge-padrao { background: #e2e8f0; color: #475569; }
-        .badge-aluno { background: #e0e7ff; color: #4f46e5; }
+        .badge { padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; display: inline-block; }
+        .badge-agendada { background: #e3f2fd; color: #1976d2; }
+        .badge-concluida { background: #e8f5e9; color: #388e3c; }
+        .badge-cancelada { background: #ffebee; color: #d32f2f; }
+        .badge-pendente { background: #fff3e0; color: #f57c00; }
+        .badge-pago { background: #e8f5e9; color: #388e3c; }
+        .badge-recebido { background: #e8f5e9; color: #388e3c; }
+        .badge-vencido { background: #ffebee; color: #d32f2f; }
+        .badge-admin { background: #fff3e0; color: #f57c00; }
+        .badge-padrao { background: #e0e0e0; color: #616161; }
+        .badge-aluno { background: #e8eaf6; color: #3f51b5; }
 
-        .thumb { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; background: #e2e8f0; display: flex; align-items: center; justify-content: center; font-size: 18px; }
+        .thumb { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; background: #333; display: flex; align-items: center; justify-content: center; font-size: 18px; }
 
-        .dashboard-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 24px; margin-bottom: 28px; }
-        .stat-card { 
-            background: rgba(255, 255, 255, 0.85);
-            backdrop-filter: blur(10px);
-            border-radius: var(--radius); box-shadow: var(--shadow); 
-            padding: 24px; display: flex; align-items: center; gap: 18px; position: relative; z-index: 1; 
-            transition: var(--transition); border: 1px solid rgba(255, 255, 255, 0.3); overflow: hidden;
-        }
-        .stat-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 4px;
-            background: var(--gradient-accent);
-        }
-        .stat-card:hover { transform: translateY(-5px); box-shadow: var(--shadow-lg); }
-        .stat-icon { 
-            width: 56px; height: 56px; border-radius: 16px; 
-            background: var(--gradient-accent); display: flex; align-items: center; justify-content: center; 
-            font-size: 28px; color: #fff; flex-shrink: 0;
-        }
-        .stat-info h4 { font-size: 28px; font-weight: 700; line-height: 1.2; }
-        .stat-info p { color: var(--text-light); font-size: 13px; font-weight: 500; }
-
-        .modal { display: none; position: fixed; inset: 0; background: rgba(0, 0, 0, 0.7); z-index: 200; align-items: center; justify-content: center; padding: 20px; backdrop-filter: blur(8px); }
-        .modal.show { display: flex; }
-        .modal-content { 
-            background: #fff; border-radius: var(--radius); width: 100%; max-width: 650px; max-height: 90vh; 
-            overflow-y: auto; box-shadow: var(--shadow-xl); animation: slideUp 0.3s;
-        }
-        .modal-header { 
-            padding: 24px 28px; border-bottom: 1px solid var(--border); display: flex; align-items: center; 
-            justify-content: space-between; position: sticky; top: 0; background: #fff; border-radius: var(--radius) var(--radius) 0 0; 
-            z-index: 10;
-        }
-        .modal-header h3 { font-size: 22px; font-weight: 700; }
-        .modal-close { background: none; border: none; font-size: 32px; cursor: pointer; color: var(--text-light); line-height: 1; transition: var(--transition); }
-        .modal-close:hover { color: var(--text); transform: rotate(90deg); }
-        .modal-body { padding: 28px; }
-        .modal-footer { padding: 20px 28px; border-top: 1px solid var(--border); display: flex; justify-content: flex-end; gap: 12px; }
-
-        .photo-upload { display: flex; align-items: center; gap: 20px; margin-bottom: 12px; }
-        .photo-preview { width: 70px; height: 70px; border-radius: 50%; object-fit: cover; background: #e2e8f0; display: flex; align-items: center; justify-content: center; font-size: 32px; }
-
-        #studentModal .photo-upload { display: block; text-align: center; }
-        #studentModal .photo-preview { width: 160px; height: 160px; border-radius: 50%; object-fit: cover; margin: 0 auto 20px; background: #e2e8f0; border: 4px solid #e2e8f0; }
-
-        body.fullscreen .sidebar { transform: translateX(-100%); }
-        body.fullscreen .main-content { margin-left: 0; }
-        body.fullscreen .sidebar.open { transform: translateX(0); }
-
-        #studentModal.modal { padding: 0; align-items: stretch; justify-content: flex-start; }
-        #studentModal .modal-content { width: 100%; max-width: 100%; height: 100vh; max-height: 100vh; margin: 0; border-radius: 0; display: flex; flex-direction: column; box-shadow: none; }
-        #studentModal .modal-header { border-radius: 0; flex-shrink: 0; }
-        #studentModal .modal-body { flex: 1; overflow-y: auto; }
-        #studentModal .modal-footer { flex-shrink: 0; border-radius: 0; }
-
-        /* Evolução fotos no modal */
-        .evolution-section { margin-top: 20px; border-top: 2px solid var(--border); padding-top: 20px; }
-        .evolution-thumbs { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 12px; }
-        .evolution-thumb { position: relative; width: 80px; height: 80px; border-radius: 10px; overflow: hidden; border: 2px solid #e2e8f0; }
-        .evolution-thumb img { width: 100%; height: 100%; object-fit: cover; cursor: pointer; }
-        .evolution-thumb .remove-evo { position: absolute; top: 4px; right: 4px; background: rgba(239,68,68,0.9); color: #fff; border: none; border-radius: 50%; width: 22px; height: 22px; font-size: 12px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
-        .evolution-thumb .remove-evo:hover { background: #dc2626; }
-
-        .album-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 24px; margin-top: 10px; }
-        .album-item { 
-            background: rgba(255, 255, 255, 0.85);
-            backdrop-filter: blur(10px);
-            border-radius: var(--radius); overflow: hidden; box-shadow: var(--shadow); 
-            transition: var(--transition); border: 1px solid rgba(255, 255, 255, 0.3);
-        }
-        .album-item:hover { transform: translateY(-6px); box-shadow: var(--shadow-lg); }
-        .album-item img { width: 100%; height: 200px; object-fit: cover; background: #f0f2f5; display: block; cursor: pointer; }
-        .album-item-info { padding: 16px; }
-        .album-item-info h4 { font-size: 15px; margin-bottom: 4px; color: var(--text); font-weight: 600; }
-        .album-item-info p { font-size: 13px; color: var(--text-light); margin-bottom: 12px; }
-        .album-item-actions { display: flex; gap: 8px; }
-        .album-item-actions .btn { font-size: 12px; padding: 6px 10px; }
-
-        .lightbox { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.95); z-index: 1000; display: flex; align-items: center; justify-content: center; cursor: zoom-out; }
-        .lightbox img { max-width: 95%; max-height: 95%; object-fit: contain; cursor: default; }
-        .lightbox-close { position: absolute; top: 20px; right: 30px; font-size: 40px; color: #fff; cursor: pointer; transition: var(--transition); }
-        .lightbox-close:hover { color: #ddd; }
-
-        .toast-container { position: fixed; bottom: 24px; right: 24px; z-index: 300; display: flex; flex-direction: column; gap: 8px; }
-        .toast { 
-            background: var(--primary-dark); color: #fff; padding: 16px 20px; border-radius: 12px; 
-            font-size: 14px; font-weight: 500; box-shadow: var(--shadow-lg); animation: slideIn 0.3s;
-        }
-        .toast.success { background: linear-gradient(135deg, #10b981, #059669); }
-        .toast.error { background: linear-gradient(135deg, #ef4444, #dc2626); }
-        .toast.warning { background: linear-gradient(135deg, #f59e0b, #d97706); }
-        @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
-
-        .permissions-container { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 8px; }
-        .perm-module { background: #f8fafc; border-radius: 10px; padding: 14px; }
-        .perm-module strong { display: block; margin-bottom: 8px; font-size: 14px; }
-        .perm-actions { display: flex; flex-wrap: wrap; gap: 12px; }
-        .perm-check { display: flex; align-items: center; gap: 6px; font-size: 13px; }
-        .permissions-updated { font-size: 12px; color: var(--text-light); margin-top: 12px; text-align: right; }
-
-        .weekly-schedule { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-top: 16px; }
-        .day-card { 
-            border: 1px solid var(--border); border-radius: 12px; padding: 16px; background: rgba(248, 250, 252, 0.8); 
-            backdrop-filter: blur(5px); transition: var(--transition);
-        }
-        .day-card:hover { background: #fff; box-shadow: var(--shadow); transform: translateY(-4px); }
-        .day-card h4 { font-size: 16px; margin-bottom: 12px; color: var(--text); font-weight: 600; }
-        .workout-item { background: #fff; border: 1px solid var(--border); border-radius: 8px; padding: 10px; margin-bottom: 8px; }
-        .workout-item strong { display: block; font-size: 14px; }
-        .workout-item small { display: block; color: var(--text-light); font-size: 12px; }
-        .workout-item pre { margin: 6px 0 0; white-space: pre-wrap; font-family: 'Poppins', sans-serif; font-size: 12px; color: var(--text); }
-
-        .student-area { background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(10px); border-radius: var(--radius); box-shadow: var(--shadow); padding: 32px; margin-bottom: 24px; }
-        .student-area h2 { margin-bottom: 20px; font-size: 28px; font-weight: 700; letter-spacing: -0.5px; display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
-        .student-area .highlight { background: #fefce8; border-left: 5px solid var(--warning); padding: 20px; border-radius: 12px; margin-bottom: 24px; }
-        .student-area .evolutions-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 16px; margin-top: 16px; }
-        .student-area .evolution-card { background: #fff; border-radius: 12px; overflow: hidden; box-shadow: var(--shadow); border: 1px solid var(--border); }
-        .student-area .evolution-card img { width: 100%; height: 160px; object-fit: cover; cursor: pointer; }
-        .student-area .evolution-card .evo-info { padding: 10px; }
-        .student-area .evolution-card .evo-info p { font-size: 12px; color: var(--text-light); margin-bottom: 4px; }
-        .student-area .evolution-card .evo-info small { font-size: 11px; color: #94a3b8; }
-
-        .student-avatar { width: 60px; height: 60px; border-radius: 50%; object-fit: cover; border: 3px solid #667eea; }
-
-        .note-helper { font-size: 12px; color: var(--text-light); font-style: italic; margin-top: 6px; }
-
-        .audit-log-table td { font-size: 13px; }
-        .audit-log-table .log-time { white-space: nowrap; }
-
-        /* Agenda grade styles */
-        .agenda-view-toggle { display: flex; gap: 8px; margin-bottom: 16px; }
-        .agenda-view-toggle .btn.active { background: var(--accent); color: #fff; border-color: var(--accent); }
-        .grade-filter { display: flex; flex-wrap: wrap; gap: 12px; align-items: flex-end; margin-bottom: 16px; }
-        .grade-filter .form-group { margin-bottom: 0; }
-        .grade-filter .form-group label { margin-bottom: 4px; }
-        .grade-filter .form-group input, .grade-filter .form-group select { padding: 8px 12px; }
-        .availability-grid-table { width: 100%; border-collapse: collapse; font-size: 12px; }
-        .availability-grid-table th, .availability-grid-table td { padding: 8px 10px; text-align: center; border: 1px solid var(--border); }
-        .availability-grid-table th { background: #f8fafc; font-weight: 600; }
-        .availability-grid-table td.ocupado { background: #fee2e2; color: #dc2626; font-weight: 500; }
-        .availability-grid-table td.livre { background: #d1fae5; color: #059669; font-weight: 500; }
-
-        /* Fluxo de Caixa - Cards de resumo */
-        .cashflow-summary {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 16px;
-            margin-bottom: 24px;
-        }
-        .cashflow-summary-card {
-            background: rgba(255, 255, 255, 0.85);
-            backdrop-filter: blur(5px);
-            border-radius: 12px;
+        .dashboard-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; margin-bottom: 20px; }
+        .stat-card {
+            background: var(--bg-card);
+            border-radius: var(--radius);
             padding: 20px;
-            text-align: center;
+            display: flex;
+            align-items: center;
+            gap: 15px;
             border: 1px solid var(--border);
             transition: var(--transition);
         }
-        .cashflow-summary-card:hover {
-            background: #fff;
-            box-shadow: var(--shadow);
-            transform: translateY(-2px);
+        .stat-card:hover { transform: translateY(-5px); box-shadow: var(--shadow-lg); border-color: var(--accent); }
+        .stat-icon {
+            width: 50px; height: 50px;
+            border-radius: 10px;
+            background: var(--accent);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 24px; color: #000;
         }
-        .cashflow-summary-card .label {
-            font-size: 13px;
-            color: var(--text-light);
-            margin-bottom: 8px;
-            font-weight: 500;
+        .stat-info h4 { font-size: 24px; font-weight: 700; }
+        .stat-info p { color: var(--text-light); font-size: 12px; }
+
+        .modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.8);
+            z-index: 200;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
         }
-        .cashflow-summary-card .value {
-            font-size: 24px;
-            font-weight: 700;
-            letter-spacing: -0.5px;
+        .modal.show { display: flex; }
+        .modal-content {
+            background: var(--bg-card);
+            border-radius: var(--radius);
+            width: 100%;
+            max-width: 600px;
+            max-height: 90vh;
+            overflow-y: auto;
+            border: 1px solid var(--accent);
         }
+        .modal-header {
+            padding: 15px 20px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            background: var(--bg-card);
+            z-index: 10;
+        }
+        .modal-header h3 { font-size: 18px; font-weight: 700; color: var(--accent); }
+        .modal-close { background: none; border: none; font-size: 24px; cursor: pointer; color: var(--text-light); }
+        .modal-close:hover { color: var(--text); }
+        .modal-body { padding: 20px; }
+        .modal-footer { padding: 15px 20px; border-top: 1px solid var(--border); display: flex; justify-content: flex-end; gap: 10px; }
+
+        .photo-upload { display: flex; align-items: center; gap: 15px; margin-bottom: 10px; }
+        .photo-preview { width: 60px; height: 60px; border-radius: 50%; object-fit: cover; background: #333; display: flex; align-items: center; justify-content: center; font-size: 28px; }
+
+        .evolution-section { margin-top: 15px; border-top: 1px solid var(--border); padding-top: 15px; }
+        .evolution-thumbs { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 10px; }
+        .evolution-thumb { position: relative; width: 70px; height: 70px; border-radius: 8px; overflow: hidden; border: 1px solid var(--border); }
+        .evolution-thumb img { width: 100%; height: 100%; object-fit: cover; cursor: pointer; }
+        .evolution-thumb .remove-evo { position: absolute; top: 2px; right: 2px; background: rgba(244,67,54,0.9); color: #fff; border: none; border-radius: 50%; width: 20px; height: 20px; font-size: 10px; cursor: pointer; }
+
+        .album-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 16px; }
+        .album-item {
+            background: var(--bg-card);
+            border-radius: var(--radius);
+            overflow: hidden;
+            border: 1px solid var(--border);
+            transition: var(--transition);
+        }
+        .album-item:hover { transform: translateY(-4px); box-shadow: var(--shadow-lg); border-color: var(--accent); }
+        .album-item img { width: 100%; height: 180px; object-fit: cover; cursor: pointer; }
+        .album-item-info { padding: 10px; }
+        .album-item-info h4 { font-size: 14px; margin-bottom: 4px; }
+        .album-item-info p { font-size: 12px; color: var(--text-light); margin-bottom: 10px; }
+        .album-item-actions { display: flex; gap: 6px; }
+
+        .lightbox {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.95);
+            z-index: 1000; display: flex; align-items: center; justify-content: center;
+            cursor: zoom-out;
+        }
+        .lightbox img { max-width: 95%; max-height: 95%; object-fit: contain; }
+        .lightbox-close { position: absolute; top: 15px; right: 25px; font-size: 32px; color: #fff; cursor: pointer; }
+
+        .toast-container { position: fixed; bottom: 20px; right: 20px; z-index: 300; display: flex; flex-direction: column; gap: 8px; }
+        .toast {
+            background: #333; color: #fff; padding: 12px 18px; border-radius: 8px;
+            font-size: 13px; font-weight: 500; box-shadow: var(--shadow-lg);
+        }
+        .toast.success { background: var(--success); }
+        .toast.error { background: var(--danger); }
+        .toast.warning { background: var(--warning); }
+
+        .permissions-container { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 8px; }
+        .perm-module { background: #2a2a2a; border-radius: 8px; padding: 10px; }
+        .perm-module strong { display: block; margin-bottom: 6px; font-size: 13px; }
+        .perm-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+        .perm-check { display: flex; align-items: center; gap: 4px; font-size: 12px; }
+
+        .weekly-schedule { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin-top: 15px; }
+        .day-card { border: 1px solid var(--border); border-radius: 8px; padding: 12px; background: #2a2a2a; }
+        .day-card h4 { font-size: 15px; margin-bottom: 10px; color: var(--accent); }
+        .workout-item { background: var(--bg-card); border: 1px solid var(--border); border-radius: 6px; padding: 8px; margin-bottom: 6px; }
+        .workout-item strong { display: block; font-size: 13px; }
+        .workout-item small { display: block; color: var(--text-light); font-size: 11px; }
+
+        .student-area { background: var(--bg-card); border-radius: var(--radius); box-shadow: var(--shadow); padding: 20px; margin-bottom: 20px; border: 1px solid var(--border); }
+        .student-area h2 { margin-bottom: 15px; font-size: 24px; font-weight: 700; color: var(--accent); display: flex; align-items: center; gap: 10px; }
+        .student-area .highlight { background: rgba(255,152,0,0.1); border-left: 4px solid var(--warning); padding: 15px; border-radius: 8px; margin-bottom: 20px; }
+        .student-area .evolutions-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 12px; margin-top: 12px; }
+        .student-area .evolution-card { background: #2a2a2a; border-radius: 8px; overflow: hidden; border: 1px solid var(--border); }
+        .student-area .evolution-card img { width: 100%; height: 130px; object-fit: cover; cursor: pointer; }
+        .student-area .evolution-card .evo-info { padding: 8px; }
+        .student-area .evolution-card .evo-info p { font-size: 11px; color: var(--text-light); margin-bottom: 2px; }
+        .student-area .evolution-card .evo-info small { font-size: 10px; color: #777; }
+
+        .student-avatar { width: 50px; height: 50px; border-radius: 50%; object-fit: cover; border: 2px solid var(--accent); }
+
+        .agenda-view-toggle { display: flex; gap: 8px; margin-bottom: 15px; }
+        .agenda-view-toggle .btn.active { background: var(--accent); color: #000; }
+        .grade-filter { display: flex; flex-wrap: wrap; gap: 10px; align-items: flex-end; margin-bottom: 15px; }
+        .availability-grid-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+        .availability-grid-table th, .availability-grid-table td { padding: 6px 8px; text-align: center; border: 1px solid var(--border); }
+        .availability-grid-table th { background: #2a2a2a; }
+        .availability-grid-table td.ocupado { background: #ffebee; color: #d32f2f; }
+        .availability-grid-table td.livre { background: #e8f5e9; color: #388e3c; }
+
+        .cashflow-summary { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin-bottom: 15px; }
+        .cashflow-summary-card { background: #2a2a2a; border-radius: 8px; padding: 15px; text-align: center; border: 1px solid var(--border); }
+        .cashflow-summary-card .label { font-size: 12px; color: var(--text-light); margin-bottom: 5px; }
+        .cashflow-summary-card .value { font-size: 20px; font-weight: 700; }
         .cashflow-summary-card.entrada .value { color: var(--success); }
         .cashflow-summary-card.saida .value { color: var(--danger); }
         .cashflow-summary-card.saldo .value { color: var(--accent); }
 
-        /* Botões de filtro rápido */
-        .cashflow-filter-buttons {
-            display: flex;
-            gap: 8px;
-            flex-wrap: wrap;
-            margin-bottom: 16px;
-        }
-        .cashflow-filter-buttons .btn.active {
+        .cashflow-filter-buttons { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 10px; }
+
+        #exitFullscreenBtn {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 500;
             background: var(--accent);
-            color: #fff;
-            border-color: var(--accent);
+            color: #000;
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            font-size: 22px;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(212,175,55,0.5);
+            display: none;
+            align-items: center;
+            justify-content: center;
         }
+        #exitFullscreenBtn:hover { background: var(--accent-hover); }
 
         @media (max-width: 768px) {
-            body.fullscreen .sidebar { transform: translateX(-100%); }
-            body.fullscreen .sidebar.open { transform: translateX(0); }
-            body.fullscreen .main-content { margin-left: 0; }
-            .permissions-container { grid-template-columns: 1fr; }
-            .section { padding: 16px; }
-            #studentModal .modal-body { padding: 16px; }
-            #studentModal .modal-header, #studentModal .modal-footer { padding: 12px 16px; }
-            #studentModal .photo-preview { width: 120px; height: 120px; }
-            .album-grid { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; }
-            .lightbox-close { font-size: 32px; top: 10px; right: 15px; }
-            .login-box { padding: 30px 20px; }
-            .student-avatar { width: 50px; height: 50px; }
-            .grade-filter { flex-direction: column; align-items: stretch; }
+            .sidebar { transform: translateX(-100%); width: 280px; }
+            .sidebar.open { transform: translateX(0); }
+            .main-content { margin-left: 0; }
+            .topbar { padding: 10px 15px; }
+            .topbar h2 { font-size: 18px; }
+            .section { padding: 10px; }
             .dashboard-cards { grid-template-columns: 1fr; }
-            .sidebar { width: 100%; }
-            .cashflow-summary { grid-template-columns: 1fr; }
+            .modal-content { max-width: 100%; margin: 10px; }
+            .permissions-container { grid-template-columns: 1fr; }
+            #studentModal .photo-preview { width: 100px; height: 100px; }
+            .album-grid { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; }
+            .sidebar-brand { padding: 15px; font-size: 20px; }
         }
     </style>
 </head>
@@ -456,14 +416,12 @@
                 <div class="form-group">
                     <label><i class="fas fa-user"></i> Usuário</label>
                     <input type="text" id="loginUsername" placeholder="Digite seu usuário" required autocomplete="off"
-                           autofocus oninput="this.value = this.value.toUpperCase()"
-                           onkeydown="if(event.key==='Enter'){event.preventDefault(); document.getElementById('loginPassword').focus();}">
+                           autofocus oninput="this.value = this.value.toUpperCase()">
                 </div>
                 <div class="form-group">
                     <label><i class="fas fa-lock"></i> Senha</label>
                     <input type="password" id="loginPassword" placeholder="Digite sua senha" required autocomplete="off"
-                           oninput="this.value = this.value.toUpperCase()"
-                           onkeydown="if(event.key==='Enter'){event.preventDefault(); document.getElementById('loginScreen').querySelector('form').requestSubmit();}">
+                           oninput="this.value = this.value.toUpperCase()">
                 </div>
                 <button type="submit" class="btn btn-primary login-btn"><i class="fas fa-sign-in-alt"></i> Entrar</button>
             </form>
@@ -478,14 +436,12 @@
                 <div class="form-group">
                     <label><i class="fas fa-user"></i> Usuário</label>
                     <input type="text" id="studentLoginUsername" placeholder="Seu nome de usuário" required autocomplete="off"
-                           autofocus oninput="this.value = this.value.toUpperCase()"
-                           onkeydown="if(event.key==='Enter'){event.preventDefault(); document.getElementById('studentLoginPassword').focus();}">
+                           autofocus oninput="this.value = this.value.toUpperCase()">
                 </div>
                 <div class="form-group">
                     <label><i class="fas fa-lock"></i> Senha</label>
                     <input type="password" id="studentLoginPassword" placeholder="Telefone sem DDD" required autocomplete="off"
-                           oninput="this.value = this.value.toUpperCase()"
-                           onkeydown="if(event.key==='Enter'){event.preventDefault(); document.getElementById('loginStudentBox').querySelector('form').requestSubmit();}">
+                           oninput="this.value = this.value.toUpperCase()">
                 </div>
                 <button type="submit" class="btn btn-primary login-btn"><i class="fas fa-sign-in-alt"></i> Entrar</button>
             </form>
@@ -503,7 +459,7 @@
                     <span id="loggedUserName"></span>
                     <span id="loggedUserRole"></span>
                 </div>
-                <button class="btn btn-sm btn-outline" style="color:#fff;border-color:rgba(255,255,255,0.3);" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Sair</button>
+                <button class="btn btn-sm btn-outline" style="color:#fff;border-color:var(--border);" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Sair</button>
             </div>
         </div>
 
@@ -608,7 +564,7 @@
                             <button class="btn btn-primary" onclick="generateAvailabilityGrid()"><i class="fas fa-chart-bar"></i> Gerar Grade</button>
                         </div>
                         <div id="availabilityGridContainer">
-                            <p style="color:#64748b;">Selecione os parâmetros e clique em "Gerar Grade".</p>
+                            <p style="color:var(--text-light);">Selecione os parâmetros e clique em "Gerar Grade".</p>
                         </div>
                     </div>
                 </div>
@@ -619,7 +575,7 @@
                 <div class="card">
                     <div class="card-header"><h3><i class="fas fa-dumbbell"></i> Treinos Semanais</h3><button class="btn btn-primary" id="btnAddWorkout" onclick="openWorkoutForm()"><i class="fas fa-plus"></i> Novo Treino</button></div>
                     <div id="weeklySchedule" class="weekly-schedule"></div>
-                    <hr style="margin: 24px 0; border-color: #e2e8f0;">
+                    <hr style="margin: 20px 0; border-color: var(--border);">
                     <div class="table-container">
                         <table>
                             <thead><tr><th>Nome do Treino</th><th>Grupo Muscular</th><th>Dias da Semana</th><th>Horário</th><th>Academia</th><th>Aluno Destinado</th><th>Ações</th></tr></thead>
@@ -645,7 +601,6 @@
                         <button class="btn btn-primary" id="btnAddCashflow" onclick="openCashflowForm()"><i class="fas fa-plus"></i> Novo Lançamento</button>
                     </div>
                     
-                    <!-- Cards de Resumo - Entrada, Saída e Saldo -->
                     <div class="cashflow-summary" id="cashflowSummary">
                         <div class="cashflow-summary-card entrada">
                             <div class="label"><i class="fas fa-arrow-down"></i> Entradas</div>
@@ -661,7 +616,6 @@
                         </div>
                     </div>
 
-                    <!-- Botões de Filtro Rápido -->
                     <div class="cashflow-filter-buttons" id="cashflowFilterButtons">
                         <button class="btn btn-sm btn-outline active" data-filter="todos" onclick="setCashflowFilter('todos')"><i class="fas fa-list"></i> Todos</button>
                         <button class="btn btn-sm btn-outline" data-filter="hoje" onclick="setCashflowFilter('hoje')"><i class="fas fa-calendar-day"></i> Hoje</button>
@@ -677,7 +631,7 @@
                     </div>
                 </div>
 
-                <!-- Contas a Pagar e Receber (Futuras) -->
+                <!-- Contas a Pagar e Receber -->
                 <div class="card">
                     <div class="card-header">
                         <h3><i class="fas fa-file-invoice-dollar"></i> Contas a Pagar e Receber (Futuras)</h3>
@@ -708,7 +662,7 @@
             <section id="section-filtro" class="section">
                 <div class="card">
                     <div class="card-header"><h3><i class="fas fa-search"></i> Filtro Avançado</h3></div>
-                    <div class="form-group" style="display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px;">
+                    <div class="form-group" style="display:grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px;">
                         <div>
                             <label>Filtrar em (Módulo)</label>
                             <select id="filtroModulo">
@@ -755,7 +709,7 @@
                         </div>
                     </div>
                     <button class="btn btn-primary" onclick="aplicarFiltro()"><i class="fas fa-search"></i> Pesquisar</button>
-                    <hr style="margin: 20px 0; border-color: #e2e8f0;">
+                    <hr style="margin: 15px 0; border-color: var(--border);">
                     <div class="table-container">
                         <table>
                             <thead><tr><th>Tipo</th><th>Data</th><th>Descrição/Nome</th><th>Detalhes</th><th>Valor/Contato</th><th>Academia</th></tr></thead>
@@ -802,7 +756,7 @@
                 </div>
             </section>
 
-            <!-- Área do Aluno (para visualização de treinos) -->
+            <!-- Área do Aluno -->
             <section id="section-aluno" class="section">
                 <div class="student-area" id="studentArea"></div>
             </section>
@@ -816,28 +770,27 @@
             <form id="studentForm" onsubmit="saveStudent(event)">
                 <div class="modal-body">
                     <div class="photo-upload">
-                        <img id="studentFotoPreview" class="photo-preview" src="" alt="Foto" style="background:#e2e8f0;">
+                        <img id="studentFotoPreview" class="photo-preview" src="" alt="Foto" style="background:#333;">
                         <input type="file" id="studentFoto" accept="image/*" onchange="handleStudentPhoto(event)" style="display:none;">
                         <button type="button" class="btn btn-outline" onclick="document.getElementById('studentFoto').click()"><i class="fas fa-camera"></i> Adicionar Foto</button>
                     </div>
-                    <div class="form-group"><label>Nome *</label><input type="text" id="studentNome" required placeholder="Nome do aluno" onkeydown="if(event.key==='Enter'){event.preventDefault(); document.getElementById('studentCpf').focus();}"></div>
-                    <div class="form-group"><label>CPF</label><input type="text" id="studentCpf" placeholder="000.000.000-00" onkeydown="if(event.key==='Enter'){event.preventDefault(); document.getElementById('studentDataCadastro').focus();}"></div>
-                    <div class="form-group"><label>Data do Cadastro</label><input type="date" id="studentDataCadastro" onkeydown="if(event.key==='Enter'){event.preventDefault(); document.getElementById('studentAcademia').focus();}"></div>
-                    <div class="form-group"><label>Academia</label><select id="studentAcademia" onkeydown="if(event.key==='Enter'){event.preventDefault(); document.getElementById('studentObjetivo').focus();}"></select></div>
-                    <div class="form-group"><label>Objetivo</label><input type="text" id="studentObjetivo" placeholder="Ex: Hipertrofia, Emagrecimento..." onkeydown="if(event.key==='Enter'){event.preventDefault(); document.getElementById('studentTelefone').focus();}"></div>
-                    <div class="form-group"><label>Celular</label><input type="text" id="studentTelefone" placeholder="(00) 00000-0000" onkeydown="if(event.key==='Enter'){event.preventDefault(); document.getElementById('studentEmail').focus();}"></div>
-                    <div class="form-group"><label>Email</label><input type="email" id="studentEmail" placeholder="email@exemplo.com" onkeydown="if(event.key==='Enter'){event.preventDefault(); document.getElementById('studentValorAula').focus();}"></div>
-                    <div class="form-group"><label>Valor por Aula (R$)</label><input type="text" id="studentValorAula" placeholder="0,00" onkeydown="if(event.key==='Enter'){event.preventDefault(); document.getElementById('studentMensalidadeFixa').focus();}"></div>
-                    <div class="form-group"><label>Mensalidade Fixa (R$)</label><input type="text" id="studentMensalidadeFixa" placeholder="0,00" onkeydown="if(event.key==='Enter'){event.preventDefault(); document.getElementById('studentObservacoes').focus();}"></div>
-                    <div class="form-group"><label>Observações</label><textarea id="studentObservacoes" rows="3" placeholder="Anotações importantes..." onkeydown="if(event.key==='Enter' && !event.shiftKey){event.preventDefault(); document.getElementById('studentModal').querySelector('button[type=submit]').focus();}"></textarea></div>
+                    <div class="form-group"><label>Nome *</label><input type="text" id="studentNome" required placeholder="Nome do aluno"></div>
+                    <div class="form-group"><label>CPF</label><input type="text" id="studentCpf" placeholder="000.000.000-00"></div>
+                    <div class="form-group"><label>Data do Cadastro</label><input type="date" id="studentDataCadastro"></div>
+                    <div class="form-group"><label>Academia</label><select id="studentAcademia"></select></div>
+                    <div class="form-group"><label>Objetivo</label><input type="text" id="studentObjetivo" placeholder="Ex: Hipertrofia, Emagrecimento..."></div>
+                    <div class="form-group"><label>Celular</label><input type="text" id="studentTelefone" placeholder="(00) 00000-0000"></div>
+                    <div class="form-group"><label>Email</label><input type="email" id="studentEmail" placeholder="email@exemplo.com"></div>
+                    <div class="form-group"><label>Valor por Aula (R$)</label><input type="text" id="studentValorAula" placeholder="0,00"></div>
+                    <div class="form-group"><label>Mensalidade Fixa (R$)</label><input type="text" id="studentMensalidadeFixa" placeholder="0,00"></div>
+                    <div class="form-group"><label>Observações</label><textarea id="studentObservacoes" rows="3" placeholder="Anotações importantes..."></textarea></div>
 
-                    <!-- Seção de Fotos de Evolução -->
                     <div class="evolution-section">
-                        <h4 style="margin-bottom: 12px; font-size: 16px; font-weight: 600;">📸 Fotos do Aluno (Evolução)</h4>
+                        <h4 style="margin-bottom: 10px; font-size: 15px; font-weight: 600;">📸 Fotos do Aluno (Evolução)</h4>
                         <button type="button" class="btn btn-outline btn-sm" onclick="document.getElementById('evolutionFotoInput').click()"><i class="fas fa-plus"></i> Adicionar Foto</button>
                         <input type="file" id="evolutionFotoInput" accept="image/*" style="display:none;" onchange="handleEvolutionPhoto(event)">
                         <div id="evolutionThumbs" class="evolution-thumbs"></div>
-                        <p class="note-helper">Estas fotos ficarão visíveis para o aluno quando ele entrar na área dele.</p>
+                        <p class="note-helper" style="font-size: 11px; color: var(--text-light); margin-top: 5px;">Estas fotos ficarão visíveis para o aluno quando ele entrar na área dele.</p>
                     </div>
                 </div>
                 <div class="modal-footer"><button type="button" class="btn btn-outline" onclick="closeModal('studentModal')"><i class="fas fa-times"></i> Cancelar</button><button type="submit" class="btn btn-success"><i class="fas fa-save"></i> Salvar</button></div>
@@ -850,10 +803,10 @@
             <div class="modal-header"><h3>Cadastro de Academia</h3><button class="modal-close" onclick="closeModal('academyModal')">&times;</button></div>
             <form id="academyForm" onsubmit="saveAcademy(event)">
                 <div class="modal-body">
-                    <div class="form-group"><label>Nome *</label><input type="text" id="academyNome" required placeholder="Nome da academia" onkeydown="if(event.key==='Enter'){event.preventDefault(); document.getElementById('academyEndereco').focus();}"></div>
-                    <div class="form-group"><label>Endereço</label><input type="text" id="academyEndereco" placeholder="Rua, número, bairro" onkeydown="if(event.key==='Enter'){event.preventDefault(); document.getElementById('academyTelefone').focus();}"></div>
-                    <div class="form-group"><label>Telefone</label><input type="text" id="academyTelefone" placeholder="(00) 00000-0000" onkeydown="if(event.key==='Enter'){event.preventDefault(); document.getElementById('academyResponsavel').focus();}"></div>
-                    <div class="form-group"><label>Responsável</label><input type="text" id="academyResponsavel" placeholder="Nome do responsável" onkeydown="if(event.key==='Enter'){event.preventDefault(); document.getElementById('academyModal').querySelector('button[type=submit]').focus();}"></div>
+                    <div class="form-group"><label>Nome *</label><input type="text" id="academyNome" required placeholder="Nome da academia"></div>
+                    <div class="form-group"><label>Endereço</label><input type="text" id="academyEndereco" placeholder="Rua, número, bairro"></div>
+                    <div class="form-group"><label>Telefone</label><input type="text" id="academyTelefone" placeholder="(00) 00000-0000"></div>
+                    <div class="form-group"><label>Responsável</label><input type="text" id="academyResponsavel" placeholder="Nome do responsável"></div>
                 </div>
                 <div class="modal-footer"><button type="button" class="btn btn-outline" onclick="closeModal('academyModal')"><i class="fas fa-times"></i> Cancelar</button><button type="submit" class="btn btn-success"><i class="fas fa-save"></i> Salvar</button></div>
             </form>
@@ -865,11 +818,11 @@
             <div class="modal-header"><h3>Agendamento de Aula</h3><button class="modal-close" onclick="closeModal('scheduleModal')">&times;</button></div>
             <form id="scheduleForm" onsubmit="saveSchedule(event)">
                 <div class="modal-body">
-                    <div class="form-group"><label>Data *</label><input type="date" id="scheduleData" required onkeydown="if(event.key==='Enter'){event.preventDefault(); document.getElementById('scheduleHora').focus();}"></div>
-                    <div class="form-group"><label>Hora *</label><input type="time" id="scheduleHora" required onkeydown="if(event.key==='Enter'){event.preventDefault(); document.getElementById('scheduleAluno').focus();}"></div>
-                    <div class="form-group"><label>Aluno *</label><select id="scheduleAluno" required onkeydown="if(event.key==='Enter'){event.preventDefault(); document.getElementById('scheduleAcademia').focus();}"></select></div>
-                    <div class="form-group"><label>Academia *</label><select id="scheduleAcademia" required onkeydown="if(event.key==='Enter'){event.preventDefault(); document.getElementById('scheduleStatus').focus();}"></select></div>
-                    <div class="form-group"><label>Status</label><select id="scheduleStatus" onkeydown="if(event.key==='Enter'){event.preventDefault(); document.getElementById('scheduleModal').querySelector('button[type=submit]').focus();}"><option value="Agendada">Agendada</option><option value="Concluída">Concluída</option><option value="Cancelada">Cancelada</option></select></div>
+                    <div class="form-group"><label>Data *</label><input type="date" id="scheduleData" required></div>
+                    <div class="form-group"><label>Hora *</label><input type="time" id="scheduleHora" required></div>
+                    <div class="form-group"><label>Aluno *</label><select id="scheduleAluno" required></select></div>
+                    <div class="form-group"><label>Academia *</label><select id="scheduleAcademia" required></select></div>
+                    <div class="form-group"><label>Status</label><select id="scheduleStatus"><option value="Agendada">Agendada</option><option value="Concluída">Concluída</option><option value="Cancelada">Cancelada</option></select></div>
                 </div>
                 <div class="modal-footer"><button type="button" class="btn btn-outline" onclick="closeModal('scheduleModal')"><i class="fas fa-times"></i> Cancelar</button><button type="submit" class="btn btn-success"><i class="fas fa-save"></i> Salvar</button></div>
             </form>
@@ -881,21 +834,24 @@
             <div class="modal-header"><h3>Agendar Aulas Recorrentes</h3><button class="modal-close" onclick="closeModal('recurringScheduleModal')">&times;</button></div>
             <form id="recurringScheduleForm" onsubmit="saveRecurringSchedule(event)">
                 <div class="modal-body">
-                    <div class="form-group"><label>Aluno *</label><select id="recurringAluno" required onkeydown="if(event.key==='Enter'){event.preventDefault(); document.getElementById('recurringAcademia').focus();}"></select></div>
-                    <div class="form-group"><label>Academia *</label><select id="recurringAcademia" required onkeydown="if(event.key==='Enter'){event.preventDefault(); document.getElementById('recurringHora').focus();}"></select></div>
-                    <div class="form-group"><label>Hora *</label><input type="time" id="recurringHora" required onkeydown="if(event.key==='Enter'){event.preventDefault(); document.getElementById('recurringStartDate').focus();}"></div>
-                    <div class="form-group"><label>Data Inicial *</label><input type="date" id="recurringStartDate" required onkeydown="if(event.key==='Enter'){event.preventDefault(); document.getElementById('recurringEndDate').focus();}"></div>
-                    <div class="form-group"><label>Data Final *</label><input type="date" id="recurringEndDate" required onkeydown="if(event.key==='Enter'){event.preventDefault(); document.querySelector('#recurringScheduleForm .perm-actions input[type=checkbox]').focus();}"></div>
-                    <div class="form-group"><label>Dias da Semana *</label><div class="perm-actions" style="flex-wrap: wrap;">
-                        <label class="perm-check"><input type="checkbox" value="1" onkeydown="if(event.key==='Enter'){event.preventDefault(); this.nextElementSibling ? this.nextElementSibling.focus() : document.getElementById('recurringStatus').focus();}"> Seg</label>
-                        <label class="perm-check"><input type="checkbox" value="2" onkeydown="if(event.key==='Enter'){event.preventDefault(); this.nextElementSibling ? this.nextElementSibling.focus() : document.getElementById('recurringStatus').focus();}"> Ter</label>
-                        <label class="perm-check"><input type="checkbox" value="3" onkeydown="if(event.key==='Enter'){event.preventDefault(); this.nextElementSibling ? this.nextElementSibling.focus() : document.getElementById('recurringStatus').focus();}"> Qua</label>
-                        <label class="perm-check"><input type="checkbox" value="4" onkeydown="if(event.key==='Enter'){event.preventDefault(); this.nextElementSibling ? this.nextElementSibling.focus() : document.getElementById('recurringStatus').focus();}"> Qui</label>
-                        <label class="perm-check"><input type="checkbox" value="5" onkeydown="if(event.key==='Enter'){event.preventDefault(); this.nextElementSibling ? this.nextElementSibling.focus() : document.getElementById('recurringStatus').focus();}"> Sex</label>
-                        <label class="perm-check"><input type="checkbox" value="6" onkeydown="if(event.key==='Enter'){event.preventDefault(); this.nextElementSibling ? this.nextElementSibling.focus() : document.getElementById('recurringStatus').focus();}"> Sáb</label>
-                        <label class="perm-check"><input type="checkbox" value="0" onkeydown="if(event.key==='Enter'){event.preventDefault(); document.getElementById('recurringStatus').focus();}"> Dom</label>
-                    </div></div>
-                    <div class="form-group"><label>Status</label><select id="recurringStatus" onkeydown="if(event.key==='Enter'){event.preventDefault(); document.getElementById('recurringScheduleModal').querySelector('button[type=submit]').focus();}"><option value="Agendada">Agendada</option><option value="Concluída">Concluída</option><option value="Cancelada">Cancelada</option></select></div>
+                    <div class="form-group"><label>Aluno *</label><select id="recurringAluno" required></select></div>
+                    <div class="form-group"><label>Academia *</label><select id="recurringAcademia" required></select></div>
+                    <div class="form-group"><label>Hora *</label><input type="time" id="recurringHora" required></div>
+                    <div class="form-group"><label>Data Inicial *</label><input type="date" id="recurringStartDate" required></div>
+                    <div class="form-group"><label>Data Final *</label><input type="date" id="recurringEndDate" required></div>
+                    <div class="form-group">
+                        <label>Dias da Semana *</label>
+                        <div class="perm-actions" style="flex-wrap: wrap;">
+                            <label class="perm-check"><input type="checkbox" value="1"> Seg</label>
+                            <label class="perm-check"><input type="checkbox" value="2"> Ter</label>
+                            <label class="perm-check"><input type="checkbox" value="3"> Qua</label>
+                            <label class="perm-check"><input type="checkbox" value="4"> Qui</label>
+                            <label class="perm-check"><input type="checkbox" value="5"> Sex</label>
+                            <label class="perm-check"><input type="checkbox" value="6"> Sáb</label>
+                            <label class="perm-check"><input type="checkbox" value="0"> Dom</label>
+                        </div>
+                    </div>
+                    <div class="form-group"><label>Status</label><select id="recurringStatus"><option value="Agendada">Agendada</option><option value="Concluída">Concluída</option><option value="Cancelada">Cancelada</option></select></div>
                 </div>
                 <div class="modal-footer"><button type="button" class="btn btn-outline" onclick="closeModal('recurringScheduleModal')"><i class="fas fa-times"></i> Cancelar</button><button type="submit" class="btn btn-success"><i class="fas fa-save"></i> Gerar Aulas</button></div>
             </form>
@@ -907,11 +863,11 @@
             <div class="modal-header"><h3>Lançamento no Fluxo de Caixa</h3><button class="modal-close" onclick="closeModal('cashflowModal')">&times;</button></div>
             <form id="cashflowForm" onsubmit="saveCashflow(event)">
                 <div class="modal-body">
-                    <div class="form-group"><label>Data *</label><input type="date" id="cashflowData" required onkeydown="if(event.key==='Enter'){event.preventDefault(); document.getElementById('cashflowDescricao').focus();}"></div>
-                    <div class="form-group"><label>Descrição *</label><input type="text" id="cashflowDescricao" required placeholder="Ex: Aula particular, Compra de material..." onkeydown="if(event.key==='Enter'){event.preventDefault(); document.getElementById('cashflowEntrada').focus();}"></div>
-                    <div class="form-group"><label>Entrada (R$)</label><input type="number" id="cashflowEntrada" step="0.01" min="0" placeholder="0.00" onkeydown="if(event.key==='Enter'){event.preventDefault(); document.getElementById('cashflowSaida').focus();}"></div>
-                    <div class="form-group"><label>Saída (R$)</label><input type="number" id="cashflowSaida" step="0.01" min="0" placeholder="0.00" onkeydown="if(event.key==='Enter'){event.preventDefault(); document.getElementById('cashflowFormaPgto').focus();}"></div>
-                    <div class="form-group"><label>Forma de Pagamento</label><select id="cashflowFormaPgto" onkeydown="if(event.key==='Enter'){event.preventDefault(); document.getElementById('cashflowModal').querySelector('button[type=submit]').focus();}"><option value="Dinheiro">Dinheiro</option><option value="Pix">Pix</option><option value="Cartão de Crédito">Cartão de Crédito</option><option value="Cartão de Débito">Cartão de Débito</option><option value="Transferência">Transferência</option><option value="Outro">Outro</option></select></div>
+                    <div class="form-group"><label>Data *</label><input type="date" id="cashflowData" required></div>
+                    <div class="form-group"><label>Descrição *</label><input type="text" id="cashflowDescricao" required placeholder="Ex: Aula particular, Compra de material..."></div>
+                    <div class="form-group"><label>Entrada (R$)</label><input type="number" id="cashflowEntrada" step="0.01" min="0" placeholder="0.00"></div>
+                    <div class="form-group"><label>Saída (R$)</label><input type="number" id="cashflowSaida" step="0.01" min="0" placeholder="0.00"></div>
+                    <div class="form-group"><label>Forma de Pagamento</label><select id="cashflowFormaPgto"><option value="Dinheiro">Dinheiro</option><option value="Pix">Pix</option><option value="Cartão de Crédito">Cartão de Crédito</option><option value="Cartão de Débito">Cartão de Débito</option><option value="Transferência">Transferência</option><option value="Outro">Outro</option></select></div>
                 </div>
                 <div class="modal-footer"><button type="button" class="btn btn-outline" onclick="closeModal('cashflowModal')"><i class="fas fa-times"></i> Cancelar</button><button type="submit" class="btn btn-success"><i class="fas fa-save"></i> Salvar</button></div>
             </form>
@@ -924,34 +880,11 @@
             <div class="modal-header"><h3>Conta a Pagar/Receber</h3><button class="modal-close" onclick="closeModal('contaModal')">&times;</button></div>
             <form id="contaForm" onsubmit="saveConta(event)">
                 <div class="modal-body">
-                    <div class="form-group">
-                        <label>Descrição *</label>
-                        <input type="text" id="contaDescricao" required placeholder="Ex: Aluguel, Mensalidade de aluno..." onkeydown="if(event.key==='Enter'){event.preventDefault(); document.getElementById('contaTipo').focus();}">
-                    </div>
-                    <div class="form-group">
-                        <label>Tipo *</label>
-                        <select id="contaTipo" required onkeydown="if(event.key==='Enter'){event.preventDefault(); document.getElementById('contaValor').focus();}">
-                            <option value="Pagar">Pagar</option>
-                            <option value="Receber">Receber</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label>Valor (R$) *</label>
-                        <input type="number" id="contaValor" step="0.01" min="0" required placeholder="0.00" onkeydown="if(event.key==='Enter'){event.preventDefault(); document.getElementById('contaVencimento').focus();}">
-                    </div>
-                    <div class="form-group">
-                        <label>Data de Vencimento *</label>
-                        <input type="date" id="contaVencimento" required onkeydown="if(event.key==='Enter'){event.preventDefault(); document.getElementById('contaStatus').focus();}">
-                    </div>
-                    <div class="form-group">
-                        <label>Status</label>
-                        <select id="contaStatus" onkeydown="if(event.key==='Enter'){event.preventDefault(); document.getElementById('contaModal').querySelector('button[type=submit]').focus();}">
-                            <option value="Pendente">Pendente</option>
-                            <option value="Pago">Pago</option>
-                            <option value="Recebido">Recebido</option>
-                            <option value="Vencido">Vencido</option>
-                        </select>
-                    </div>
+                    <div class="form-group"><label>Descrição *</label><input type="text" id="contaDescricao" required placeholder="Ex: Aluguel, Mensalidade de aluno..."></div>
+                    <div class="form-group"><label>Tipo *</label><select id="contaTipo" required><option value="Pagar">Pagar</option><option value="Receber">Receber</option></select></div>
+                    <div class="form-group"><label>Valor (R$) *</label><input type="number" id="contaValor" step="0.01" min="0" required placeholder="0.00"></div>
+                    <div class="form-group"><label>Data de Vencimento *</label><input type="date" id="contaVencimento" required></div>
+                    <div class="form-group"><label>Status</label><select id="contaStatus"><option value="Pendente">Pendente</option><option value="Pago">Pago</option><option value="Recebido">Recebido</option><option value="Vencido">Vencido</option></select></div>
                 </div>
                 <div class="modal-footer"><button type="button" class="btn btn-outline" onclick="closeModal('contaModal')"><i class="fas fa-times"></i> Cancelar</button><button type="submit" class="btn btn-success"><i class="fas fa-save"></i> Salvar</button></div>
             </form>
@@ -963,12 +896,12 @@
             <div class="modal-header"><h3>Cadastro de Usuário</h3><button class="modal-close" onclick="closeModal('userModal')">&times;</button></div>
             <form id="userForm" onsubmit="saveUser(event)">
                 <div class="modal-body">
-                    <div class="form-group"><label>Usuário *</label><input type="text" id="userUsername" required placeholder="Nome de usuário" autocomplete="off" oninput="this.value = this.value.toUpperCase()" onkeydown="if(event.key==='Enter'){event.preventDefault(); document.getElementById('userPassword').focus();}"></div>
-                    <div class="form-group"><label>Senha <span id="userPasswordHint" style="font-weight:400;color:#64748b;">*</span></label><input type="text" id="userPassword" placeholder="Digite a senha" autocomplete="new-password" oninput="this.value = this.value.toUpperCase()" onkeydown="if(event.key==='Enter'){event.preventDefault(); document.getElementById('userNome').focus();}"></div>
-                    <div class="form-group"><label>Nome completo</label><input type="text" id="userNome" placeholder="Nome do usuário" onkeydown="if(event.key==='Enter'){event.preventDefault(); document.getElementById('userRole').focus();}"></div>
-                    <div class="form-group"><label>Perfil</label><select id="userRole" onkeydown="if(event.key==='Enter'){event.preventDefault(); document.getElementById('userActive').focus();}"><option value="padrao">Padrão</option><option value="admin">Administrador</option><option value="aluno">Aluno</option></select></div>
-                    <div class="form-group"><label><input type="checkbox" id="userActive" checked onkeydown="if(event.key==='Enter'){event.preventDefault(); document.getElementById('userModal').querySelector('button[type=submit]').focus();}"> Usuário ativo</label></div>
-                    <div class="form-group"><label>Permissões de Acesso <span style="font-weight:400;color:#64748b;">(gerado automaticamente)</span></label><div id="permissionsContainer" class="permissions-container"></div><div class="permissions-updated">Atualizado em: <span id="permissionsUpdatedAt"></span></div></div>
+                    <div class="form-group"><label>Usuário *</label><input type="text" id="userUsername" required placeholder="Nome de usuário" autocomplete="off" oninput="this.value = this.value.toUpperCase()"></div>
+                    <div class="form-group"><label>Senha <span id="userPasswordHint" style="font-weight:400;color:var(--text-light);">*</span></label><input type="text" id="userPassword" placeholder="Digite a senha" autocomplete="new-password" oninput="this.value = this.value.toUpperCase()"></div>
+                    <div class="form-group"><label>Nome completo</label><input type="text" id="userNome" placeholder="Nome do usuário"></div>
+                    <div class="form-group"><label>Perfil</label><select id="userRole"><option value="padrao">Padrão</option><option value="admin">Administrador</option><option value="aluno">Aluno</option></select></div>
+                    <div class="form-group"><label><input type="checkbox" id="userActive" checked> Usuário ativo</label></div>
+                    <div class="form-group"><label>Permissões de Acesso <span style="font-weight:400;color:var(--text-light);">(gerado automaticamente)</span></label><div id="permissionsContainer" class="permissions-container"></div><div class="permissions-updated" style="font-size:11px;color:var(--text-light);margin-top:8px;">Atualizado em: <span id="permissionsUpdatedAt"></span></div></div>
                 </div>
                 <div class="modal-footer"><button type="button" class="btn btn-outline" onclick="closeModal('userModal')"><i class="fas fa-times"></i> Cancelar</button><button type="submit" class="btn btn-success"><i class="fas fa-save"></i> Salvar</button></div>
             </form>
@@ -981,12 +914,12 @@
             <form id="albumForm" onsubmit="saveAlbum(event)">
                 <div class="modal-body">
                     <div class="photo-upload" style="flex-direction: column; align-items: center; gap: 10px;">
-                        <img id="albumFotoPreview" class="photo-preview" src="" alt="Foto" style="width: 100%; height: 200px; border-radius: 8px; object-fit: contain; background:#e2e8f0;">
+                        <img id="albumFotoPreview" class="photo-preview" src="" alt="Foto" style="width: 100%; height: 200px; border-radius: 8px; object-fit: contain; background:#333;">
                         <input type="file" id="albumFoto" accept="image/*" onchange="handleAlbumPhoto(event)" style="display:none;">
                         <button type="button" class="btn btn-outline" onclick="document.getElementById('albumFoto').click()"><i class="fas fa-camera"></i> Selecionar Foto</button>
                     </div>
-                    <div class="form-group"><label>Título</label><input type="text" id="albumTitulo" placeholder="Título da foto" onkeydown="if(event.key==='Enter'){event.preventDefault(); document.getElementById('albumDescricao').focus();}"></div>
-                    <div class="form-group"><label>Descrição</label><textarea id="albumDescricao" rows="2" placeholder="Descrição da foto" onkeydown="if(event.key==='Enter' && !event.shiftKey){event.preventDefault(); document.getElementById('albumModal').querySelector('button[type=submit]').focus();}"></textarea></div>
+                    <div class="form-group"><label>Título</label><input type="text" id="albumTitulo" placeholder="Título da foto"></div>
+                    <div class="form-group"><label>Descrição</label><textarea id="albumDescricao" rows="2" placeholder="Descrição da foto"></textarea></div>
                 </div>
                 <div class="modal-footer"><button type="button" class="btn btn-outline" onclick="closeModal('albumModal')"><i class="fas fa-times"></i> Cancelar</button><button type="submit" class="btn btn-success"><i class="fas fa-save"></i> Salvar</button></div>
             </form>
@@ -999,10 +932,10 @@
             <div class="modal-header"><h3>Cadastro de Treino</h3><button class="modal-close" onclick="closeModal('workoutModal')">&times;</button></div>
             <form id="workoutForm" onsubmit="saveWorkout(event)">
                 <div class="modal-body">
-                    <div class="form-group"><label>Nome do Treino *</label><input type="text" id="workoutNome" required placeholder="Ex: Treino A - Peito e Tríceps" onkeydown="if(event.key==='Enter'){event.preventDefault(); document.getElementById('workoutGrupo').focus();}"></div>
-                    <div class="form-group"><label>Grupo Muscular *</label><input type="text" id="workoutGrupo" required placeholder="Ex: Peito, Tríceps, Ombro..." onkeydown="if(event.key==='Enter'){event.preventDefault(); document.getElementById('workoutHorario').focus();}"></div>
-                    <div class="form-group"><label>Horário do Treino</label><input type="time" id="workoutHorario" onkeydown="if(event.key==='Enter'){event.preventDefault(); document.getElementById('workoutAcademia').focus();}"></div>
-                    <div class="form-group"><label>Academia</label><select id="workoutAcademia" onkeydown="if(event.key==='Enter'){event.preventDefault(); document.getElementById('workoutDiasContainer').focus();}"></select></div>
+                    <div class="form-group"><label>Nome do Treino *</label><input type="text" id="workoutNome" required placeholder="Ex: Treino A - Peito e Tríceps"></div>
+                    <div class="form-group"><label>Grupo Muscular *</label><input type="text" id="workoutGrupo" required placeholder="Ex: Peito, Tríceps, Ombro..."></div>
+                    <div class="form-group"><label>Horário do Treino</label><input type="time" id="workoutHorario"></div>
+                    <div class="form-group"><label>Academia</label><select id="workoutAcademia"></select></div>
                     <div class="form-group">
                         <label>Dias da Semana *</label>
                         <div class="perm-actions" id="workoutDiasContainer" style="flex-wrap: wrap;">
@@ -1015,8 +948,8 @@
                             <label class="perm-check"><input type="checkbox" value="0"> Dom</label>
                         </div>
                     </div>
-                    <div class="form-group"><label>Aluno Destinado (opcional)</label><select id="workoutAluno" onkeydown="if(event.key==='Enter'){event.preventDefault(); document.getElementById('workoutExercicios').focus();}"></select></div>
-                    <div class="form-group"><label>Exercícios / Descrição</label><textarea id="workoutExercicios" rows="4" placeholder="Lista de exercícios, séries, repetições..." onkeydown="if(event.key==='Enter' && !event.shiftKey){event.preventDefault(); document.getElementById('workoutModal').querySelector('button[type=submit]').focus();}"></textarea></div>
+                    <div class="form-group"><label>Aluno Destinado (opcional)</label><select id="workoutAluno"></select></div>
+                    <div class="form-group"><label>Exercícios / Descrição</label><textarea id="workoutExercicios" rows="4" placeholder="Lista de exercícios, séries, repetições..."></textarea></div>
                 </div>
                 <div class="modal-footer"><button type="button" class="btn btn-outline" onclick="closeModal('workoutModal')"><i class="fas fa-times"></i> Cancelar</button><button type="submit" class="btn btn-success"><i class="fas fa-save"></i> Salvar</button></div>
             </form>
@@ -1029,6 +962,10 @@
     </div>
 
     <div class="toast-container" id="toastContainer"></div>
+
+    <button id="exitFullscreenBtn" onclick="exitFullscreen()" title="Sair da tela cheia">
+        <i class="fas fa-compress"></i>
+    </button>
 
     <script>
         // ==================== FIREBASE INIT ====================
@@ -1136,7 +1073,7 @@
             if (state.auditLogs.length > 500) {
                 state.auditLogs = state.auditLogs.slice(-500);
             }
-            saveState();
+            // Não chamar saveState aqui para evitar múltiplas gravações
         }
         function loadState() {
             return db.collection(STATE_COLLECTION).doc(STATE_DOC).get()
@@ -1268,7 +1205,7 @@
             const role = document.getElementById('userRole').value;
             let html = '';
             if (role === 'aluno') {
-                html = '<p style="color:#64748b;">Usuários do tipo Aluno não possuem permissões de painel.</p>';
+                html = '<p style="color:var(--text-light);">Usuários do tipo Aluno não possuem permissões de painel.</p>';
             } else {
                 MODULES.forEach(mod => {
                     html += `<div class="perm-module"><strong><i class="fas ${mod.icon}"></i> ${mod.label}</strong><div class="perm-actions">`;
@@ -1300,14 +1237,13 @@
         function enterFullscreen() {
             const elem = document.documentElement;
             if (elem.requestFullscreen) {
-                elem.requestFullscreen().catch(err => { window.scrollTo(0, 1); });
+                elem.requestFullscreen().catch(() => {});
             } else if (elem.webkitRequestFullscreen) {
                 elem.webkitRequestFullscreen();
             } else if (elem.msRequestFullscreen) {
                 elem.msRequestFullscreen();
-            } else {
-                window.scrollTo(0, 1);
             }
+            document.getElementById('exitFullscreenBtn').style.display = 'flex';
         }
 
         function exitFullscreen() {
@@ -1318,6 +1254,7 @@
             } else if (document.msFullscreenElement) {
                 document.msExitFullscreen();
             }
+            document.getElementById('exitFullscreenBtn').style.display = 'none';
         }
 
         // ==================== LOGIN/LOGOUT ====================
@@ -1325,8 +1262,6 @@
             document.getElementById('loginPersonalBox').classList.add('hidden');
             document.getElementById('loginStudentBox').classList.remove('hidden');
             document.getElementById('studentLoginError').classList.add('hidden');
-            document.getElementById('studentLoginUsername').value = '';
-            document.getElementById('studentLoginPassword').value = '';
         }
         function showPersonalLogin() {
             document.getElementById('loginStudentBox').classList.add('hidden');
@@ -1357,11 +1292,11 @@
             }
             currentStudent = student;
             logAction('Login Aluno', `Aluno ${student.nome} entrou no sistema`, 'aluno');
+            saveState();
             document.getElementById('loginScreen').classList.add('hidden');
             document.getElementById('app').classList.remove('hidden');
             document.getElementById('sidebar').classList.add('hidden');
             document.getElementById('sidebar').classList.remove('open');
-            document.body.classList.add('fullscreen');
             enterFullscreen();
             navigate('aluno');
             toast('Bem-vindo, ' + student.nome + '!');
@@ -1381,12 +1316,12 @@
             currentUser = user;
             currentStudent = null;
             logAction('Login', `Usuário ${user.username} entrou no sistema`, 'dashboard');
+            saveState();
             document.getElementById('loginScreen').classList.add('hidden');
             document.getElementById('app').classList.remove('hidden');
             document.getElementById('sidebar').classList.remove('hidden');
             document.getElementById('loggedUserName').textContent = currentUser.nome || currentUser.username;
             document.getElementById('loggedUserRole').textContent = currentUser.role === 'admin' ? 'Administrador' : currentUser.role === 'aluno' ? 'Aluno' : 'Usuário Padrão';
-            document.body.classList.add('fullscreen');
             enterFullscreen();
             renderNav();
             const firstPermitted = MODULES.find(m => can(m.key, 'ver'));
@@ -1397,25 +1332,27 @@
         function logout() {
             if (currentStudent) {
                 logAction('Logout Aluno', `Aluno ${currentStudent.nome} saiu`, 'aluno');
+                saveState();
                 currentStudent = null;
                 document.getElementById('app').classList.add('hidden');
                 document.getElementById('loginScreen').classList.remove('hidden');
                 document.getElementById('loginStudentBox').classList.add('hidden');
                 document.getElementById('loginPersonalBox').classList.remove('hidden');
                 document.getElementById('studentLoginError').classList.add('hidden');
-                document.body.classList.remove('fullscreen');
                 document.getElementById('sidebar').classList.remove('hidden');
                 document.getElementById('sidebar').classList.remove('open');
                 closeLightbox();
                 exitFullscreen();
             } else {
-                if (currentUser) logAction('Logout', `Usuário ${currentUser.username} saiu`, 'dashboard');
+                if (currentUser) {
+                    logAction('Logout', `Usuário ${currentUser.username} saiu`, 'dashboard');
+                    saveState();
+                }
                 currentUser = null;
                 document.getElementById('app').classList.add('hidden');
                 document.getElementById('loginScreen').classList.remove('hidden');
                 document.getElementById('loginPassword').value = '';
                 document.getElementById('loginError').classList.add('hidden');
-                document.body.classList.remove('fullscreen');
                 document.getElementById('sidebar').classList.remove('hidden');
                 document.getElementById('sidebar').classList.remove('open');
                 closeLightbox();
@@ -1457,10 +1394,10 @@
             const mod = MODULES.find(m => m.key === section);
             document.getElementById('pageTitle').textContent = mod ? mod.label : '';
 
-            document.body.classList.add('fullscreen');
             document.getElementById('sidebar').classList.remove('open');
             closeLightbox();
 
+            // Mostrar/esconder botões de acordo com permissões
             const btnAluno = document.getElementById('btnAddStudent');
             if (btnAluno) btnAluno.style.display = can('alunos', 'criar') ? '' : 'none';
             const btnAcademia = document.getElementById('btnAddAcademy');
@@ -1641,7 +1578,7 @@
                         <button type="button" class="remove-evo" onclick="removeEvolutionPhoto('${foto.id}')">&times;</button>
                     </div>`;
             });
-            container.innerHTML = html || '<p style="color:#64748b;">Nenhuma foto adicionada.</p>';
+            container.innerHTML = html || '<p style="color:var(--text-light);">Nenhuma foto adicionada.</p>';
         }
 
         function removeEvolutionPhoto(id) {
@@ -1657,7 +1594,7 @@
             studentFotoData = '';
             document.getElementById('studentFotoPreview').src = '';
             studentEvolucaoFotos = [];
-            document.getElementById('evolutionThumbs').innerHTML = '<p style="color:#64748b;">Nenhuma foto adicionada.</p>';
+            document.getElementById('evolutionThumbs').innerHTML = '<p style="color:var(--text-light);">Nenhuma foto adicionada.</p>';
             fillAcademiaSelect('studentAcademia');
             document.getElementById('studentDataCadastro').value = formatDateInput(new Date());
             if (id) {
@@ -1913,28 +1850,22 @@
                     state.schedule[idx] = { ...state.schedule[idx], data, hora, alunoId, academiaId, status };
                     logAction('Editar Aula', `Aula ${data} ${hora} editada`, 'agenda');
                 }
-                saveState();
-
                 if (oldAlunoId && oldAnoMes && (oldAlunoId !== alunoId || oldAnoMes !== novoAnoMes)) {
-                    atualizarMensalidadeAlunoMes(oldAlunoId, oldAnoMes);
+                    recalcularMensalidade(oldAlunoId, oldAnoMes);
                 }
                 if (alunoId && novoAnoMes) {
-                    atualizarMensalidadeAlunoMes(alunoId, novoAnoMes);
-                }
-                if (oldAlunoId === alunoId && oldAnoMes === novoAnoMes) {
-                    atualizarMensalidadeAlunoMes(alunoId, novoAnoMes);
+                    recalcularMensalidade(alunoId, novoAnoMes);
                 }
             } else {
                 const nova = { id: genId(), data, hora, alunoId, academiaId, status };
                 state.schedule.push(nova);
                 logAction('Criar Aula', `Aula ${data} ${hora} criada`, 'agenda');
-                saveState();
-
                 if (alunoId && novoAnoMes) {
-                    atualizarMensalidadeAlunoMes(alunoId, novoAnoMes);
+                    recalcularMensalidade(alunoId, novoAnoMes);
                 }
             }
 
+            saveState();
             closeModal('scheduleModal');
             renderSchedule();
             renderContasFuturas();
@@ -1950,9 +1881,13 @@
             state.schedule = state.schedule.filter(a => a.id !== id);
             if (alunoId) {
                 const anoMes = data.slice(0, 7);
-                atualizarMensalidadeAlunoMes(alunoId, anoMes);
+                recalcularMensalidade(alunoId, anoMes);
             }
-            saveState(); renderSchedule(); renderContasFuturas(); toast('Agendamento excluído.', 'warning');
+            logAction('Excluir Aula', `Aula ${aula.data} ${aula.hora} excluída`, 'agenda');
+            saveState();
+            renderSchedule();
+            renderContasFuturas();
+            toast('Agendamento excluído.', 'warning');
         }
 
         function toggleSelectAllSchedule() {
@@ -1968,18 +1903,25 @@
             if (!confirmAdminDeletion()) return;
             const idsToDelete = [];
             checkboxes.forEach(cb => idsToDelete.push(cb.getAttribute('data-id')));
+
             const aulasSelecionadas = state.schedule.filter(a => idsToDelete.includes(a.id));
             const gruposRecalculo = {};
+
             aulasSelecionadas.forEach(a => {
-                logAction('Excluir Aula (seleção)', `Aula ${a.data} ${a.hora} excluída`, 'agenda');
                 if (a.alunoId) {
                     const anoMes = a.data.slice(0, 7);
                     const chave = a.alunoId + '|' + anoMes;
                     if (!gruposRecalculo[chave]) gruposRecalculo[chave] = { alunoId: a.alunoId, anoMes };
                 }
             });
+
             state.schedule = state.schedule.filter(a => !idsToDelete.includes(a.id));
-            Object.values(gruposRecalculo).forEach(g => atualizarMensalidadeAlunoMes(g.alunoId, g.anoMes));
+
+            Object.values(gruposRecalculo).forEach(g => {
+                recalcularMensalidade(g.alunoId, g.anoMes);
+            });
+
+            logAction('Excluir Aulas em Lote', `${aulasSelecionadas.length} aulas excluídas`, 'agenda');
             saveState();
             renderSchedule();
             renderContasFuturas();
@@ -2062,15 +2004,15 @@
             if (newEntries.length === 0) { toast('Nenhum dia selecionado dentro do período.', 'warning'); return; }
             state.schedule.push(...newEntries);
             logAction('Aulas Recorrentes', `Geradas ${newEntries.length} aulas recorrentes`, 'agenda');
-            saveState();
 
             const grupos = {};
             newEntries.forEach(a => {
                 const chave = a.alunoId + '|' + a.data.slice(0,7);
                 if (!grupos[chave]) grupos[chave] = { alunoId: a.alunoId, anoMes: a.data.slice(0,7) };
             });
-            Object.values(grupos).forEach(g => atualizarMensalidadeAlunoMes(g.alunoId, g.anoMes));
+            Object.values(grupos).forEach(g => recalcularMensalidade(g.alunoId, g.anoMes));
 
+            saveState();
             closeModal('recurringScheduleModal');
             renderSchedule();
             renderContasFuturas();
@@ -2188,7 +2130,7 @@
                 });
                 weekHtml += `<div class="day-card"><h4>${getWeekdayName(day)}</h4>`;
                 if (dayWorkouts.length === 0) {
-                    weekHtml += '<small style="color:#94a3b8;">Nenhum treino</small>';
+                    weekHtml += '<small style="color:var(--text-light);">Nenhum treino</small>';
                 } else {
                     dayWorkouts.forEach(w => {
                         const aluno = state.students.find(s => s.id === w.alunoId);
@@ -2241,7 +2183,7 @@
                 });
                 html += `<div class="day-card"><h4>${getWeekdayName(day)}</h4>`;
                 if (dayWorkouts.length === 0) {
-                    html += '<small style="color:#94a3b8;">Nenhum treino</small>';
+                    html += '<small style="color:var(--text-light);">Nenhum treino</small>';
                 } else {
                     dayWorkouts.forEach(w => {
                         const academia = state.academias.find(a => a.id === w.academiaId);
@@ -2254,10 +2196,10 @@
                 html += '</div>';
             });
 
-            html += '<h3 style="margin-top: 32px;"><i class="fas fa-camera"></i> Minhas Fotos de Evolução</h3>';
+            html += '<h3 style="margin-top: 25px;"><i class="fas fa-camera"></i> Minhas Fotos de Evolução</h3>';
             const evolucaoFotos = currentStudent.evolucaoFotos || [];
             if (evolucaoFotos.length === 0) {
-                html += '<p style="color:#94a3b8;">Nenhuma foto de evolução adicionada ainda.</p>';
+                html += '<p style="color:var(--text-light);">Nenhuma foto de evolução adicionada ainda.</p>';
             } else {
                 html += '<div class="evolutions-grid">';
                 evolucaoFotos.forEach(foto => {
@@ -2355,7 +2297,7 @@
             if (!grid) return;
             let html = '';
             if (state.album.length === 0) {
-                html = '<p style="color:#64748b;">Nenhuma foto no álbum. Clique em "+ Nova Foto" para adicionar.</p>';
+                html = '<p style="color:var(--text-light);">Nenhuma foto no álbum. Clique em "+ Nova Foto" para adicionar.</p>';
             } else {
                 state.album.forEach(item => {
                     html += `
@@ -2503,7 +2445,7 @@
             updateCashflowSummary();
         }
 
-        // ==================== CONTAS A PAGAR E RECEBER (FUTURAS) ====================
+        // ==================== CONTAS A PAGAR E RECEBER ====================
         function openContaForm(id) {
             if (id) { if (!can('fluxocaixa', 'editar')) { toast('Sem permissão para editar.', 'error'); return; } }
             else { if (!can('fluxocaixa', 'criar')) { toast('Sem permissão para criar.', 'error'); return; } }
@@ -2624,7 +2566,7 @@
             tbody.innerHTML = html || '<tr><td colspan="6">Nenhuma conta futura cadastrada.</td></tr>';
         }
 
-        // ==================== GERAR MENSALIDADES (manual) ====================
+        // ==================== GERAR MENSALIDADES ====================
         function gerarMensalidades() {
             if (!can('fluxocaixa', 'criar')) { toast('Sem permissão para gerar mensalidades.', 'error'); return; }
             const hoje = new Date();
@@ -2691,7 +2633,7 @@
             toast(`Mensalidades geradas: ${geradas} | Ignoradas: ${ignoradas}`, geradas > 0 ? 'success' : 'warning');
         }
 
-        // ==================== RECALCULAR MENSALIDADE (usado internamente) ====================
+        // ==================== RECALCULAR MENSALIDADE ====================
         function recalcularMensalidade(alunoId, anoMes) {
             const aluno = state.students.find(s => s.id === alunoId);
             if (!aluno) return;
@@ -2699,10 +2641,7 @@
             state.contasFuturas = state.contasFuturas.filter(c => !(c.alunoId === alunoId && c.anoMes === anoMes && c.tipo === 'Receber' && (c.status === 'Pendente' || c.status === 'Vencido')));
 
             const aulasNoMes = state.schedule.filter(a => a.alunoId === alunoId && a.status !== 'Cancelada' && a.data.slice(0,7) === anoMes).length;
-            if (aulasNoMes === 0) {
-                logAction('Remover Mensalidade', `Mensalidade de ${aluno.nome} para ${anoMes} removida por não haver aulas`, 'fluxocaixa');
-                return;
-            }
+            if (aulasNoMes === 0) return;
 
             const valorAula = parseFloat(aluno.valorAula) || 0;
             const mensalidadeFixa = parseFloat(aluno.mensalidadeFixa) || 0;
@@ -2719,24 +2658,24 @@
                 descricao = `Mensalidade de ${aluno.nome} - ${String(numMes).padStart(2,'0')}/${ano}`;
             }
 
-            const [ano, numMes] = anoMes.split('-').map(Number);
-            const diaCadastro = parseInt(aluno.dataCadastro ? aluno.dataCadastro.slice(8,10) : String(new Date().getDate()).padStart(2,'0'));
-            const lastDay = new Date(ano, numMes, 0).getDate();
-            const diaVenc = Math.min(diaCadastro, lastDay);
-            const vencimento = `${ano}-${String(numMes).padStart(2,'0')}-${String(diaVenc).padStart(2,'0')}`;
+            if (valorTotal > 0) {
+                const [ano, numMes] = anoMes.split('-').map(Number);
+                const diaCadastro = parseInt(aluno.dataCadastro ? aluno.dataCadastro.slice(8,10) : String(new Date().getDate()).padStart(2,'0'));
+                const lastDay = new Date(ano, numMes, 0).getDate();
+                const diaVenc = Math.min(diaCadastro, lastDay);
+                const vencimento = `${ano}-${String(numMes).padStart(2,'0')}-${String(diaVenc).padStart(2,'0')}`;
 
-            state.contasFuturas.push({
-                id: genId(),
-                descricao,
-                tipo: 'Receber',
-                valor: valorTotal,
-                vencimento,
-                status: 'Pendente',
-                alunoId,
-                anoMes
-            });
-
-            logAction('Atualizar Mensalidade', `Mensalidade de ${aluno.nome} para ${anoMes} recalculada para ${formatCurrency(valorTotal)}`, 'fluxocaixa');
+                state.contasFuturas.push({
+                    id: genId(),
+                    descricao,
+                    tipo: 'Receber',
+                    valor: valorTotal,
+                    vencimento,
+                    status: 'Pendente',
+                    alunoId,
+                    anoMes
+                });
+            }
         }
 
         // ==================== FILTRO ====================
@@ -2774,6 +2713,7 @@
 
             const results = [];
 
+            // Implementação dos filtros por módulo
             if (modulesToSearch.includes('alunos')) {
                 state.students.forEach(s => {
                     const acad = state.academias.find(a => a.id === s.academiaId);
@@ -2791,36 +2731,17 @@
                     }
                     if (match) {
                         let valorDisplay = '';
-                        if (s.valorAula > 0) {
-                            valorDisplay = `Aula: ${formatCurrency(s.valorAula)}`;
-                        } else if (s.mensalidadeFixa > 0) {
-                            valorDisplay = `Mensal: ${formatCurrency(s.mensalidadeFixa)}`;
-                        }
-                        results.push({
-                            tipo: 'Aluno',
-                            data: '',
-                            descricao: s.nome,
-                            detalhes: `CPF: ${s.cpf || '-'} | Cel: ${s.telefone || '-'}`,
-                            valor: valorDisplay,
-                            academia: acad ? acad.nome : '-'
-                        });
+                        if (s.valorAula > 0) valorDisplay = `Aula: ${formatCurrency(s.valorAula)}`;
+                        else if (s.mensalidadeFixa > 0) valorDisplay = `Mensal: ${formatCurrency(s.mensalidadeFixa)}`;
+                        results.push({ tipo: 'Aluno', data: '', descricao: s.nome, detalhes: `CPF: ${s.cpf || '-'} | Cel: ${s.telefone || '-'}`, valor: valorDisplay, academia: acad ? acad.nome : '-' });
                     }
                 });
             }
 
             if (modulesToSearch.includes('academias')) {
                 state.academias.forEach(a => {
-                    let match = true;
-                    if (academiaId && a.id !== academiaId) match = false;
-                    if (match) {
-                        results.push({
-                            tipo: 'Academia',
-                            data: '',
-                            descricao: a.nome,
-                            detalhes: `Endereço: ${a.endereco || '-'} | Tel: ${a.telefone || '-'}`,
-                            valor: `Responsável: ${a.responsavel || '-'}`,
-                            academia: a.nome
-                        });
+                    if (!academiaId || a.id === academiaId) {
+                        results.push({ tipo: 'Academia', data: '', descricao: a.nome, detalhes: `Endereço: ${a.endereco || '-'} | Tel: ${a.telefone || '-'}`, valor: `Responsável: ${a.responsavel || '-'}`, academia: a.nome });
                     }
                 });
             }
@@ -2833,91 +2754,36 @@
                     if (dataIni && a.data < dataIni) match = false;
                     if (dataFim && a.data > dataFim) match = false;
                     if (academiaId && a.academiaId !== academiaId) match = false;
-                    if (cpf) {
-                        if (!aluno || !aluno.cpf) match = false;
-                        else {
-                            const cpfAluno = aluno.cpf.replace(/\D/g, '');
-                            if (!cpfAluno.includes(cpf)) match = false;
-                        }
-                    }
-                    if (celular) {
-                        if (!aluno || !aluno.telefone) match = false;
-                        else {
-                            const celAluno = aluno.telefone.replace(/\D/g, '');
-                            if (!celAluno.includes(celular)) match = false;
-                        }
-                    }
-                    if (match) {
-                        results.push({
-                            tipo: 'Aula',
-                            data: a.data,
-                            descricao: a.hora,
-                            detalhes: aluno ? aluno.nome : 'Aluno removido',
-                            valor: a.status,
-                            academia: acad ? acad.nome : '-'
-                        });
-                    }
+                    if (cpf && (!aluno || !aluno.cpf || !aluno.cpf.replace(/\D/g, '').includes(cpf))) match = false;
+                    if (celular && (!aluno || !aluno.telefone || !aluno.telefone.replace(/\D/g, '').includes(celular))) match = false;
+                    if (match) results.push({ tipo: 'Aula', data: a.data, descricao: a.hora, detalhes: aluno ? aluno.nome : 'Aluno removido', valor: a.status, academia: acad ? acad.nome : '-' });
                 });
             }
 
             if (modulesToSearch.includes('album')) {
                 state.album.forEach(item => {
-                    let match = true;
-                    if (dataIni && item.data && item.data.slice(0,10) < dataIni) match = false;
-                    if (dataFim && item.data && item.data.slice(0,10) > dataFim) match = false;
-                    if (descricao && item.descricao && !item.descricao.toLowerCase().includes(descricao)) match = false;
-                    if (match) {
-                        results.push({
-                            tipo: 'Álbum',
-                            data: item.data ? item.data.slice(0,10) : '',
-                            descricao: item.titulo || 'Foto',
-                            detalhes: item.descricao || 'Sem descrição',
-                            valor: '',
-                            academia: '-'
-                        });
+                    if ((!dataIni || !item.data || item.data.slice(0,10) >= dataIni) && (!dataFim || !item.data || item.data.slice(0,10) <= dataFim) && (!descricao || (item.descricao && item.descricao.toLowerCase().includes(descricao)))) {
+                        results.push({ tipo: 'Álbum', data: item.data ? item.data.slice(0,10) : '', descricao: item.titulo || 'Foto', detalhes: item.descricao || 'Sem descrição', valor: '', academia: '-' });
                     }
                 });
             }
 
             if (modulesToSearch.includes('fluxocaixa')) {
                 state.cashflow.forEach(c => {
-                    let match = true;
-                    if (dataIni && c.data < dataIni) match = false;
-                    if (dataFim && c.data > dataFim) match = false;
-                    if (entradaMin > 0 && (parseFloat(c.entrada) || 0) < entradaMin) match = false;
-                    if (saidaMin > 0 && (parseFloat(c.saida) || 0) < saidaMin) match = false;
-                    if (descricao && !c.descricao.toLowerCase().includes(descricao)) match = false;
-                    if (academiaId) match = false;
-                    if (match) {
-                        results.push({
-                            tipo: 'Caixa',
-                            data: c.data,
-                            descricao: c.descricao,
-                            detalhes: c.forma_pgto || '-',
-                            valor: `Entrada: ${c.entrada > 0 ? formatCurrency(c.entrada) : '-'} / Saída: ${c.saida > 0 ? formatCurrency(c.saida) : '-'}`,
-                            academia: '-'
-                        });
+                    if ((!dataIni || c.data >= dataIni) && (!dataFim || c.data <= dataFim) && (entradaMin === 0 || (c.entrada || 0) >= entradaMin) && (saidaMin === 0 || (c.saida || 0) >= saidaMin) && (!descricao || c.descricao.toLowerCase().includes(descricao)) && !academiaId) {
+                        results.push({ tipo: 'Caixa', data: c.data, descricao: c.descricao, detalhes: c.forma_pgto || '-', valor: `Entrada: ${c.entrada > 0 ? formatCurrency(c.entrada) : '-'} / Saída: ${c.saida > 0 ? formatCurrency(c.saida) : '-'}`, academia: '-' });
                     }
                 });
             }
 
             if (modulesToSearch.includes('treinos')) {
                 state.workouts.forEach(w => {
-                    const aluno = state.students.find(s => s.id === w.alunoId);
-                    const academia = state.academias.find(a => a.id === w.academiaId);
-                    const dias = w.diasSemana || (w.diaSemana !== undefined ? [w.diaSemana] : []);
-                    const diasStr = dias.map(d => getWeekdayName(d)).join(', ');
-                    let match = true;
-                    if (descricao && !w.nome.toLowerCase().includes(descricao) && !w.grupo.toLowerCase().includes(descricao)) match = false;
-                    if (match) {
-                        results.push({
-                            tipo: 'Treino',
-                            data: '',
-                            descricao: w.nome,
-                            detalhes: `Grupo: ${w.grupo} | Dias: ${diasStr} | Horário: ${w.horario || '-'} | Academia: ${academia ? academia.nome : '-'}`,
-                            valor: aluno ? `Aluno: ${aluno.nome}` : 'Todos os alunos',
-                            academia: academia ? academia.nome : '-'
-                        });
+                    if (!descricao || w.nome.toLowerCase().includes(descricao) || w.grupo.toLowerCase().includes(descricao)) {
+                        const aluno = state.students.find(s => s.id === w.alunoId);
+                        const academia = state.academias.find(a => a.id === w.academiaId);
+                        const dias = w.diasSemana || [];
+                        const diasStr = dias.map(d => getWeekdayName(d)).join(', ');
+                        results.push({ tipo: 'Treino', data: '', descricao: w.nome, detalhes: `Grupo: ${w.grupo} | Dias: ${diasStr}`, valor: aluno ? `Aluno: ${aluno.nome}` : 'Todos os alunos', academia: academia ? academia.nome : '-' });
                     }
                 });
             }
@@ -3128,8 +2994,7 @@
 
             const days = ['Segunda-feira', 'Terça-feira', 'Quarta-feira', 'Quinta-feira', 'Sexta-feira', 'Sábado', 'Domingo'];
             const weekStartDate = new Date(weekStart + 'T00:00:00');
-            const jsDay = weekStartDate.getDay();
-            if (jsDay !== 1) {
+            if (weekStartDate.getDay() !== 1) {
                 toast('A data inicial deve ser uma segunda-feira. Usando a data fornecida como início da semana.', 'warning');
             }
 
@@ -3185,7 +3050,6 @@
                 if (e.key === 'Escape') closeLightbox();
             });
             document.getElementById('loginScreen').classList.remove('hidden');
-            // Tenta ativar tela cheia automaticamente ao carregar
             enterFullscreen();
         }
         initApp();
