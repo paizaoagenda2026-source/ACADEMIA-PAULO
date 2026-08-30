@@ -40,12 +40,6 @@
             font-family: 'Poppins', sans-serif;
         }
 
-        html, body {
-            width: 100%;
-            max-width: 100%;
-            overflow-x: hidden;
-        }
-
         body {
             background-color: var(--bg-dark);
             color: var(--text);
@@ -63,7 +57,6 @@
             align-items: center;
             justify-content: center;
             z-index: 9999;
-            padding: 15px;
         }
 
         .login-box {
@@ -74,6 +67,7 @@
             width: 100%;
             max-width: 400px;
             border: 1px solid var(--accent);
+            position: relative;
         }
         .login-box h1 { font-size: 28px; text-align: center; color: var(--accent); margin-bottom: 5px; }
         .login-box p { text-align: center; color: var(--text-light); margin-bottom: 30px; font-size: 14px; }
@@ -83,7 +77,6 @@
         .form-group input, .form-group select, .form-group textarea {
             width: 100%; padding: 12px 16px; border: 1px solid var(--border); border-radius: var(--radius-sm);
             font-size: 14px; background: #2a2a2a; color: var(--text); transition: var(--transition);
-            max-width: 100%;
         }
         .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
             outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px rgba(212,175,55,0.2);
@@ -107,7 +100,7 @@
         .login-error { background: rgba(244,67,54,0.1); color: var(--danger); padding: 10px; border-radius: 6px; font-size: 13px; margin-bottom: 15px; text-align: center; border-left: 3px solid var(--danger); }
 
         /* APP */
-        #app { display: flex; min-height: 100vh; width: 100%; }
+        #app { display: flex; min-height: 100vh; }
 
         .sidebar {
             width: var(--sidebar-width);
@@ -171,7 +164,6 @@
             display: flex;
             flex-direction: column;
             min-height: 100vh;
-            min-width: 0; /* Importante para evitar overflow */
         }
         .topbar {
             background: var(--bg-card);
@@ -190,8 +182,6 @@
             display: none;
             padding: 20px;
             animation: fadeIn 0.3s;
-            width: 100%;
-            max-width: 100%;
         }
         .section.active { display: block; }
 
@@ -204,8 +194,6 @@
             padding: 20px;
             margin-bottom: 20px;
             border: 1px solid var(--border);
-            width: 100%;
-            max-width: 100%;
         }
         .card-header {
             display: flex;
@@ -217,8 +205,8 @@
         }
         .card-header h3 { font-size: 20px; font-weight: 700; color: var(--accent); }
 
-        .table-container { overflow-x: auto; border-radius: var(--radius-sm); max-width: 100%; }
-        table { width: 100%; border-collapse: collapse; font-size: 14px; min-width: 600px; }
+        .table-container { overflow-x: auto; border-radius: var(--radius-sm); }
+        table { width: 100%; border-collapse: collapse; font-size: 14px; }
         table th, table td { padding: 12px 14px; text-align: left; border-bottom: 1px solid var(--border); }
         table th { background: #2a2a2a; font-weight: 700; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--accent); }
         table tr:hover td { background: rgba(255,255,255,0.03); }
@@ -351,7 +339,7 @@
         .workout-item small { display: block; color: var(--text-light); font-size: 11px; }
 
         .student-area { background: var(--bg-card); border-radius: var(--radius); box-shadow: var(--shadow); padding: 20px; margin-bottom: 20px; border: 1px solid var(--border); }
-        .student-area h2 { margin-bottom: 15px; font-size: 24px; font-weight: 700; color: var(--accent); display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+        .student-area h2 { margin-bottom: 15px; font-size: 24px; font-weight: 700; color: var(--accent); display: flex; align-items: center; gap: 10px; }
         .student-area .highlight { background: rgba(255,152,0,0.1); border-left: 4px solid var(--warning); padding: 15px; border-radius: 8px; margin-bottom: 20px; }
         .student-area .evolutions-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 12px; margin-top: 12px; }
         .student-area .evolution-card { background: #2a2a2a; border-radius: 8px; overflow: hidden; border: 1px solid var(--border); }
@@ -401,70 +389,19 @@
         }
         #exitFullscreenBtn:hover { background: var(--accent-hover); }
 
-        /* ========== AJUSTES PARA MOBILE ========== */
         @media (max-width: 768px) {
-            .sidebar {
-                transform: translateX(-100%);
-                width: 280px;
-                box-shadow: 2px 0 10px rgba(0,0,0,0.5);
-            }
-            .sidebar.open {
-                transform: translateX(0);
-            }
-            .main-content {
-                margin-left: 0;
-                width: 100%;
-                max-width: 100%;
-            }
-            .topbar {
-                padding: 10px 15px;
-                gap: 10px;
-            }
-            .topbar h2 {
-                font-size: 18px;
-                flex: 1;
-                white-space: nowrap;
-                overflow: hidden;
-                text-overflow: ellipsis;
-            }
-            .section {
-                padding: 10px;
-                width: 100%;
-                max-width: 100%;
-            }
-            .card {
-                padding: 15px;
-            }
-            .dashboard-cards {
-                grid-template-columns: 1fr;
-            }
-            .modal-content {
-                max-width: 100%;
-                margin: 10px;
-            }
-            .permissions-container {
-                grid-template-columns: 1fr;
-            }
-            #studentModal .photo-preview {
-                width: 100px;
-                height: 100px;
-            }
-            .album-grid {
-                grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-                gap: 10px;
-            }
-            .sidebar-brand {
-                padding: 15px;
-                font-size: 20px;
-            }
-            /* Garantir que tabelas não causem overflow */
-            .table-container {
-                overflow-x: auto;
-                -webkit-overflow-scrolling: touch;
-            }
-            table {
-                min-width: 600px; /* Mantém a tabela rolável, mas sem quebrar layout */
-            }
+            .sidebar { transform: translateX(-100%); width: 280px; }
+            .sidebar.open { transform: translateX(0); }
+            .main-content { margin-left: 0; }
+            .topbar { padding: 10px 15px; }
+            .topbar h2 { font-size: 18px; }
+            .section { padding: 10px; }
+            .dashboard-cards { grid-template-columns: 1fr; }
+            .modal-content { max-width: 100%; margin: 10px; }
+            .permissions-container { grid-template-columns: 1fr; }
+            #studentModal .photo-preview { width: 100px; height: 100px; }
+            .album-grid { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; }
+            .sidebar-brand { padding: 15px; font-size: 20px; }
         }
     </style>
 </head>
@@ -480,7 +417,11 @@
                 <div class="form-group">
                     <label><i class="fas fa-user"></i> Usuário</label>
                     <input type="text" id="loginUsername" placeholder="Digite seu usuário" required autocomplete="off"
-                           autofocus oninput="this.value = this.value.toUpperCase()">
+                           autofocus oninput="this.value = this.value.toUpperCase(); showUserPhotoPreview()">
+                    <div style="display: flex; align-items: center; gap: 10px; margin-top: 5px;">
+                        <img id="loginUserPhoto" class="hidden" style="width: 50px; height: 50px; border-radius: 50%; object-fit: cover; border: 2px solid var(--accent);" alt="Foto do usuário">
+                        <span id="loginUserPhotoPlaceholder" style="color: var(--text-light); font-size: 12px;"></span>
+                    </div>
                 </div>
                 <div class="form-group">
                     <label><i class="fas fa-lock"></i> Senha</label>
@@ -578,7 +519,7 @@
                 <div class="card">
                     <div class="card-header">
                         <h3><i class="fas fa-calendar-check"></i> Agenda de Aulas</h3>
-                        <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+                        <div style="display: flex; gap: 8px; align-items: center;">
                             <button class="btn btn-danger" id="btnDeleteSelectedSchedule" onclick="deleteSelectedSchedule()" style="display:none;"><i class="fas fa-trash"></i> Excluir Selecionados</button>
                             <button class="btn btn-warning" id="btnAddRecurringSchedule" onclick="openRecurringScheduleForm()" style="display:none;"><i class="fas fa-calendar-plus"></i> Aulas Recorrentes</button>
                             <button class="btn btn-primary" id="btnAddSchedule" onclick="openScheduleForm()"><i class="fas fa-plus"></i> Nova Aula</button>
@@ -699,7 +640,7 @@
                 <div class="card">
                     <div class="card-header">
                         <h3><i class="fas fa-file-invoice-dollar"></i> Contas a Pagar e Receber (Futuras)</h3>
-                        <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+                        <div style="display: flex; gap: 8px; align-items: center;">
                             <button class="btn btn-warning" id="btnGerarMensalidades" onclick="gerarMensalidades()"><i class="fas fa-cogs"></i> Gerar Mensalidades</button>
                             <button class="btn btn-primary" id="btnAddConta" onclick="openContaForm()"><i class="fas fa-plus"></i> Nova Conta</button>
                         </div>
@@ -789,7 +730,7 @@
                     <div class="card-header"><h3><i class="fas fa-user-cog"></i> Usuários e Permissões</h3><button class="btn btn-primary" id="btnAddUser" onclick="openUserForm()"><i class="fas fa-plus"></i> Novo Usuário</button></div>
                     <div class="table-container">
                         <table>
-                            <thead><tr><th>Usuário</th><th>Nome</th><th>Perfil</th><th>Ativo</th><th>Ações</th></tr></thead>
+                            <thead><tr><th>Foto</th><th>Usuário</th><th>Nome</th><th>Perfil</th><th>Ativo</th><th>Ações</th></tr></thead>
                             <tbody id="usersTableBody"></tbody>
                         </table>
                     </div>
@@ -828,6 +769,7 @@
     </div>
 
     <!-- Modais -->
+    <!-- Modal de Aluno -->
     <div class="modal" id="studentModal">
         <div class="modal-content">
             <div class="modal-header"><h3>Cadastro de Aluno</h3><button class="modal-close" onclick="closeModal('studentModal')">&times;</button></div>
@@ -835,8 +777,7 @@
                 <div class="modal-body">
                     <div class="photo-upload">
                         <img id="studentFotoPreview" class="photo-preview" src="" alt="Foto" style="background:#333;">
-                        <input type="file" id="studentFoto" accept="image/*" onchange="handleStudentPhoto(event)" style="display:none;">
-                        <button type="button" class="btn btn-outline" onclick="document.getElementById('studentFoto').click()"><i class="fas fa-camera"></i> Adicionar Foto</button>
+                        <button type="button" class="btn btn-outline" onclick="openCameraForStudent()"><i class="fas fa-camera"></i> Selfie</button>
                     </div>
                     <div class="form-group"><label>Nome *</label><input type="text" id="studentNome" required placeholder="Nome do aluno"></div>
                     <div class="form-group"><label>CPF</label><input type="text" id="studentCpf" placeholder="000.000.000-00"></div>
@@ -862,6 +803,7 @@
         </div>
     </div>
 
+    <!-- Modal de Academia -->
     <div class="modal" id="academyModal">
         <div class="modal-content">
             <div class="modal-header"><h3>Cadastro de Academia</h3><button class="modal-close" onclick="closeModal('academyModal')">&times;</button></div>
@@ -877,6 +819,7 @@
         </div>
     </div>
 
+    <!-- Modal de Agenda -->
     <div class="modal" id="scheduleModal">
         <div class="modal-content">
             <div class="modal-header"><h3>Agendamento de Aula</h3><button class="modal-close" onclick="closeModal('scheduleModal')">&times;</button></div>
@@ -893,6 +836,7 @@
         </div>
     </div>
 
+    <!-- Modal de Agendamento Recorrente -->
     <div class="modal" id="recurringScheduleModal">
         <div class="modal-content">
             <div class="modal-header"><h3>Agendar Aulas Recorrentes</h3><button class="modal-close" onclick="closeModal('recurringScheduleModal')">&times;</button></div>
@@ -922,6 +866,7 @@
         </div>
     </div>
 
+    <!-- Modal de Fluxo de Caixa -->
     <div class="modal" id="cashflowModal">
         <div class="modal-content">
             <div class="modal-header"><h3>Lançamento no Fluxo de Caixa</h3><button class="modal-close" onclick="closeModal('cashflowModal')">&times;</button></div>
@@ -938,7 +883,7 @@
         </div>
     </div>
 
-    <!-- Modal para Contas a Pagar e Receber -->
+    <!-- Modal de Conta a Pagar/Receber -->
     <div class="modal" id="contaModal">
         <div class="modal-content">
             <div class="modal-header"><h3>Conta a Pagar/Receber</h3><button class="modal-close" onclick="closeModal('contaModal')">&times;</button></div>
@@ -955,11 +900,16 @@
         </div>
     </div>
 
+    <!-- Modal de Usuário -->
     <div class="modal" id="userModal">
         <div class="modal-content">
             <div class="modal-header"><h3>Cadastro de Usuário</h3><button class="modal-close" onclick="closeModal('userModal')">&times;</button></div>
             <form id="userForm" onsubmit="saveUser(event)">
                 <div class="modal-body">
+                    <div class="photo-upload">
+                        <img id="userFotoPreview" class="photo-preview" src="" alt="Foto" style="background:#333;">
+                        <button type="button" class="btn btn-outline" onclick="openCameraForUser()"><i class="fas fa-camera"></i> Selfie</button>
+                    </div>
                     <div class="form-group"><label>Usuário *</label><input type="text" id="userUsername" required placeholder="Nome de usuário" autocomplete="off" oninput="this.value = this.value.toUpperCase()"></div>
                     <div class="form-group"><label>Senha <span id="userPasswordHint" style="font-weight:400;color:var(--text-light);">*</span></label><input type="text" id="userPassword" placeholder="Digite a senha" autocomplete="new-password" oninput="this.value = this.value.toUpperCase()"></div>
                     <div class="form-group"><label>Nome completo</label><input type="text" id="userNome" placeholder="Nome do usuário"></div>
@@ -972,6 +922,7 @@
         </div>
     </div>
 
+    <!-- Modal de Álbum -->
     <div class="modal" id="albumModal">
         <div class="modal-content">
             <div class="modal-header"><h3>Foto do Álbum</h3><button class="modal-close" onclick="closeModal('albumModal')">&times;</button></div>
@@ -1017,6 +968,21 @@
                 </div>
                 <div class="modal-footer"><button type="button" class="btn btn-outline" onclick="closeModal('workoutModal')"><i class="fas fa-times"></i> Cancelar</button><button type="submit" class="btn btn-success"><i class="fas fa-save"></i> Salvar</button></div>
             </form>
+        </div>
+    </div>
+
+    <!-- Modal da Câmera -->
+    <div class="modal" id="cameraModal">
+        <div class="modal-content">
+            <div class="modal-header"><h3>Tirar Selfie</h3><button class="modal-close" onclick="closeCamera()">&times;</button></div>
+            <div class="modal-body text-center">
+                <video id="cameraVideo" autoplay playsinline style="width: 100%; max-height: 300px; background: #000; border-radius: 8px;"></video>
+                <canvas id="cameraCanvas" style="display:none;"></canvas>
+                <div style="display: flex; gap: 10px; justify-content: center; margin-top: 15px;">
+                    <button class="btn btn-primary" onclick="capturePhoto()"><i class="fas fa-camera"></i> Capturar</button>
+                    <button class="btn btn-outline" onclick="closeCamera()"><i class="fas fa-times"></i> Cancelar</button>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -1078,10 +1044,13 @@
         let currentStudent = null;
         let editingId = null;
         let studentFotoData = '';
+        let userFotoData = '';
         let albumFotoData = '';
         let currentSection = 'dashboard';
         let studentEvolucaoFotos = [];
         let cashflowFilter = 'todos';
+        let cameraStream = null;
+        let cameraTarget = null; // 'student' ou 'user'
 
         // ==================== UTILITÁRIOS ====================
         function genId() { return Date.now().toString(36) + Math.random().toString(36).substr(2, 5); }
@@ -1183,7 +1152,7 @@
                 });
         }
         function seedData() {
-            state.users = [{ id: genId(), username: 'SERGIO', password: '080888', nome: 'Sérgio', role: 'admin', active: true, permissions: {} }];
+            state.users = [{ id: genId(), username: 'SERGIO', password: '080888', nome: 'Sérgio', role: 'admin', active: true, permissions: {}, foto: '' }];
             state.academias = [{ id: genId(), nome: 'Academia Exemplo', endereco: 'Rua das Flores, 123', telefone: '(11) 99999-0000', responsavel: 'Carlos' }];
             state.students = [];
             state.schedule = [];
@@ -1238,7 +1207,8 @@
                 role: 'aluno',
                 active: true,
                 permissions: {},
-                alunoId: student.id
+                alunoId: student.id,
+                foto: student.foto || '' // herda a foto do aluno se existir
             };
             state.users.push(newUser);
             return newUser;
@@ -1253,6 +1223,9 @@
                 }
                 if (user.nome !== student.nome) {
                     user.nome = student.nome;
+                }
+                if (student.foto && user.foto !== student.foto) {
+                    user.foto = student.foto;
                 }
             }
         }
@@ -1320,6 +1293,58 @@
             document.getElementById('exitFullscreenBtn').style.display = 'none';
         }
 
+        // ==================== CÂMERA ====================
+        async function openCamera(target) {
+            cameraTarget = target;
+            const modal = document.getElementById('cameraModal');
+            modal.classList.add('show');
+            const video = document.getElementById('cameraVideo');
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' }, audio: false });
+                cameraStream = stream;
+                video.srcObject = stream;
+                await video.play();
+            } catch (err) {
+                console.error('Erro ao acessar câmera:', err);
+                toast('Não foi possível acessar a câmera. Verifique as permissões.', 'error');
+                closeCamera();
+            }
+        }
+
+        function closeCamera() {
+            if (cameraStream) {
+                cameraStream.getTracks().forEach(track => track.stop());
+                cameraStream = null;
+            }
+            document.getElementById('cameraModal').classList.remove('show');
+            cameraTarget = null;
+        }
+
+        function capturePhoto() {
+            const video = document.getElementById('cameraVideo');
+            const canvas = document.getElementById('cameraCanvas');
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);
+            const dataUrl = canvas.toDataURL('image/jpeg', 0.8);
+            if (cameraTarget === 'student') {
+                studentFotoData = dataUrl;
+                document.getElementById('studentFotoPreview').src = dataUrl;
+            } else if (cameraTarget === 'user') {
+                userFotoData = dataUrl;
+                document.getElementById('userFotoPreview').src = dataUrl;
+            }
+            closeCamera();
+        }
+
+        function openCameraForStudent() {
+            openCamera('student');
+        }
+
+        function openCameraForUser() {
+            openCamera('user');
+        }
+
         // ==================== LOGIN/LOGOUT ====================
         function showStudentLogin() {
             document.getElementById('loginPersonalBox').classList.add('hidden');
@@ -1330,6 +1355,21 @@
             document.getElementById('loginStudentBox').classList.add('hidden');
             document.getElementById('loginPersonalBox').classList.remove('hidden');
             document.getElementById('loginError').classList.add('hidden');
+        }
+
+        function showUserPhotoPreview() {
+            const username = val('loginUsername');
+            const user = state.users.find(u => u.username.toUpperCase() === username && u.role !== 'aluno');
+            const img = document.getElementById('loginUserPhoto');
+            const placeholder = document.getElementById('loginUserPhotoPlaceholder');
+            if (user && user.foto) {
+                img.src = user.foto;
+                img.classList.remove('hidden');
+                placeholder.textContent = '';
+            } else {
+                img.classList.add('hidden');
+                placeholder.textContent = user ? 'Sem foto cadastrada' : '';
+            }
         }
 
         function handleStudentLogin(e) {
@@ -1425,19 +1465,7 @@
 
         // ==================== NAVEGAÇÃO ====================
         function toggleSidebar() {
-            if (!currentStudent) {
-                const sidebar = document.getElementById('sidebar');
-                sidebar.classList.toggle('open');
-                // Fecha automaticamente ao clicar em um item de menu no mobile
-                if (sidebar.classList.contains('open') && window.innerWidth <= 768) {
-                    const navItems = document.querySelectorAll('.nav-item');
-                    navItems.forEach(item => {
-                        item.addEventListener('click', function() {
-                            sidebar.classList.remove('open');
-                        });
-                    });
-                }
-            }
+            if (!currentStudent) document.getElementById('sidebar').classList.toggle('open');
         }
         function renderNav() {
             const nav = document.getElementById('sidebarNav');
@@ -1448,15 +1476,6 @@
                 }
             });
             nav.innerHTML = html;
-            // Adiciona listener para fechar sidebar ao clicar em item
-            const navItems = document.querySelectorAll('.nav-item');
-            navItems.forEach(item => {
-                item.addEventListener('click', function() {
-                    if (window.innerWidth <= 768) {
-                        document.getElementById('sidebar').classList.remove('open');
-                    }
-                });
-            });
         }
         function navigate(section) {
             if (section === 'aluno') {
@@ -1608,29 +1627,6 @@
             });
             select.innerHTML = html;
         }
-        function handleStudentPhoto(event) {
-            const file = event.target.files[0];
-            if (!file) return;
-            const reader = new FileReader();
-            reader.onload = e => {
-                const img = new Image();
-                img.onload = () => {
-                    const canvas = document.createElement('canvas');
-                    let width = img.width, height = img.height;
-                    const max = 200;
-                    if (width > height && width > max) { height *= max / width; width = max; }
-                    else if (height > max) { width *= max / height; height = max; }
-                    canvas.width = width; canvas.height = height;
-                    const ctx = canvas.getContext('2d');
-                    ctx.drawImage(img, 0, 0, width, height);
-                    studentFotoData = canvas.toDataURL('image/jpeg', 0.7);
-                    document.getElementById('studentFotoPreview').src = studentFotoData;
-                };
-                img.src = e.target.result;
-            };
-            reader.readAsDataURL(file);
-            event.target.value = '';
-        }
 
         function handleEvolutionPhoto(event) {
             const file = event.target.files[0];
@@ -1712,6 +1708,7 @@
             }
             openModal('studentModal');
         }
+
         function saveStudent(e) {
             e.preventDefault();
             if (editingId && !can('alunos', 'editar')) return;
@@ -1906,11 +1903,6 @@
             openModal('scheduleModal');
         }
 
-        function atualizarMensalidadeAlunoMes(alunoId, anoMes) {
-            if (!alunoId || !anoMes) return;
-            recalcularMensalidade(alunoId, anoMes);
-        }
-
         function saveSchedule(e) {
             e.preventDefault();
             if (editingId && !can('agenda', 'editar')) return;
@@ -1927,7 +1919,6 @@
                 return;
             }
 
-            // Verificar conflito
             if (checkScheduleConflict(alunoId, data, hora, editingId)) {
                 toast('Aula já cadastrada para este aluno neste dia e horário!', 'error');
                 return;
@@ -2099,7 +2090,6 @@
             while (current <= end) {
                 if (selectedDays.includes(current.getDay())) {
                     const dateStr = formatDateInput(current);
-                    // Verificar conflito individual
                     if (checkScheduleConflict(alunoId, dateStr, hora)) {
                         toast(`Aula já cadastrada para ${formatDate(dateStr)} às ${hora}!`, 'error');
                         return;
@@ -2821,7 +2811,6 @@
 
             const results = [];
 
-            // Implementação dos filtros por módulo
             if (modulesToSearch.includes('alunos')) {
                 state.students.forEach(s => {
                     const acad = state.academias.find(a => a.id === s.academiaId);
@@ -2923,6 +2912,8 @@
             else { if (!can('usuarios', 'criar')) { toast('Sem permissão para criar.', 'error'); return; } }
             editingId = id || null;
             document.getElementById('userForm').reset();
+            userFotoData = '';
+            document.getElementById('userFotoPreview').src = '';
             document.getElementById('userActive').checked = true;
             document.getElementById('userPasswordHint').textContent = '*';
             document.getElementById('userRole').value = 'padrao';
@@ -2935,6 +2926,8 @@
                 document.getElementById('userNome').value = u.nome || '';
                 document.getElementById('userRole').value = u.role || 'padrao';
                 document.getElementById('userActive').checked = u.active !== false;
+                userFotoData = u.foto || '';
+                document.getElementById('userFotoPreview').src = userFotoData;
                 renderPermissionMatrix(u);
             } else {
                 renderPermissionMatrix(null);
@@ -2950,6 +2943,7 @@
             const nome = val('userNome');
             const role = val('userRole');
             const active = document.getElementById('userActive').checked;
+            const foto = userFotoData || '';
             if (!username) { toast('Informe o usuário.', 'error'); return; }
             if (role === 'aluno' && !nome) { toast('Para usuários do tipo Aluno, informe o nome completo.', 'error'); return; }
 
@@ -2965,6 +2959,7 @@
                 existing.role = role;
                 existing.active = active;
                 if (password) existing.password = password;
+                existing.foto = foto;
                 if (role === 'admin') { existing.permissions = {}; }
                 else if (role === 'aluno') { existing.permissions = {}; }
                 else { existing.permissions = collectPermissions(); }
@@ -2976,7 +2971,7 @@
                     toast('Já existe um usuário com esse nome.', 'error');
                     return;
                 }
-                const newUser = { id: genId(), username, password, nome, role, active, permissions: role === 'admin' || role === 'aluno' ? {} : collectPermissions() };
+                const newUser = { id: genId(), username, password, nome, role, active, permissions: role === 'admin' || role === 'aluno' ? {} : collectPermissions(), foto };
                 state.users.push(newUser);
                 logAction('Criar Usuário', `Usuário ${username} criado`, 'usuarios');
             }
@@ -3005,12 +3000,13 @@
                 else if (u.role === 'aluno') perfilBadge = '<span class="badge badge-aluno">Aluno</span>';
                 else perfilBadge = '<span class="badge badge-padrao">Padrão</span>';
                 const ativo = u.active !== false ? '✅' : '❌';
-                html += `<tr><td>${esc(u.username)}</td><td>${esc(u.nome || '-')}</td><td>${perfilBadge}</td><td>${ativo}</td><td>
+                const foto = u.foto ? `<img class="thumb" src="${esc(u.foto)}" alt="Foto">` : '<div class="thumb"><i class="fas fa-user"></i></div>';
+                html += `<tr><td>${foto}</td><td>${esc(u.username)}</td><td>${esc(u.nome || '-')}</td><td>${perfilBadge}</td><td>${ativo}</td><td>
                     <button class="btn btn-sm btn-outline" onclick="openUserForm('${u.id}')" ${can('usuarios', 'editar') ? '' : 'disabled'}><i class="fas fa-edit"></i></button>
                     <button class="btn btn-sm btn-danger" onclick="deleteUser('${u.id}')" ${can('usuarios', 'excluir') ? '' : 'disabled'}><i class="fas fa-trash"></i></button>
                 </td></tr>`;
             });
-            tbody.innerHTML = html || '<tr><td colspan="5">Nenhum usuário cadastrado.</td></tr>';
+            tbody.innerHTML = html || '<tr><td colspan="6">Nenhum usuário cadastrado.</td></tr>';
         }
 
         // ==================== AUDITORIA ====================
