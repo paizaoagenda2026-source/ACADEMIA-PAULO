@@ -57,6 +57,9 @@
             align-items: center;
             justify-content: center;
             z-index: 9999;
+            width: 100%;
+            height: 100vh;
+            overflow-y: auto;
         }
 
         .login-box {
@@ -100,7 +103,7 @@
         .login-error { background: rgba(244,67,54,0.1); color: var(--danger); padding: 10px; border-radius: 6px; font-size: 13px; margin-bottom: 15px; text-align: center; border-left: 3px solid var(--danger); }
 
         /* APP */
-        #app { display: flex; min-height: 100vh; }
+        #app { display: flex; min-height: 100vh; width: 100%; }
 
         .sidebar {
             width: var(--sidebar-width);
@@ -164,6 +167,7 @@
             display: flex;
             flex-direction: column;
             min-height: 100vh;
+            width: calc(100% - var(--sidebar-width));
         }
         .topbar {
             background: var(--bg-card);
@@ -182,6 +186,7 @@
             display: none;
             padding: 20px;
             animation: fadeIn 0.3s;
+            width: 100%;
         }
         .section.active { display: block; }
 
@@ -256,6 +261,8 @@
             align-items: center;
             justify-content: center;
             padding: 20px;
+            width: 100%;
+            height: 100vh;
         }
         .modal.show { display: flex; }
         .modal-content {
@@ -369,6 +376,23 @@
 
         .cashflow-filter-buttons { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 10px; }
 
+        /* Filtros para tabelas */
+        .filter-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 15px;
+            align-items: end;
+        }
+        .filter-container .form-group {
+            margin-bottom: 0;
+            flex: 1;
+            min-width: 150px;
+        }
+        .filter-container .btn {
+            margin-bottom: 0;
+        }
+
         #exitFullscreenBtn {
             position: fixed;
             bottom: 20px;
@@ -390,18 +414,44 @@
         #exitFullscreenBtn:hover { background: var(--accent-hover); }
 
         @media (max-width: 768px) {
+            body {
+                width: 100%;
+                overflow-x: hidden;
+            }
             .sidebar { transform: translateX(-100%); width: 280px; }
             .sidebar.open { transform: translateX(0); }
-            .main-content { margin-left: 0; }
+            .main-content { 
+                margin-left: 0; 
+                width: 100%;
+            }
             .topbar { padding: 10px 15px; }
             .topbar h2 { font-size: 18px; }
-            .section { padding: 10px; }
+            .section { padding: 10px; width: 100%; }
+            .card { padding: 15px; }
             .dashboard-cards { grid-template-columns: 1fr; }
-            .modal-content { max-width: 100%; margin: 10px; }
+            .modal-content { 
+                max-width: 100%; 
+                margin: 10px;
+                max-height: 95vh;
+            }
+            .modal { padding: 10px; }
             .permissions-container { grid-template-columns: 1fr; }
             #studentModal .photo-preview { width: 100px; height: 100px; }
             .album-grid { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; }
             .sidebar-brand { padding: 15px; font-size: 20px; }
+            table { font-size: 12px; }
+            table th, table td { padding: 8px 10px; }
+            .filter-container {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .filter-container .form-group {
+                min-width: 100%;
+            }
+            .login-box {
+                margin: 10px;
+                padding: 30px 20px;
+            }
         }
     </style>
 </head>
@@ -491,7 +541,34 @@
             <!-- Alunos -->
             <section id="section-alunos" class="section">
                 <div class="card">
-                    <div class="card-header"><h3><i class="fas fa-users"></i> Alunos</h3><button class="btn btn-primary" id="btnAddStudent" onclick="openStudentForm()"><i class="fas fa-plus"></i> Novo Aluno</button></div>
+                    <div class="card-header">
+                        <h3><i class="fas fa-users"></i> Alunos</h3>
+                        <button class="btn btn-primary" id="btnAddStudent" onclick="openStudentForm()"><i class="fas fa-plus"></i> Novo Aluno</button>
+                    </div>
+                    
+                    <!-- Filtro para Alunos -->
+                    <div class="filter-container">
+                        <div class="form-group">
+                            <label><i class="fas fa-search"></i> Buscar por texto</label>
+                            <input type="text" id="alunosFilterText" placeholder="Nome, CPF, celular, email..." oninput="renderStudents()">
+                        </div>
+                        <div class="form-group">
+                            <label><i class="fas fa-calendar"></i> Data de Cadastro</label>
+                            <input type="date" id="alunosFilterDate" onchange="renderStudents()">
+                        </div>
+                        <div class="form-group">
+                            <label><i class="fas fa-building"></i> Academia</label>
+                            <select id="alunosFilterAcademia" onchange="renderStudents()">
+                                <option value="">Todas</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label><i class="fas fa-money-bill"></i> Valor mínimo (R$)</label>
+                            <input type="text" id="alunosFilterValorMin" placeholder="R$ 0,00" oninput="renderStudents()">
+                        </div>
+                        <button class="btn btn-outline" onclick="clearAlunosFilter()"><i class="fas fa-times"></i> Limpar</button>
+                    </div>
+                    
                     <div class="table-container">
                         <table>
                             <thead><tr><th>Foto</th><th>Nome</th><th>Academia</th><th>CPF</th><th>Celular</th><th>Data Cadastro</th><th>Valor</th><th>Ações</th></tr></thead>
@@ -530,6 +607,32 @@
                         <button class="btn btn-sm btn-outline" id="btnAgendaViewGrade" onclick="setAgendaView('grade')"><i class="fas fa-table"></i> Grade de Horários</button>
                     </div>
                     <div id="agendaListContainer">
+                        <!-- Filtro para Agenda -->
+                        <div class="filter-container">
+                            <div class="form-group">
+                                <label><i class="fas fa-search"></i> Buscar por texto</label>
+                                <input type="text" id="agendaFilterText" placeholder="Aluno, academia..." oninput="renderSchedule()">
+                            </div>
+                            <div class="form-group">
+                                <label><i class="fas fa-calendar"></i> Data</label>
+                                <input type="date" id="agendaFilterDate" onchange="renderSchedule()">
+                            </div>
+                            <div class="form-group">
+                                <label><i class="fas fa-clock"></i> Hora</label>
+                                <input type="time" id="agendaFilterHora" onchange="renderSchedule()">
+                            </div>
+                            <div class="form-group">
+                                <label><i class="fas fa-tasks"></i> Status</label>
+                                <select id="agendaFilterStatus" onchange="renderSchedule()">
+                                    <option value="">Todos</option>
+                                    <option value="Agendada">Agendada</option>
+                                    <option value="Concluída">Concluída</option>
+                                    <option value="Cancelada">Cancelada</option>
+                                </select>
+                            </div>
+                            <button class="btn btn-outline" onclick="clearAgendaFilter()"><i class="fas fa-times"></i> Limpar</button>
+                        </div>
+                        
                         <div class="table-container">
                             <table>
                                 <thead>
@@ -641,10 +744,33 @@
                     <div class="card-header">
                         <h3><i class="fas fa-file-invoice-dollar"></i> Contas a Pagar e Receber (Futuras)</h3>
                         <div style="display: flex; gap: 8px; align-items: center;">
-                            <button class="btn btn-warning" id="btnGerarMensalidades" onclick="gerarMensalidades()"><i class="fas fa-cogs"></i> Gerar Mensalidades</button>
                             <button class="btn btn-primary" id="btnAddConta" onclick="openContaForm()"><i class="fas fa-plus"></i> Nova Conta</button>
                         </div>
                     </div>
+                    
+                    <!-- Filtro para Contas a Pagar e Receber -->
+                    <div class="filter-container">
+                        <div class="form-group">
+                            <label><i class="fas fa-search"></i> Buscar por texto</label>
+                            <input type="text" id="contasFilterText" placeholder="Digite parte do texto..." oninput="renderContasFuturas()">
+                        </div>
+                        <div class="form-group">
+                            <label><i class="fas fa-calendar"></i> Data de Vencimento</label>
+                            <input type="date" id="contasFilterDate" onchange="renderContasFuturas()">
+                        </div>
+                        <div class="form-group">
+                            <label><i class="fas fa-filter"></i> Status</label>
+                            <select id="contasFilterStatus" onchange="renderContasFuturas()">
+                                <option value="">Todos</option>
+                                <option value="Pendente">Pendente</option>
+                                <option value="Pago">Pago</option>
+                                <option value="Recebido">Recebido</option>
+                                <option value="Vencido">Vencido</option>
+                            </select>
+                        </div>
+                        <button class="btn btn-outline" onclick="clearContasFilter()"><i class="fas fa-times"></i> Limpar Filtro</button>
+                    </div>
+                    
                     <div class="table-container">
                         <table>
                             <thead>
@@ -728,6 +854,33 @@
             <section id="section-usuarios" class="section">
                 <div class="card">
                     <div class="card-header"><h3><i class="fas fa-user-cog"></i> Usuários e Permissões</h3><button class="btn btn-primary" id="btnAddUser" onclick="openUserForm()"><i class="fas fa-plus"></i> Novo Usuário</button></div>
+                    
+                    <!-- Filtro para Usuários -->
+                    <div class="filter-container">
+                        <div class="form-group">
+                            <label><i class="fas fa-search"></i> Buscar por texto</label>
+                            <input type="text" id="usersFilterText" placeholder="Usuário, nome..." oninput="renderUsers()">
+                        </div>
+                        <div class="form-group">
+                            <label><i class="fas fa-user-tag"></i> Perfil</label>
+                            <select id="usersFilterRole" onchange="renderUsers()">
+                                <option value="">Todos</option>
+                                <option value="admin">Administrador</option>
+                                <option value="padrao">Padrão</option>
+                                <option value="aluno">Aluno</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label><i class="fas fa-toggle-on"></i> Status</label>
+                            <select id="usersFilterActive" onchange="renderUsers()">
+                                <option value="">Todos</option>
+                                <option value="ativo">Ativos</option>
+                                <option value="inativo">Inativos</option>
+                            </select>
+                        </div>
+                        <button class="btn btn-outline" onclick="clearUsersFilter()"><i class="fas fa-times"></i> Limpar</button>
+                    </div>
+                    
                     <div class="table-container">
                         <table>
                             <thead><tr><th>Foto</th><th>Usuário</th><th>Nome</th><th>Perfil</th><th>Ativo</th><th>Ações</th></tr></thead>
@@ -744,6 +897,41 @@
                         <h3><i class="fas fa-history"></i> Auditoria de Usuários</h3>
                         <button class="btn btn-danger" id="btnClearAuditLogs" onclick="clearAuditLogs()" style="display:none;"><i class="fas fa-trash"></i> Limpar Logs</button>
                     </div>
+                    
+                    <!-- Filtro para Auditoria -->
+                    <div class="filter-container">
+                        <div class="form-group">
+                            <label><i class="fas fa-search"></i> Buscar por texto</label>
+                            <input type="text" id="auditFilterText" placeholder="Usuário, ação, módulo, detalhes..." oninput="renderAuditoria()">
+                        </div>
+                        <div class="form-group">
+                            <label><i class="fas fa-calendar"></i> Data Inicial</label>
+                            <input type="date" id="auditFilterDateStart" onchange="renderAuditoria()">
+                        </div>
+                        <div class="form-group">
+                            <label><i class="fas fa-calendar"></i> Data Final</label>
+                            <input type="date" id="auditFilterDateEnd" onchange="renderAuditoria()">
+                        </div>
+                        <div class="form-group">
+                            <label><i class="fas fa-cubes"></i> Módulo</label>
+                            <select id="auditFilterModule" onchange="renderAuditoria()">
+                                <option value="">Todos</option>
+                                <option value="dashboard">Dashboard</option>
+                                <option value="alunos">Alunos</option>
+                                <option value="academias">Academias</option>
+                                <option value="agenda">Agenda</option>
+                                <option value="treinos">Treinos</option>
+                                <option value="album">Álbum</option>
+                                <option value="fluxocaixa">Fluxo de Caixa</option>
+                                <option value="filtro">Filtro</option>
+                                <option value="usuarios">Usuários</option>
+                                <option value="auditoria">Auditoria</option>
+                                <option value="aluno">Área do Aluno</option>
+                            </select>
+                        </div>
+                        <button class="btn btn-outline" onclick="clearAuditFilter()"><i class="fas fa-times"></i> Limpar</button>
+                    </div>
+                    
                     <div class="table-container">
                         <table class="audit-log-table">
                             <thead>
@@ -786,8 +974,8 @@
                     <div class="form-group"><label>Objetivo</label><input type="text" id="studentObjetivo" placeholder="Ex: Hipertrofia, Emagrecimento..."></div>
                     <div class="form-group"><label>Celular</label><input type="text" id="studentTelefone" placeholder="(00) 00000-0000"></div>
                     <div class="form-group"><label>Email</label><input type="email" id="studentEmail" placeholder="email@exemplo.com"></div>
-                    <div class="form-group"><label>Valor por Aula (R$)</label><input type="text" id="studentValorAula" placeholder="0,00"></div>
-                    <div class="form-group"><label>Mensalidade Fixa (R$)</label><input type="text" id="studentMensalidadeFixa" placeholder="0,00"></div>
+                    <div class="form-group"><label>Valor por Aula (R$)</label><input type="text" id="studentValorAula" placeholder="R$ 0,00"></div>
+                    <div class="form-group"><label>Mensalidade Fixa (R$)</label><input type="text" id="studentMensalidadeFixa" placeholder="R$ 0,00"></div>
                     <div class="form-group"><label>Observações</label><textarea id="studentObservacoes" rows="3" placeholder="Anotações importantes..."></textarea></div>
 
                     <div class="evolution-section">
@@ -874,8 +1062,8 @@
                 <div class="modal-body">
                     <div class="form-group"><label>Data *</label><input type="date" id="cashflowData" required></div>
                     <div class="form-group"><label>Descrição *</label><input type="text" id="cashflowDescricao" required placeholder="Ex: Aula particular, Compra de material..."></div>
-                    <div class="form-group"><label>Entrada (R$)</label><input type="number" id="cashflowEntrada" step="0.01" min="0" placeholder="0.00"></div>
-                    <div class="form-group"><label>Saída (R$)</label><input type="number" id="cashflowSaida" step="0.01" min="0" placeholder="0.00"></div>
+                    <div class="form-group"><label>Entrada (R$)</label><input type="text" id="cashflowEntrada" placeholder="R$ 0,00"></div>
+                    <div class="form-group"><label>Saída (R$)</label><input type="text" id="cashflowSaida" placeholder="R$ 0,00"></div>
                     <div class="form-group"><label>Forma de Pagamento</label><select id="cashflowFormaPgto"><option value="Dinheiro">Dinheiro</option><option value="Pix">Pix</option><option value="Cartão de Crédito">Cartão de Crédito</option><option value="Cartão de Débito">Cartão de Débito</option><option value="Transferência">Transferência</option><option value="Outro">Outro</option></select></div>
                 </div>
                 <div class="modal-footer"><button type="button" class="btn btn-outline" onclick="closeModal('cashflowModal')"><i class="fas fa-times"></i> Cancelar</button><button type="submit" class="btn btn-success"><i class="fas fa-save"></i> Salvar</button></div>
@@ -891,7 +1079,7 @@
                 <div class="modal-body">
                     <div class="form-group"><label>Descrição *</label><input type="text" id="contaDescricao" required placeholder="Ex: Aluguel, Mensalidade de aluno..."></div>
                     <div class="form-group"><label>Tipo *</label><select id="contaTipo" required><option value="Pagar">Pagar</option><option value="Receber">Receber</option></select></div>
-                    <div class="form-group"><label>Valor (R$) *</label><input type="number" id="contaValor" step="0.01" min="0" required placeholder="0.00"></div>
+                    <div class="form-group"><label>Valor (R$) *</label><input type="text" id="contaValor" placeholder="R$ 0,00" required></div>
                     <div class="form-group"><label>Data de Vencimento *</label><input type="date" id="contaVencimento" required></div>
                     <div class="form-group"><label>Status</label><select id="contaStatus"><option value="Pendente">Pendente</option><option value="Pago">Pago</option><option value="Recebido">Recebido</option><option value="Vencido">Vencido</option></select></div>
                 </div>
@@ -1050,7 +1238,7 @@
         let studentEvolucaoFotos = [];
         let cashflowFilter = 'todos';
         let cameraStream = null;
-        let cameraTarget = null; // 'student' ou 'user'
+        let cameraTarget = null;
 
         // ==================== UTILITÁRIOS ====================
         function genId() { return Date.now().toString(36) + Math.random().toString(36).substr(2, 5); }
@@ -1065,7 +1253,9 @@
             }
             return parseFloat(value) || 0;
         }
-        function formatCurrency(v) { return Number(v || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }); }
+        function formatCurrency(v) { 
+            return 'R$ ' + Number(v || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); 
+        }
         function formatDate(dateStr) { if (!dateStr) return ''; const [y, m, d] = dateStr.split('-'); return `${d}/${m}/${y}`; }
         function formatDateTime(isoStr) {
             if (!isoStr) return '-';
@@ -1124,7 +1314,6 @@
                         state.users.forEach(u => {
                             if (u.username) u.username = u.username.toUpperCase();
                             if (u.password) u.password = u.password.toUpperCase();
-                            // Garantir que a foto seja preservada
                             if (!u.foto) u.foto = '';
                         });
                         state.students.forEach(s => { 
@@ -1211,7 +1400,7 @@
                 active: true,
                 permissions: {},
                 alunoId: student.id,
-                foto: student.foto || '' // herda a foto do aluno se existir
+                foto: student.foto || ''
             };
             state.users.push(newUser);
             return newUser;
@@ -1520,8 +1709,6 @@
             if (btnCashflow) btnCashflow.style.display = can('fluxocaixa', 'criar') ? '' : 'none';
             const btnConta = document.getElementById('btnAddConta');
             if (btnConta) btnConta.style.display = can('fluxocaixa', 'criar') ? '' : 'none';
-            const btnGerarMensalidades = document.getElementById('btnGerarMensalidades');
-            if (btnGerarMensalidades) btnGerarMensalidades.style.display = can('fluxocaixa', 'criar') ? '' : 'none';
             const btnUser = document.getElementById('btnAddUser');
             if (btnUser) btnUser.style.display = can('usuarios', 'criar') ? '' : 'none';
             const btnWorkout = document.getElementById('btnAddWorkout');
@@ -1530,7 +1717,7 @@
             if (btnClearAudit) btnClearAudit.style.display = can('auditoria', 'excluir') ? '' : 'none';
 
             if (section === 'dashboard') renderDashboard();
-            if (section === 'alunos') renderStudents();
+            if (section === 'alunos') { fillAlunosFilterAcademia(); renderStudents(); }
             if (section === 'academias') renderAcademies();
             if (section === 'agenda') renderSchedule();
             if (section === 'treinos') renderWorkouts();
@@ -1631,6 +1818,47 @@
             select.innerHTML = html;
         }
 
+        function fillAlunosFilterAcademia() {
+            const select = document.getElementById('alunosFilterAcademia');
+            if (!select) return;
+            let html = '<option value="">Todas</option>';
+            state.academias.forEach(a => {
+                html += `<option value="${a.id}">${esc(a.nome)}</option>`;
+            });
+            select.innerHTML = html;
+        }
+
+        function clearAlunosFilter() {
+            document.getElementById('alunosFilterText').value = '';
+            document.getElementById('alunosFilterDate').value = '';
+            document.getElementById('alunosFilterAcademia').value = '';
+            document.getElementById('alunosFilterValorMin').value = '';
+            renderStudents();
+        }
+
+        function clearAgendaFilter() {
+            document.getElementById('agendaFilterText').value = '';
+            document.getElementById('agendaFilterDate').value = '';
+            document.getElementById('agendaFilterHora').value = '';
+            document.getElementById('agendaFilterStatus').value = '';
+            renderSchedule();
+        }
+
+        function clearUsersFilter() {
+            document.getElementById('usersFilterText').value = '';
+            document.getElementById('usersFilterRole').value = '';
+            document.getElementById('usersFilterActive').value = '';
+            renderUsers();
+        }
+
+        function clearAuditFilter() {
+            document.getElementById('auditFilterText').value = '';
+            document.getElementById('auditFilterDateStart').value = '';
+            document.getElementById('auditFilterDateEnd').value = '';
+            document.getElementById('auditFilterModule').value = '';
+            renderAuditoria();
+        }
+
         function handleEvolutionPhoto(event) {
             const file = event.target.files[0];
             if (!file) return;
@@ -1701,8 +1929,8 @@
                 document.getElementById('studentObjetivo').value = s.objetivo || '';
                 document.getElementById('studentTelefone').value = s.telefone || '';
                 document.getElementById('studentEmail').value = s.email || '';
-                document.getElementById('studentValorAula').value = s.valorAula ? s.valorAula.toString().replace('.', ',') : '';
-                document.getElementById('studentMensalidadeFixa').value = s.mensalidadeFixa ? s.mensalidadeFixa.toString().replace('.', ',') : '';
+                document.getElementById('studentValorAula').value = s.valorAula ? formatCurrency(s.valorAula) : '';
+                document.getElementById('studentMensalidadeFixa').value = s.mensalidadeFixa ? formatCurrency(s.mensalidadeFixa) : '';
                 document.getElementById('studentObservacoes').value = s.observacoes || '';
                 studentFotoData = s.foto || '';
                 document.getElementById('studentFotoPreview').src = studentFotoData || '';
@@ -1796,8 +2024,38 @@
 
         function renderStudents() {
             const tbody = document.getElementById('studentsTableBody');
+            const filterText = (document.getElementById('alunosFilterText')?.value || '').toLowerCase();
+            const filterDate = document.getElementById('alunosFilterDate')?.value || '';
+            const filterAcademia = document.getElementById('alunosFilterAcademia')?.value || '';
+            const filterValorMin = parseCurrency(document.getElementById('alunosFilterValorMin')?.value || '');
+            
+            let filtered = [...state.students];
+            
+            if (filterText) {
+                filtered = filtered.filter(s => 
+                    s.nome.toLowerCase().includes(filterText) || 
+                    (s.cpf || '').toLowerCase().includes(filterText) || 
+                    (s.telefone || '').toLowerCase().includes(filterText) || 
+                    (s.email || '').toLowerCase().includes(filterText) ||
+                    (s.objetivo || '').toLowerCase().includes(filterText)
+                );
+            }
+            if (filterDate) {
+                filtered = filtered.filter(s => s.dataCadastro === filterDate);
+            }
+            if (filterAcademia) {
+                filtered = filtered.filter(s => s.academiaId === filterAcademia);
+            }
+            if (filterValorMin > 0) {
+                filtered = filtered.filter(s => {
+                    const valorAula = parseFloat(s.valorAula) || 0;
+                    const mensalidadeFixa = parseFloat(s.mensalidadeFixa) || 0;
+                    return valorAula >= filterValorMin || mensalidadeFixa >= filterValorMin;
+                });
+            }
+            
             let html = '';
-            state.students.forEach(s => {
+            filtered.forEach(s => {
                 const academia = state.academias.find(a => a.id === s.academiaId);
                 const foto = s.foto ? `<img class="thumb" src="${esc(s.foto)}" alt="Foto">` : '<div class="thumb"><i class="fas fa-user"></i></div>';
                 let valorDisplay = '';
@@ -1822,7 +2080,7 @@
                     </td>
                 </tr>`;
             });
-            tbody.innerHTML = html || '<tr><td colspan="8">Nenhum aluno cadastrado.</td></tr>';
+            tbody.innerHTML = html || '<tr><td colspan="8">Nenhum aluno encontrado.</td></tr>';
         }
 
         // ==================== ACADEMIAS ====================
@@ -2025,7 +2283,32 @@
 
         function renderSchedule() {
             const tbody = document.getElementById('scheduleTableBody');
-            const sorted = [...state.schedule].sort((a, b) => (a.data + 'T' + a.hora).localeCompare(b.data + 'T' + b.hora));
+            const filterText = (document.getElementById('agendaFilterText')?.value || '').toLowerCase();
+            const filterDate = document.getElementById('agendaFilterDate')?.value || '';
+            const filterHora = document.getElementById('agendaFilterHora')?.value || '';
+            const filterStatus = document.getElementById('agendaFilterStatus')?.value || '';
+            
+            let filtered = [...state.schedule];
+            
+            if (filterText) {
+                filtered = filtered.filter(a => {
+                    const aluno = state.students.find(s => s.id === a.alunoId);
+                    const acad = state.academias.find(g => g.id === a.academiaId);
+                    return (aluno && aluno.nome.toLowerCase().includes(filterText)) || 
+                           (acad && acad.nome.toLowerCase().includes(filterText));
+                });
+            }
+            if (filterDate) {
+                filtered = filtered.filter(a => a.data === filterDate);
+            }
+            if (filterHora) {
+                filtered = filtered.filter(a => a.hora === filterHora);
+            }
+            if (filterStatus) {
+                filtered = filtered.filter(a => a.status === filterStatus);
+            }
+            
+            const sorted = filtered.sort((a, b) => (a.data + 'T' + a.hora).localeCompare(b.data + 'T' + b.hora));
             let html = '';
             const canDelete = can('agenda', 'excluir');
             const selectAll = document.getElementById('selectAllSchedule');
@@ -2051,7 +2334,7 @@
                     </td>
                 </tr>`;
             });
-            tbody.innerHTML = html || `<tr><td colspan="8">Nenhuma aula agendada.</td></tr>`;
+            tbody.innerHTML = html || `<tr><td colspan="8">Nenhuma aula encontrada.</td></tr>`;
         }
 
         // ==================== AGENDA RECORRENTE ====================
@@ -2490,8 +2773,8 @@
                 if (!c) return;
                 document.getElementById('cashflowData').value = c.data;
                 document.getElementById('cashflowDescricao').value = c.descricao;
-                document.getElementById('cashflowEntrada').value = c.entrada || '';
-                document.getElementById('cashflowSaida').value = c.saida || '';
+                document.getElementById('cashflowEntrada').value = c.entrada ? formatCurrency(c.entrada) : '';
+                document.getElementById('cashflowSaida').value = c.saida ? formatCurrency(c.saida) : '';
                 document.getElementById('cashflowFormaPgto').value = c.forma_pgto || 'Dinheiro';
             } else {
                 document.getElementById('cashflowFormaPgto').value = 'Dinheiro';
@@ -2505,8 +2788,8 @@
             if (!editingId && !can('fluxocaixa', 'criar')) return;
             const data = val('cashflowData');
             const descricao = val('cashflowDescricao');
-            const entrada = parseFloat(val('cashflowEntrada')) || 0;
-            const saida = parseFloat(val('cashflowSaida')) || 0;
+            const entrada = parseCurrency(val('cashflowEntrada'));
+            const saida = parseCurrency(val('cashflowSaida'));
             const forma_pgto = val('cashflowFormaPgto');
             if (!data || !descricao) { toast('Informe data e descrição.', 'error'); return; }
             if (entrada === 0 && saida === 0) { toast('Informe ao menos uma entrada ou saída.', 'error'); return; }
@@ -2547,6 +2830,13 @@
         }
 
         // ==================== CONTAS A PAGAR E RECEBER ====================
+        function clearContasFilter() {
+            document.getElementById('contasFilterText').value = '';
+            document.getElementById('contasFilterDate').value = '';
+            document.getElementById('contasFilterStatus').value = '';
+            renderContasFuturas();
+        }
+
         function openContaForm(id) {
             if (id) { if (!can('fluxocaixa', 'editar')) { toast('Sem permissão para editar.', 'error'); return; } }
             else { if (!can('fluxocaixa', 'criar')) { toast('Sem permissão para criar.', 'error'); return; } }
@@ -2558,7 +2848,7 @@
                 if (!c) return;
                 document.getElementById('contaDescricao').value = c.descricao;
                 document.getElementById('contaTipo').value = c.tipo;
-                document.getElementById('contaValor').value = c.valor;
+                document.getElementById('contaValor').value = formatCurrency(c.valor);
                 document.getElementById('contaVencimento').value = c.vencimento;
                 document.getElementById('contaStatus').value = c.status;
             }
@@ -2570,7 +2860,7 @@
             if (!editingId && !can('fluxocaixa', 'criar')) return;
             const descricao = val('contaDescricao');
             const tipo = val('contaTipo');
-            const valor = parseFloat(val('contaValor')) || 0;
+            const valor = parseCurrency(val('contaValor'));
             const vencimento = val('contaVencimento');
             const status = val('contaStatus');
             if (!descricao || !tipo || valor <= 0 || !vencimento) { toast('Preencha todos os campos obrigatórios.', 'error'); return; }
@@ -2642,7 +2932,26 @@
         }
         function renderContasFuturas() {
             const tbody = document.getElementById('contasFuturasTableBody');
-            const sorted = [...state.contasFuturas].sort((a, b) => a.vencimento.localeCompare(b.vencimento) || a.descricao.localeCompare(b.descricao));
+            const filterText = (document.getElementById('contasFilterText')?.value || '').toLowerCase();
+            const filterDate = document.getElementById('contasFilterDate')?.value || '';
+            const filterStatus = document.getElementById('contasFilterStatus')?.value || '';
+            
+            let filtered = [...state.contasFuturas];
+            
+            if (filterText) {
+                filtered = filtered.filter(c => 
+                    c.descricao.toLowerCase().includes(filterText) || 
+                    c.tipo.toLowerCase().includes(filterText)
+                );
+            }
+            if (filterDate) {
+                filtered = filtered.filter(c => c.vencimento === filterDate);
+            }
+            if (filterStatus) {
+                filtered = filtered.filter(c => c.status === filterStatus);
+            }
+            
+            const sorted = filtered.sort((a, b) => a.vencimento.localeCompare(b.vencimento) || a.descricao.localeCompare(b.descricao));
             let html = '';
             sorted.forEach(c => {
                 let badgeClass = 'badge-pendente';
@@ -2962,7 +3271,7 @@
                 existing.role = role;
                 existing.active = active;
                 if (password) existing.password = password;
-                existing.foto = foto; // Garantir que a foto seja salva
+                existing.foto = foto;
                 if (role === 'admin') { existing.permissions = {}; }
                 else if (role === 'aluno') { existing.permissions = {}; }
                 else { existing.permissions = collectPermissions(); }
@@ -2996,8 +3305,31 @@
         }
         function renderUsers() {
             const tbody = document.getElementById('usersTableBody');
+            const filterText = (document.getElementById('usersFilterText')?.value || '').toLowerCase();
+            const filterRole = document.getElementById('usersFilterRole')?.value || '';
+            const filterActive = document.getElementById('usersFilterActive')?.value || '';
+            
+            let filtered = [...state.users];
+            
+            if (filterText) {
+                filtered = filtered.filter(u => 
+                    u.username.toLowerCase().includes(filterText) || 
+                    (u.nome || '').toLowerCase().includes(filterText)
+                );
+            }
+            if (filterRole) {
+                filtered = filtered.filter(u => u.role === filterRole);
+            }
+            if (filterActive) {
+                if (filterActive === 'ativo') {
+                    filtered = filtered.filter(u => u.active !== false);
+                } else if (filterActive === 'inativo') {
+                    filtered = filtered.filter(u => u.active === false);
+                }
+            }
+            
             let html = '';
-            state.users.forEach(u => {
+            filtered.forEach(u => {
                 let perfilBadge = '';
                 if (u.role === 'admin') perfilBadge = '<span class="badge badge-admin">Admin</span>';
                 else if (u.role === 'aluno') perfilBadge = '<span class="badge badge-aluno">Aluno</span>';
@@ -3009,14 +3341,46 @@
                     <button class="btn btn-sm btn-danger" onclick="deleteUser('${u.id}')" ${can('usuarios', 'excluir') ? '' : 'disabled'}><i class="fas fa-trash"></i></button>
                 </td></tr>`;
             });
-            tbody.innerHTML = html || '<tr><td colspan="6">Nenhum usuário cadastrado.</td></tr>';
+            tbody.innerHTML = html || '<tr><td colspan="6">Nenhum usuário encontrado.</td></tr>';
         }
 
         // ==================== AUDITORIA ====================
         function renderAuditoria() {
             const tbody = document.getElementById('auditLogsTableBody');
             if (!tbody) return;
-            const logs = [...(state.auditLogs || [])].sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+            const filterText = (document.getElementById('auditFilterText')?.value || '').toLowerCase();
+            const filterDateStart = document.getElementById('auditFilterDateStart')?.value || '';
+            const filterDateEnd = document.getElementById('auditFilterDateEnd')?.value || '';
+            const filterModule = document.getElementById('auditFilterModule')?.value || '';
+            
+            let logs = [...(state.auditLogs || [])];
+            
+            if (filterText) {
+                logs = logs.filter(log => 
+                    (log.user || '').toLowerCase().includes(filterText) || 
+                    (log.action || '').toLowerCase().includes(filterText) || 
+                    (log.module || '').toLowerCase().includes(filterText) || 
+                    (log.details || '').toLowerCase().includes(filterText)
+                );
+            }
+            if (filterDateStart) {
+                logs = logs.filter(log => {
+                    const logDate = new Date(log.timestamp);
+                    return formatDateInput(logDate) >= filterDateStart;
+                });
+            }
+            if (filterDateEnd) {
+                logs = logs.filter(log => {
+                    const logDate = new Date(log.timestamp);
+                    return formatDateInput(logDate) <= filterDateEnd;
+                });
+            }
+            if (filterModule) {
+                logs = logs.filter(log => log.module === filterModule);
+            }
+            
+            logs.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+            
             let html = '';
             logs.forEach(log => {
                 html += `<tr>
@@ -3027,7 +3391,7 @@
                     <td>${esc(log.details || '-')}</td>
                 </tr>`;
             });
-            tbody.innerHTML = html || '<tr><td colspan="5">Nenhum registro de auditoria encontrado.</td></tr>';
+            tbody.innerHTML = html || '<tr><td colspan="5">Nenhum registro encontrado.</td></tr>';
         }
         function clearAuditLogs() {
             if (!can('auditoria', 'excluir')) { toast('Sem permissão para limpar logs.', 'error'); return; }
@@ -3153,6 +3517,7 @@
             renderNav();
             renderDashboard();
             setAgendaView('list');
+            fillAlunosFilterAcademia();
             document.addEventListener('keydown', function(e) {
                 if (e.key === 'Escape') closeLightbox();
             });
