@@ -1085,7 +1085,7 @@
             setTimeout(() => el.remove(), 4000);
         }
         function saveState() {
-            db.collection(STATE_COLLECTION).doc(STATE_DOC).set(state)
+            db.collection(STATE_COLLECTION).doc(STATE_DOC).set(state, { merge: true })
                 .then(() => console.log('Estado salvo no Firestore'))
                 .catch(err => {
                     console.error('Erro ao salvar no Firestore:', err);
@@ -1124,10 +1124,13 @@
                         state.users.forEach(u => {
                             if (u.username) u.username = u.username.toUpperCase();
                             if (u.password) u.password = u.password.toUpperCase();
+                            // Garantir que a foto seja preservada
+                            if (!u.foto) u.foto = '';
                         });
                         state.students.forEach(s => { 
                             if (!s.evolucaoFotos) s.evolucaoFotos = [];
                             if (s.mensalidadeFixa === undefined) s.mensalidadeFixa = 0;
+                            if (!s.foto) s.foto = '';
                         });
                         state.workouts.forEach(w => {
                             if (!w.diasSemana && w.diaSemana !== undefined) {
@@ -2959,7 +2962,7 @@
                 existing.role = role;
                 existing.active = active;
                 if (password) existing.password = password;
-                existing.foto = foto;
+                existing.foto = foto; // Garantir que a foto seja salva
                 if (role === 'admin') { existing.permissions = {}; }
                 else if (role === 'aluno') { existing.permissions = {}; }
                 else { existing.permissions = collectPermissions(); }
