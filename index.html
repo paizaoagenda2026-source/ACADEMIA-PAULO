@@ -966,6 +966,8 @@
                     <div class="photo-upload">
                         <img id="studentFotoPreview" class="photo-preview" src="" alt="Foto" style="background:#333;">
                         <button type="button" class="btn btn-outline" onclick="openCameraForStudent()"><i class="fas fa-camera"></i> Selfie</button>
+                        <button type="button" class="btn btn-outline" onclick="document.getElementById('studentFotoFileInput').click()"><i class="fas fa-upload"></i> Upload</button>
+                        <input type="file" id="studentFotoFileInput" accept="image/*" style="display:none;" onchange="handleStudentFotoUpload(event)">
                     </div>
                     <div class="form-group"><label>Nome *</label><input type="text" id="studentNome" required placeholder="Nome do aluno"></div>
                     <div class="form-group"><label>CPF</label><input type="text" id="studentCpf" placeholder="000.000.000-00"></div>
@@ -1938,6 +1940,33 @@
                 renderEvolutionThumbs();
             }
             openModal('studentModal');
+        }
+
+        // Nova função para upload de imagem do PC (solicitada)
+        function handleStudentFotoUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = e => {
+                const img = new Image();
+                img.onload = () => {
+                    const canvas = document.createElement('canvas');
+                    let width = img.width, height = img.height;
+                    const max = 800;
+                    if (width > height && width > max) { height *= max / width; width = max; }
+                    else if (height > max) { width *= max / height; height = max; }
+                    canvas.width = width;
+                    canvas.height = height;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, width, height);
+                    const dataUrl = canvas.toDataURL('image/jpeg', 0.8);
+                    studentFotoData = dataUrl;
+                    document.getElementById('studentFotoPreview').src = dataUrl;
+                };
+                img.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+            event.target.value = '';
         }
 
         function saveStudent(e) {
