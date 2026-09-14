@@ -2037,6 +2037,8 @@
         }
 
         function confirmAdminAction(message) {
+            // Se o usuário logado já é Administrador, não exige senha
+            if (currentUser && currentUser.role === 'admin') return true;
             const admin = state.users.find(u => u.role === 'admin');
             if (!admin) {
                 toast('Nenhum administrador encontrado no sistema.', 'error');
@@ -2418,12 +2420,23 @@
             state.schedule.push(...newEntries);
             logAction('Aulas Recorrentes', `Geradas ${newEntries.length} aulas recorrentes`, 'agenda');
 
-            const grupos = {};
+            // ============================================================
+            // Para aulas recorrentes, gerar em "Contas a Pagar e Receber"
+            // APENAS o PRIMEIRO vencimento por aluno (o mês mais antigo).
+            // Os próximos vencimentos serão gerados somente quando o
+            // vencimento anterior for marcado como PAGO.
+            // ============================================================
+            const earliestByAluno = {};
             newEntries.forEach(a => {
-                const chave = a.alunoId + '|' + a.data.slice(0,7);
-                if (!grupos[chave]) grupos[chave] = { alunoId: a.alunoId, anoMes: a.data.slice(0,7) };
+                const anoMes = a.data.slice(0, 7);
+                if (!earliestByAluno[a.alunoId] || anoMes < earliestByAluno[a.alunoId]) {
+                    earliestByAluno[a.alunoId] = anoMes;
+                }
             });
-            Object.values(grupos).forEach(g => recalcularMensalidade(g.alunoId, g.anoMes));
+            Object.keys(earliestByAluno).forEach(alunoIdKey => {
+                recalcularMensalidade(alunoIdKey, earliestByAluno[alunoIdKey]);
+            });
+            // ============================================================
 
             saveState();
             closeModal('recurringScheduleModal');
@@ -2914,6 +2927,40 @@
             state.contasFuturas = state.contasFuturas.filter(c => c.id !== id);
             saveState(); renderContasFuturas(); toast('Conta excluída.', 'warning');
         }
+
+        // ============================================================
+        // Verifica se existe um próximo mês com aulas para o aluno
+        // e, em caso afirmativo, gera o próximo vencimento (uma única vez).
+        // ============================================================
+        function lancarProximoVencimento(contaPaga) {
+            if (!contaPaga) return;
+            if (contaPaga.tipo !== 'Receber') return;
+            if (!contaPaga.alunoId || !contaPaga.anoMes) return;
+
+            const proximosMeses = [...new Set(
+                state.schedule
+                    .filter(a =>
+                        a.alunoId === contaPaga.alunoId &&
+                        a.status !== 'Cancelada' &&
+                        a.data.slice(0, 7) > contaPaga.anoMes
+                    )
+                    .map(a => a.data.slice(0, 7))
+            )].sort();
+
+            if (proximosMeses.length === 0) return;
+
+            const proximoAnoMes = proximosMeses[0];
+            const jaExiste = state.contasFuturas.some(c =>
+                c.alunoId === contaPaga.alunoId &&
+                c.anoMes === proximoAnoMes &&
+                c.tipo === 'Receber'
+            );
+            if (jaExiste) return;
+
+            recalcularMensalidade(contaPaga.alunoId, proximoAnoMes);
+        }
+        // ============================================================
+
         function marcarContaComoPaga(id) {
             if (!can('fluxocaixa', 'editar') || !can('fluxocaixa', 'criar')) {
                 toast('Sem permissão para realizar esta operação.', 'error');
@@ -2953,6 +3000,11 @@
                 });
             }
             conta.status = 'Pago';
+
+            // Após marcar este vencimento como PAGO, lançar o próximo
+            // vencimento (se existir) para o mesmo aluno.
+            lancarProximoVencimento(conta);
+
             logAction('Conta Paga', `Conta ${descricao} marcada como paga e lançada no fluxo de caixa`, 'fluxocaixa');
             saveState();
             renderContasFuturas();
@@ -2980,7 +3032,14 @@
                 filtered = filtered.filter(c => c.status === filterStatus);
             }
             
-            const sorted = filtered.sort((a, b) => a.vencimento.localeCompare(b.vencimento) || a.descricao.localeCompare(b.descricao));
+            // Ordenação: status "Pago" sempre por último (embaixo).
+            // Pendentes/Vencidos/Recebidos ficam em cima, ordenados por vencimento.
+            const sorted = filtered.sort((a, b) => {
+                const aPago = a.status === 'Pago' ? 1 : 0;
+                const bPago = b.status === 'Pago' ? 1 : 0;
+                if (aPago !== bPago) return aPago - bPago;
+                return a.vencimento.localeCompare(b.vencimento) || a.descricao.localeCompare(b.descricao);
+            });
             let html = '';
             sorted.forEach(c => {
                 let badgeClass = 'badge-pendente';
