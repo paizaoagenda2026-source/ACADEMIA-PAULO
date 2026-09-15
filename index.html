@@ -2044,13 +2044,25 @@
             saveState(); renderSchedule(); renderContasFuturas();
             toast(`${idsToDelete.length} aula(s) excluída(s) com sucesso!`, 'warning');
         }
+
+        // ==================== AGENDA: SOMENTE AULAS FUTURAS ====================
         function renderSchedule() {
             const tbody = document.getElementById('scheduleTableBody');
             const filterText = (document.getElementById('agendaFilterText')?.value || '').toLowerCase();
             const filterDate = document.getElementById('agendaFilterDate')?.value || '';
             const filterHora = document.getElementById('agendaFilterHora')?.value || '';
             const filterStatus = document.getElementById('agendaFilterStatus')?.value || '';
-            let filtered = [...state.schedule];
+
+            // *** NOVO: Somente aulas que ainda NÃO foram dadas ***
+            // Considera "já dada" toda aula cuja data+hora seja anterior ao momento atual.
+            const agora = new Date();
+            let filtered = state.schedule.filter(a => {
+                if (!a.data || !a.hora) return false;
+                const dataHoraAula = new Date(a.data + 'T' + a.hora);
+                if (isNaN(dataHoraAula)) return false;
+                return dataHoraAula >= agora;
+            });
+
             if (filterText) filtered = filtered.filter(a => {
                 const aluno = state.students.find(s => s.id === a.alunoId);
                 const acad = state.academias.find(g => g.id === a.academiaId);
@@ -2083,8 +2095,9 @@
                     </td>
                 </tr>`;
             });
-            tbody.innerHTML = html || `<tr><td colspan="8">Nenhuma aula encontrada.</td></tr>`;
+            tbody.innerHTML = html || `<tr><td colspan="8">Nenhuma aula futura encontrada.</td></tr>`;
         }
+        // ==================== FIM AGENDA: SOMENTE AULAS FUTURAS ====================
 
         function openRecurringScheduleForm() {
             if (!can('agenda', 'criar')) { toast('Sem permissão para criar.', 'error'); return; }
