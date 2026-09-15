@@ -52,7 +52,8 @@
         #loginScreen {
             position: fixed;
             inset: 0;
-            background: linear-gradient(135deg, #1a1a1a 0%, #0a0a0a 100%);
+            background: linear-gradient(135deg, rgba(10,10,10,0.75) 0%, rgba(0,0,0,0.85) 100%),
+                        url('fundo-login.jpg') center center / cover no-repeat fixed;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -63,7 +64,9 @@
         }
 
         .login-box {
-            background: var(--bg-card);
+            background: rgba(30, 30, 30, 0.92);
+            backdrop-filter: blur(6px);
+            -webkit-backdrop-filter: blur(6px);
             padding: 40px 30px;
             border-radius: 20px;
             box-shadow: 0 0 40px rgba(212,175,55,0.3);
