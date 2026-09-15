@@ -21,7 +21,6 @@
     <link id="manifestLink" rel="manifest">
 
     <script>
-    // Gera o manifest dinamicamente (Blob) — evita precisar de arquivo externo
     (function () {
         try {
             var manifest = {
@@ -56,7 +55,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
 
-    <!-- Firebase Compat Scripts -->
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore-compat.js"></script>
 
@@ -132,6 +130,35 @@
         .btn-outline { background: transparent; border: 1px solid var(--border); color: var(--text); }
         .btn-outline:hover { border-color: var(--accent); color: var(--accent); }
         .login-btn { width: 100%; padding: 14px; font-size: 16px; justify-content: center; }
+
+        /* Botão Instalar App (dentro do login) */
+        .btn-install {
+            width: 100%; padding: 13px; font-size: 15px; justify-content: center;
+            background: linear-gradient(135deg, #d4af37, #f0c75e);
+            color: #000; font-weight: 700;
+            border: none;
+            box-shadow: 0 4px 15px rgba(212,175,55,0.35);
+            animation: pulseInstall 2s ease-in-out infinite;
+        }
+        .btn-install:hover {
+            background: linear-gradient(135deg, #f0c75e, #ffd97a);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(212,175,55,0.55);
+        }
+        .btn-install i { font-size: 17px; }
+
+        @keyframes pulseInstall {
+            0%, 100% { box-shadow: 0 4px 15px rgba(212,175,55,0.35); }
+            50% { box-shadow: 0 4px 25px rgba(212,175,55,0.7); }
+        }
+
+        .login-separator {
+            display: flex; align-items: center; gap: 10px;
+            margin: 14px 0; color: var(--text-light); font-size: 12px;
+        }
+        .login-separator::before, .login-separator::after {
+            content: ''; flex: 1; height: 1px; background: var(--border);
+        }
 
         .login-error { background: rgba(244,67,54,0.1); color: var(--danger); padding: 10px; border-radius: 6px; font-size: 13px; margin-bottom: 15px; text-align: center; border-left: 3px solid var(--danger); }
 
@@ -400,6 +427,14 @@
                 <button type="submit" class="btn btn-primary login-btn"><i class="fas fa-sign-in-alt"></i> Entrar</button>
             </form>
             <button class="btn btn-outline login-btn" style="margin-top:10px;" onclick="showStudentLogin()"><i class="fas fa-graduation-cap"></i> Sou Aluno</button>
+
+            <!-- BOTÃO INSTALAR APP (TELA DE LOGIN PERSONAL) -->
+            <div id="installSectionPersonal" style="display:none; margin-top: 15px;">
+                <div class="login-separator">ou</div>
+                <button type="button" class="btn btn-install" onclick="installApp()">
+                    <i class="fas fa-download"></i> 📲 Instalar App no Celular
+                </button>
+            </div>
         </div>
 
         <div class="login-box hidden" id="loginStudentBox">
@@ -420,6 +455,14 @@
                 <button type="submit" class="btn btn-primary login-btn"><i class="fas fa-sign-in-alt"></i> Entrar</button>
             </form>
             <button class="btn btn-outline login-btn" style="margin-top:10px;" onclick="showPersonalLogin()"><i class="fas fa-arrow-left"></i> Voltar ao Login do Personal</button>
+
+            <!-- BOTÃO INSTALAR APP (TELA DE LOGIN ALUNO) -->
+            <div id="installSectionStudent" style="display:none; margin-top: 15px;">
+                <div class="login-separator">ou</div>
+                <button type="button" class="btn btn-install" onclick="installApp()">
+                    <i class="fas fa-download"></i> 📲 Instalar App no Celular
+                </button>
+            </div>
         </div>
     </div>
 
@@ -433,9 +476,6 @@
                     <span id="loggedUserName"></span>
                     <span id="loggedUserRole"></span>
                 </div>
-                <button class="btn btn-sm btn-primary" id="installAppBtn" onclick="installApp()" style="display:none; justify-content:center;">
-                    <i class="fas fa-download"></i> Instalar App
-                </button>
                 <button class="btn btn-sm btn-outline" style="color:#fff;border-color:var(--border); justify-content:center;" onclick="logout()">
                     <i class="fas fa-sign-out-alt"></i> Sair
                 </button>
@@ -448,7 +488,6 @@
                 <button class="btn btn-sm btn-outline" onclick="toggleSidebar()"><i class="fas fa-bars"></i> Menu</button>
             </div>
 
-            <!-- Dashboard -->
             <section id="section-dashboard" class="section active">
                 <div class="dashboard-cards" id="dashboardCards"></div>
                 <div class="card">
@@ -462,36 +501,19 @@
                 </div>
             </section>
 
-            <!-- Alunos -->
             <section id="section-alunos" class="section">
                 <div class="card">
                     <div class="card-header">
                         <h3><i class="fas fa-users"></i> Alunos</h3>
                         <button class="btn btn-primary" id="btnAddStudent" onclick="openStudentForm()"><i class="fas fa-plus"></i> Novo Aluno</button>
                     </div>
-
                     <div class="filter-container">
-                        <div class="form-group">
-                            <label><i class="fas fa-search"></i> Buscar por texto</label>
-                            <input type="text" id="alunosFilterText" placeholder="Nome, CPF, celular, email..." oninput="renderStudents()">
-                        </div>
-                        <div class="form-group">
-                            <label><i class="fas fa-calendar"></i> Data de Cadastro</label>
-                            <input type="date" id="alunosFilterDate" onchange="renderStudents()">
-                        </div>
-                        <div class="form-group">
-                            <label><i class="fas fa-building"></i> Academia</label>
-                            <select id="alunosFilterAcademia" onchange="renderStudents()">
-                                <option value="">Todas</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label><i class="fas fa-money-bill"></i> Valor mínimo (R$)</label>
-                            <input type="text" id="alunosFilterValorMin" placeholder="R$ 0,00" oninput="renderStudents()">
-                        </div>
+                        <div class="form-group"><label><i class="fas fa-search"></i> Buscar por texto</label><input type="text" id="alunosFilterText" placeholder="Nome, CPF, celular, email..." oninput="renderStudents()"></div>
+                        <div class="form-group"><label><i class="fas fa-calendar"></i> Data de Cadastro</label><input type="date" id="alunosFilterDate" onchange="renderStudents()"></div>
+                        <div class="form-group"><label><i class="fas fa-building"></i> Academia</label><select id="alunosFilterAcademia" onchange="renderStudents()"><option value="">Todas</option></select></div>
+                        <div class="form-group"><label><i class="fas fa-money-bill"></i> Valor mínimo (R$)</label><input type="text" id="alunosFilterValorMin" placeholder="R$ 0,00" oninput="renderStudents()"></div>
                         <button class="btn btn-outline" onclick="clearAlunosFilter()"><i class="fas fa-times"></i> Limpar</button>
                     </div>
-
                     <div class="table-container">
                         <table>
                             <thead><tr><th>Foto</th><th>Nome</th><th>Academia</th><th>CPF</th><th>Celular</th><th>Data Cadastro</th><th>Valor</th><th>Ações</th></tr></thead>
@@ -501,7 +523,6 @@
                 </div>
             </section>
 
-            <!-- Academias -->
             <section id="section-academias" class="section">
                 <div class="card">
                     <div class="card-header"><h3><i class="fas fa-building"></i> Academias</h3><button class="btn btn-primary" id="btnAddAcademy" onclick="openAcademyForm()"><i class="fas fa-plus"></i> Nova Academia</button></div>
@@ -514,7 +535,6 @@
                 </div>
             </section>
 
-            <!-- Agenda -->
             <section id="section-agenda" class="section">
                 <div class="card">
                     <div class="card-header">
@@ -531,42 +551,22 @@
                     </div>
                     <div id="agendaListContainer">
                         <div class="filter-container">
-                            <div class="form-group">
-                                <label><i class="fas fa-search"></i> Buscar por texto</label>
-                                <input type="text" id="agendaFilterText" placeholder="Aluno, academia..." oninput="renderSchedule()">
-                            </div>
-                            <div class="form-group">
-                                <label><i class="fas fa-calendar"></i> Data</label>
-                                <input type="date" id="agendaFilterDate" onchange="renderSchedule()">
-                            </div>
-                            <div class="form-group">
-                                <label><i class="fas fa-clock"></i> Hora</label>
-                                <input type="time" id="agendaFilterHora" onchange="renderSchedule()">
-                            </div>
-                            <div class="form-group">
-                                <label><i class="fas fa-tasks"></i> Status</label>
+                            <div class="form-group"><label><i class="fas fa-search"></i> Buscar por texto</label><input type="text" id="agendaFilterText" placeholder="Aluno, academia..." oninput="renderSchedule()"></div>
+                            <div class="form-group"><label><i class="fas fa-calendar"></i> Data</label><input type="date" id="agendaFilterDate" onchange="renderSchedule()"></div>
+                            <div class="form-group"><label><i class="fas fa-clock"></i> Hora</label><input type="time" id="agendaFilterHora" onchange="renderSchedule()"></div>
+                            <div class="form-group"><label><i class="fas fa-tasks"></i> Status</label>
                                 <select id="agendaFilterStatus" onchange="renderSchedule()">
-                                    <option value="">Todos</option>
-                                    <option value="Agendada">Agendada</option>
-                                    <option value="Concluída">Concluída</option>
-                                    <option value="Cancelada">Cancelada</option>
+                                    <option value="">Todos</option><option value="Agendada">Agendada</option><option value="Concluída">Concluída</option><option value="Cancelada">Cancelada</option>
                                 </select>
                             </div>
                             <button class="btn btn-outline" onclick="clearAgendaFilter()"><i class="fas fa-times"></i> Limpar</button>
                         </div>
-
                         <div class="table-container">
                             <table>
                                 <thead>
                                     <tr>
                                         <th style="width:40px;"><input type="checkbox" id="selectAllSchedule" onclick="toggleSelectAllSchedule()" title="Selecionar todos" style="display:none;"></th>
-                                        <th>Data</th>
-                                        <th>Dia da Semana</th>
-                                        <th>Hora</th>
-                                        <th>Aluno</th>
-                                        <th>Academia</th>
-                                        <th>Status</th>
-                                        <th>Ações</th>
+                                        <th>Data</th><th>Dia da Semana</th><th>Hora</th><th>Aluno</th><th>Academia</th><th>Status</th><th>Ações</th>
                                     </tr>
                                 </thead>
                                 <tbody id="scheduleTableBody"></tbody>
@@ -575,32 +575,17 @@
                     </div>
                     <div id="agendaGradeContainer" class="hidden">
                         <div class="grade-filter">
-                            <div class="form-group">
-                                <label>Data inicial da semana</label>
-                                <input type="date" id="gradeWeekStart" value="">
-                            </div>
-                            <div class="form-group">
-                                <label>Hora inicial</label>
-                                <input type="time" id="gradeStartTime" value="06:00">
-                            </div>
-                            <div class="form-group">
-                                <label>Hora final</label>
-                                <input type="time" id="gradeEndTime" value="22:00">
-                            </div>
-                            <div class="form-group">
-                                <label>Duração (min)</label>
-                                <input type="number" id="gradeDuration" value="60" min="15" step="15">
-                            </div>
+                            <div class="form-group"><label>Data inicial da semana</label><input type="date" id="gradeWeekStart" value=""></div>
+                            <div class="form-group"><label>Hora inicial</label><input type="time" id="gradeStartTime" value="06:00"></div>
+                            <div class="form-group"><label>Hora final</label><input type="time" id="gradeEndTime" value="22:00"></div>
+                            <div class="form-group"><label>Duração (min)</label><input type="number" id="gradeDuration" value="60" min="15" step="15"></div>
                             <button class="btn btn-primary" onclick="generateAvailabilityGrid()"><i class="fas fa-chart-bar"></i> Gerar Grade</button>
                         </div>
-                        <div id="availabilityGridContainer">
-                            <p style="color:var(--text-light);">Selecione os parâmetros e clique em "Gerar Grade".</p>
-                        </div>
+                        <div id="availabilityGridContainer"><p style="color:var(--text-light);">Selecione os parâmetros e clique em "Gerar Grade".</p></div>
                     </div>
                 </div>
             </section>
 
-            <!-- Treinos -->
             <section id="section-treinos" class="section">
                 <div class="card">
                     <div class="card-header"><h3><i class="fas fa-dumbbell"></i> Treinos Semanais</h3><button class="btn btn-primary" id="btnAddWorkout" onclick="openWorkoutForm()"><i class="fas fa-plus"></i> Novo Treino</button></div>
@@ -615,7 +600,6 @@
                 </div>
             </section>
 
-            <!-- Álbum -->
             <section id="section-album" class="section">
                 <div class="card">
                     <div class="card-header"><h3><i class="fas fa-images"></i> Álbum de Fotos</h3><button class="btn btn-primary" id="btnAddAlbum" onclick="openAlbumForm()"><i class="fas fa-plus"></i> Nova Foto</button></div>
@@ -623,36 +607,23 @@
                 </div>
             </section>
 
-            <!-- Fluxo de Caixa -->
             <section id="section-fluxocaixa" class="section">
                 <div class="card">
                     <div class="card-header">
                         <h3><i class="fas fa-money-bill-wave"></i> Fluxo de Caixa</h3>
                         <button class="btn btn-primary" id="btnAddCashflow" onclick="openCashflowForm()"><i class="fas fa-plus"></i> Novo Lançamento</button>
                     </div>
-
                     <div class="cashflow-summary" id="cashflowSummary">
-                        <div class="cashflow-summary-card entrada">
-                            <div class="label"><i class="fas fa-arrow-down"></i> Entradas</div>
-                            <div class="value" id="cashflowTotalEntrada">R$ 0,00</div>
-                        </div>
-                        <div class="cashflow-summary-card saida">
-                            <div class="label"><i class="fas fa-arrow-up"></i> Saídas</div>
-                            <div class="value" id="cashflowTotalSaida">R$ 0,00</div>
-                        </div>
-                        <div class="cashflow-summary-card saldo">
-                            <div class="label"><i class="fas fa-wallet"></i> Saldo</div>
-                            <div class="value" id="cashflowSaldo">R$ 0,00</div>
-                        </div>
+                        <div class="cashflow-summary-card entrada"><div class="label"><i class="fas fa-arrow-down"></i> Entradas</div><div class="value" id="cashflowTotalEntrada">R$ 0,00</div></div>
+                        <div class="cashflow-summary-card saida"><div class="label"><i class="fas fa-arrow-up"></i> Saídas</div><div class="value" id="cashflowTotalSaida">R$ 0,00</div></div>
+                        <div class="cashflow-summary-card saldo"><div class="label"><i class="fas fa-wallet"></i> Saldo</div><div class="value" id="cashflowSaldo">R$ 0,00</div></div>
                     </div>
-
                     <div class="cashflow-filter-buttons" id="cashflowFilterButtons">
                         <button class="btn btn-sm btn-outline active" data-filter="todos" onclick="setCashflowFilter('todos')"><i class="fas fa-list"></i> Todos</button>
                         <button class="btn btn-sm btn-outline" data-filter="hoje" onclick="setCashflowFilter('hoje')"><i class="fas fa-calendar-day"></i> Hoje</button>
                         <button class="btn btn-sm btn-outline" data-filter="semana" onclick="setCashflowFilter('semana')"><i class="fas fa-calendar-week"></i> Esta Semana</button>
                         <button class="btn btn-sm btn-outline" data-filter="mes" onclick="setCashflowFilter('mes')"><i class="fas fa-calendar"></i> Este Mês</button>
                     </div>
-
                     <div class="table-container">
                         <table>
                             <thead><tr><th>Data</th><th>Descrição</th><th>Entrada</th><th>Saída</th><th>Forma de Pagamento</th><th>Ações</th></tr></thead>
@@ -668,96 +639,45 @@
                             <button class="btn btn-primary" id="btnAddConta" onclick="openContaForm()"><i class="fas fa-plus"></i> Nova Conta</button>
                         </div>
                     </div>
-
                     <div class="filter-container">
-                        <div class="form-group">
-                            <label><i class="fas fa-search"></i> Buscar por texto</label>
-                            <input type="text" id="contasFilterText" placeholder="Digite parte do texto..." oninput="renderContasFuturas()">
-                        </div>
-                        <div class="form-group">
-                            <label><i class="fas fa-calendar"></i> Data de Vencimento</label>
-                            <input type="date" id="contasFilterDate" onchange="renderContasFuturas()">
-                        </div>
-                        <div class="form-group">
-                            <label><i class="fas fa-filter"></i> Status</label>
+                        <div class="form-group"><label><i class="fas fa-search"></i> Buscar por texto</label><input type="text" id="contasFilterText" placeholder="Digite parte do texto..." oninput="renderContasFuturas()"></div>
+                        <div class="form-group"><label><i class="fas fa-calendar"></i> Data de Vencimento</label><input type="date" id="contasFilterDate" onchange="renderContasFuturas()"></div>
+                        <div class="form-group"><label><i class="fas fa-filter"></i> Status</label>
                             <select id="contasFilterStatus" onchange="renderContasFuturas()">
-                                <option value="">Todos</option>
-                                <option value="Pendente">Pendente</option>
-                                <option value="Pago">Pago</option>
-                                <option value="Recebido">Recebido</option>
-                                <option value="Vencido">Vencido</option>
+                                <option value="">Todos</option><option value="Pendente">Pendente</option><option value="Pago">Pago</option><option value="Recebido">Recebido</option><option value="Vencido">Vencido</option>
                             </select>
                         </div>
                         <button class="btn btn-outline" onclick="clearContasFilter()"><i class="fas fa-times"></i> Limpar Filtro</button>
                     </div>
-
                     <div class="table-container">
                         <table>
-                            <thead>
-                                <tr>
-                                    <th>Descrição</th>
-                                    <th>Tipo</th>
-                                    <th>Valor</th>
-                                    <th>Vencimento</th>
-                                    <th>Status</th>
-                                    <th>Ações</th>
-                                </tr>
-                            </thead>
+                            <thead><tr><th>Descrição</th><th>Tipo</th><th>Valor</th><th>Vencimento</th><th>Status</th><th>Ações</th></tr></thead>
                             <tbody id="contasFuturasTableBody"></tbody>
                         </table>
                     </div>
                 </div>
             </section>
 
-            <!-- Filtro -->
             <section id="section-filtro" class="section">
                 <div class="card">
                     <div class="card-header"><h3><i class="fas fa-search"></i> Filtro Avançado</h3></div>
                     <div class="form-group" style="display:grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px;">
-                        <div>
-                            <label>Filtrar em (Módulo)</label>
+                        <div><label>Filtrar em (Módulo)</label>
                             <select id="filtroModulo">
                                 <option value="todos">Todos os módulos</option>
-                                <option value="alunos">Alunos</option>
-                                <option value="academias">Academias</option>
-                                <option value="agenda">Agenda</option>
-                                <option value="fluxocaixa">Fluxo de Caixa</option>
-                                <option value="album">Álbum</option>
-                                <option value="treinos">Treinos</option>
+                                <option value="alunos">Alunos</option><option value="academias">Academias</option>
+                                <option value="agenda">Agenda</option><option value="fluxocaixa">Fluxo de Caixa</option>
+                                <option value="album">Álbum</option><option value="treinos">Treinos</option>
                             </select>
                         </div>
-                        <div>
-                            <label>Data Inicial</label>
-                            <input type="date" id="filtroDataInicio">
-                        </div>
-                        <div>
-                            <label>Data Final</label>
-                            <input type="date" id="filtroDataFim">
-                        </div>
-                        <div>
-                            <label>CPF (Alunos e Aulas)</label>
-                            <input type="text" id="filtroCpf" placeholder="000.000.000-00">
-                        </div>
-                        <div>
-                            <label>Celular (Alunos e Aulas)</label>
-                            <input type="text" id="filtroCelular" placeholder="(00) 00000-0000">
-                        </div>
-                        <div>
-                            <label>Academia (Alunos, Aulas, Caixa)</label>
-                            <select id="filtroAcademia"></select>
-                        </div>
-                        <div>
-                            <label>Entrada mín (R$) - Caixa</label>
-                            <input type="number" id="filtroEntradaMin" step="0.01" min="0" placeholder="0.00">
-                        </div>
-                        <div>
-                            <label>Saída mín (R$) - Caixa</label>
-                            <input type="number" id="filtroSaidaMin" step="0.01" min="0" placeholder="0.00">
-                        </div>
-                        <div>
-                            <label>Descrição (contém) - Caixa</label>
-                            <input type="text" id="filtroDescricao" placeholder="Parte da descrição">
-                        </div>
+                        <div><label>Data Inicial</label><input type="date" id="filtroDataInicio"></div>
+                        <div><label>Data Final</label><input type="date" id="filtroDataFim"></div>
+                        <div><label>CPF (Alunos e Aulas)</label><input type="text" id="filtroCpf" placeholder="000.000.000-00"></div>
+                        <div><label>Celular (Alunos e Aulas)</label><input type="text" id="filtroCelular" placeholder="(00) 00000-0000"></div>
+                        <div><label>Academia (Alunos, Aulas, Caixa)</label><select id="filtroAcademia"></select></div>
+                        <div><label>Entrada mín (R$) - Caixa</label><input type="number" id="filtroEntradaMin" step="0.01" min="0" placeholder="0.00"></div>
+                        <div><label>Saída mín (R$) - Caixa</label><input type="number" id="filtroSaidaMin" step="0.01" min="0" placeholder="0.00"></div>
+                        <div><label>Descrição (contém) - Caixa</label><input type="text" id="filtroDescricao" placeholder="Parte da descrição"></div>
                     </div>
                     <button class="btn btn-primary" onclick="aplicarFiltro()"><i class="fas fa-search"></i> Pesquisar</button>
                     <hr style="margin: 15px 0; border-color: var(--border);">
@@ -770,36 +690,23 @@
                 </div>
             </section>
 
-            <!-- Usuários -->
             <section id="section-usuarios" class="section">
                 <div class="card">
                     <div class="card-header"><h3><i class="fas fa-user-cog"></i> Usuários e Permissões</h3><button class="btn btn-primary" id="btnAddUser" onclick="openUserForm()"><i class="fas fa-plus"></i> Novo Usuário</button></div>
-
                     <div class="filter-container">
-                        <div class="form-group">
-                            <label><i class="fas fa-search"></i> Buscar por texto</label>
-                            <input type="text" id="usersFilterText" placeholder="Usuário, nome..." oninput="renderUsers()">
-                        </div>
-                        <div class="form-group">
-                            <label><i class="fas fa-user-tag"></i> Perfil</label>
+                        <div class="form-group"><label><i class="fas fa-search"></i> Buscar por texto</label><input type="text" id="usersFilterText" placeholder="Usuário, nome..." oninput="renderUsers()"></div>
+                        <div class="form-group"><label><i class="fas fa-user-tag"></i> Perfil</label>
                             <select id="usersFilterRole" onchange="renderUsers()">
-                                <option value="">Todos</option>
-                                <option value="admin">Administrador</option>
-                                <option value="padrao">Padrão</option>
-                                <option value="aluno">Aluno</option>
+                                <option value="">Todos</option><option value="admin">Administrador</option><option value="padrao">Padrão</option><option value="aluno">Aluno</option>
                             </select>
                         </div>
-                        <div class="form-group">
-                            <label><i class="fas fa-toggle-on"></i> Status</label>
+                        <div class="form-group"><label><i class="fas fa-toggle-on"></i> Status</label>
                             <select id="usersFilterActive" onchange="renderUsers()">
-                                <option value="">Todos</option>
-                                <option value="ativo">Ativos</option>
-                                <option value="inativo">Inativos</option>
+                                <option value="">Todos</option><option value="ativo">Ativos</option><option value="inativo">Inativos</option>
                             </select>
                         </div>
                         <button class="btn btn-outline" onclick="clearUsersFilter()"><i class="fas fa-times"></i> Limpar</button>
                     </div>
-
                     <div class="table-container">
                         <table>
                             <thead><tr><th>Foto</th><th>Usuário</th><th>Nome</th><th>Perfil</th><th>Ativo</th><th>Ações</th></tr></thead>
@@ -809,73 +716,42 @@
                 </div>
             </section>
 
-            <!-- Auditoria -->
             <section id="section-auditoria" class="section">
                 <div class="card">
                     <div class="card-header">
                         <h3><i class="fas fa-history"></i> Auditoria de Usuários</h3>
                         <button class="btn btn-danger" id="btnClearAuditLogs" onclick="clearAuditLogs()" style="display:none;"><i class="fas fa-trash"></i> Limpar Logs</button>
                     </div>
-
                     <div class="filter-container">
-                        <div class="form-group">
-                            <label><i class="fas fa-search"></i> Buscar por texto</label>
-                            <input type="text" id="auditFilterText" placeholder="Usuário, ação, módulo, detalhes..." oninput="renderAuditoria()">
-                        </div>
-                        <div class="form-group">
-                            <label><i class="fas fa-calendar"></i> Data Inicial</label>
-                            <input type="date" id="auditFilterDateStart" onchange="renderAuditoria()">
-                        </div>
-                        <div class="form-group">
-                            <label><i class="fas fa-calendar"></i> Data Final</label>
-                            <input type="date" id="auditFilterDateEnd" onchange="renderAuditoria()">
-                        </div>
-                        <div class="form-group">
-                            <label><i class="fas fa-cubes"></i> Módulo</label>
+                        <div class="form-group"><label><i class="fas fa-search"></i> Buscar por texto</label><input type="text" id="auditFilterText" placeholder="Usuário, ação, módulo, detalhes..." oninput="renderAuditoria()"></div>
+                        <div class="form-group"><label><i class="fas fa-calendar"></i> Data Inicial</label><input type="date" id="auditFilterDateStart" onchange="renderAuditoria()"></div>
+                        <div class="form-group"><label><i class="fas fa-calendar"></i> Data Final</label><input type="date" id="auditFilterDateEnd" onchange="renderAuditoria()"></div>
+                        <div class="form-group"><label><i class="fas fa-cubes"></i> Módulo</label>
                             <select id="auditFilterModule" onchange="renderAuditoria()">
-                                <option value="">Todos</option>
-                                <option value="dashboard">Dashboard</option>
-                                <option value="alunos">Alunos</option>
-                                <option value="academias">Academias</option>
-                                <option value="agenda">Agenda</option>
-                                <option value="treinos">Treinos</option>
-                                <option value="album">Álbum</option>
-                                <option value="fluxocaixa">Fluxo de Caixa</option>
-                                <option value="filtro">Filtro</option>
-                                <option value="usuarios">Usuários</option>
-                                <option value="auditoria">Auditoria</option>
-                                <option value="aluno">Área do Aluno</option>
+                                <option value="">Todos</option><option value="dashboard">Dashboard</option><option value="alunos">Alunos</option>
+                                <option value="academias">Academias</option><option value="agenda">Agenda</option><option value="treinos">Treinos</option>
+                                <option value="album">Álbum</option><option value="fluxocaixa">Fluxo de Caixa</option><option value="filtro">Filtro</option>
+                                <option value="usuarios">Usuários</option><option value="auditoria">Auditoria</option><option value="aluno">Área do Aluno</option>
                             </select>
                         </div>
                         <button class="btn btn-outline" onclick="clearAuditFilter()"><i class="fas fa-times"></i> Limpar</button>
                     </div>
-
                     <div class="table-container">
                         <table class="audit-log-table">
-                            <thead>
-                                <tr>
-                                    <th>Data/Hora</th>
-                                    <th>Usuário</th>
-                                    <th>Ação</th>
-                                    <th>Módulo</th>
-                                    <th>Detalhes</th>
-                                </tr>
-                            </thead>
+                            <thead><tr><th>Data/Hora</th><th>Usuário</th><th>Ação</th><th>Módulo</th><th>Detalhes</th></tr></thead>
                             <tbody id="auditLogsTableBody"></tbody>
                         </table>
                     </div>
                 </div>
             </section>
 
-            <!-- Área do Aluno -->
             <section id="section-aluno" class="section">
                 <div class="student-area" id="studentArea"></div>
             </section>
         </div>
     </div>
 
-    <!-- Modais (iguais ao original) -->
-    <!-- Modal de Aluno -->
+    <!-- Modais -->
     <div class="modal" id="studentModal">
         <div class="modal-content">
             <div class="modal-header"><h3>Cadastro de Aluno</h3><button class="modal-close" onclick="closeModal('studentModal')">&times;</button></div>
@@ -897,7 +773,6 @@
                     <div class="form-group"><label>Valor por Aula (R$)</label><input type="text" id="studentValorAula" placeholder="R$ 0,00"></div>
                     <div class="form-group"><label>Mensalidade Fixa (R$)</label><input type="text" id="studentMensalidadeFixa" placeholder="R$ 0,00"></div>
                     <div class="form-group"><label>Observações</label><textarea id="studentObservacoes" rows="3" placeholder="Anotações importantes..."></textarea></div>
-
                     <div class="evolution-section">
                         <h4 style="margin-bottom: 10px; font-size: 15px; font-weight: 600;">📸 Fotos do Aluno (Evolução)</h4>
                         <button type="button" class="btn btn-outline btn-sm" onclick="document.getElementById('evolutionFotoInput').click()"><i class="fas fa-plus"></i> Adicionar Foto</button>
@@ -911,7 +786,6 @@
         </div>
     </div>
 
-    <!-- Modal de Academia -->
     <div class="modal" id="academyModal">
         <div class="modal-content">
             <div class="modal-header"><h3>Cadastro de Academia</h3><button class="modal-close" onclick="closeModal('academyModal')">&times;</button></div>
@@ -927,7 +801,6 @@
         </div>
     </div>
 
-    <!-- Modal de Agenda -->
     <div class="modal" id="scheduleModal">
         <div class="modal-content">
             <div class="modal-header"><h3>Agendamento de Aula</h3><button class="modal-close" onclick="closeModal('scheduleModal')">&times;</button></div>
@@ -944,7 +817,6 @@
         </div>
     </div>
 
-    <!-- Modal de Agendamento Recorrente -->
     <div class="modal" id="recurringScheduleModal">
         <div class="modal-content">
             <div class="modal-header"><h3>Agendar Aulas Recorrentes</h3><button class="modal-close" onclick="closeModal('recurringScheduleModal')">&times;</button></div>
@@ -974,7 +846,6 @@
         </div>
     </div>
 
-    <!-- Modal de Fluxo de Caixa -->
     <div class="modal" id="cashflowModal">
         <div class="modal-content">
             <div class="modal-header"><h3>Lançamento no Fluxo de Caixa</h3><button class="modal-close" onclick="closeModal('cashflowModal')">&times;</button></div>
@@ -991,7 +862,6 @@
         </div>
     </div>
 
-    <!-- Modal de Conta a Pagar/Receber -->
     <div class="modal" id="contaModal">
         <div class="modal-content">
             <div class="modal-header"><h3>Conta a Pagar/Receber</h3><button class="modal-close" onclick="closeModal('contaModal')">&times;</button></div>
@@ -1008,7 +878,6 @@
         </div>
     </div>
 
-    <!-- Modal de Usuário -->
     <div class="modal" id="userModal">
         <div class="modal-content">
             <div class="modal-header"><h3>Cadastro de Usuário</h3><button class="modal-close" onclick="closeModal('userModal')">&times;</button></div>
@@ -1030,7 +899,6 @@
         </div>
     </div>
 
-    <!-- Modal de Álbum -->
     <div class="modal" id="albumModal">
         <div class="modal-content">
             <div class="modal-header"><h3>Foto do Álbum</h3><button class="modal-close" onclick="closeModal('albumModal')">&times;</button></div>
@@ -1049,7 +917,6 @@
         </div>
     </div>
 
-    <!-- Modal de Treino -->
     <div class="modal" id="workoutModal">
         <div class="modal-content">
             <div class="modal-header"><h3>Cadastro de Treino</h3><button class="modal-close" onclick="closeModal('workoutModal')">&times;</button></div>
@@ -1079,7 +946,6 @@
         </div>
     </div>
 
-    <!-- Modal da Câmera -->
     <div class="modal" id="cameraModal">
         <div class="modal-content">
             <div class="modal-header"><h3>Tirar Selfie</h3><button class="modal-close" onclick="closeCamera()">&times;</button></div>
@@ -1107,54 +973,88 @@
 
     <!-- ==================== PWA: Install + Service Worker ==================== -->
     <script>
-        // ---------- Install Prompt ----------
         var deferredPrompt = null;
 
+        // Detecta se já está instalado (standalone)
+        function isAppInstalled() {
+            try {
+                if (window.matchMedia('(display-mode: standalone)').matches) return true;
+                if (window.matchMedia('(display-mode: fullscreen)').matches) return true;
+                if (window.matchMedia('(display-mode: minimal-ui)').matches) return true;
+                if (window.navigator.standalone === true) return true;
+            } catch (e) {}
+            return false;
+        }
+
+        // Mostra/oculta os botões de instalação nas telas de login
+        function updateInstallButtons() {
+            var secP = document.getElementById('installSectionPersonal');
+            var secS = document.getElementById('installSectionStudent');
+            if (isAppInstalled()) {
+                if (secP) secP.style.display = 'none';
+                if (secS) secS.style.display = 'none';
+            } else {
+                // Mostra sempre nas telas de login (mesmo sem beforeinstallprompt)
+                if (secP) secP.style.display = 'block';
+                if (secS) secS.style.display = 'block';
+            }
+        }
+
+        // beforeinstallprompt
         window.addEventListener('beforeinstallprompt', function (e) {
             e.preventDefault();
             deferredPrompt = e;
-            var btn = document.getElementById('installAppBtn');
-            if (btn) btn.style.display = 'inline-flex';
+            updateInstallButtons();
         });
 
-        function installApp() {
-            var btn = document.getElementById('installAppBtn');
-            var isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
-            if (isStandalone) {
-                try { toast('O app já está instalado!', 'success'); } catch (e) { alert('O app já está instalado!'); }
-                return;
-            }
-            if (!deferredPrompt) {
-                var msg = 'Para instalar: abra o menu do navegador e escolha "Instalar aplicativo" ou "Adicionar à tela inicial".';
-                try { toast(msg, 'warning'); } catch (e) { alert(msg); }
-                return;
-            }
-            deferredPrompt.prompt();
-            deferredPrompt.userChoice.then(function (choiceResult) {
-                if (choiceResult.outcome === 'accepted') {
-                    try { toast('App instalado com sucesso!'); } catch (e) {}
-                    if (btn) btn.style.display = 'none';
-                }
-                deferredPrompt = null;
-            }).catch(function () { deferredPrompt = null; });
-        }
-
+        // appinstalled → esconde botões
         window.addEventListener('appinstalled', function () {
             deferredPrompt = null;
-            var btn = document.getElementById('installAppBtn');
-            if (btn) btn.style.display = 'none';
-            try { toast('App instalado com sucesso!'); } catch (e) {}
+            if (document.getElementById('installSectionPersonal')) document.getElementById('installSectionPersonal').style.display = 'none';
+            if (document.getElementById('installSectionStudent')) document.getElementById('installSectionStudent').style.display = 'none';
+            try { toast('App instalado com sucesso! 🎉'); } catch (e) {}
         });
 
-        // Esconde o botão se já estiver em modo standalone
-        (function () {
-            try {
-                if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true) {
-                    var btn = document.getElementById('installAppBtn');
-                    if (btn) btn.style.display = 'none';
-                }
-            } catch (e) {}
-        })();
+        // Verifica mudança de display-mode
+        try {
+            window.matchMedia('(display-mode: standalone)').addEventListener('change', function () {
+                updateInstallButtons();
+            });
+        } catch (e) {}
+
+        // Função de instalar
+        function installApp() {
+            if (isAppInstalled()) {
+                try { toast('O app já está instalado!', 'success'); } catch (e) { alert('O app já está instalado!'); }
+                updateInstallButtons();
+                return;
+            }
+
+            var isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+            var isAndroid = /Android/i.test(navigator.userAgent);
+
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                deferredPrompt.userChoice.then(function (choiceResult) {
+                    if (choiceResult.outcome === 'accepted') {
+                        try { toast('Instalando o app...'); } catch (e) {}
+                    }
+                    deferredPrompt = null;
+                }).catch(function () { deferredPrompt = null; });
+                return;
+            }
+
+            // Fallback: instruções manuais
+            var msg = '';
+            if (isIOS) {
+                msg = 'Para instalar no iPhone:\n\n1) Toque no ícone "Compartilhar" (□↑)\n2) Escolha "Adicionar à Tela de Início"\n3) Confirme';
+            } else if (isAndroid) {
+                msg = 'Para instalar no Android:\n\n1) Toque no menu (⋮) do navegador\n2) Escolha "Instalar aplicativo" ou "Adicionar à tela inicial"\n3) Confirme';
+            } else {
+                msg = 'Para instalar:\n\nClique no ícone de instalação na barra de endereço do navegador OU abra o menu (⋮) e escolha "Instalar aplicativo".';
+            }
+            alert(msg);
+        }
 
         // ---------- Service Worker ----------
         if ('serviceWorker' in navigator) {
@@ -1168,12 +1068,10 @@
                         "e.respondWith(fetch(e.request).catch(function(){return caches.match(e.request);}));" +
                     "});";
 
-                // 1) Tenta registrar sw.js externo (melhor compatibilidade)
                 navigator.serviceWorker.register('./sw.js', { scope: './' })
                     .then(function (reg) { console.log('SW registrado (externo):', reg.scope); })
                     .catch(function (err) {
                         console.warn('SW externo não encontrado. Tentando inline...', err && err.message);
-                        // 2) Fallback: tenta registrar via Blob (funciona em alguns browsers)
                         try {
                             var blob = new Blob([swCode], { type: 'application/javascript' });
                             var url = URL.createObjectURL(blob);
@@ -1188,6 +1086,16 @@
                     });
             });
         }
+
+        // Inicializa botões assim que o DOM carregar
+        document.addEventListener('DOMContentLoaded', function () {
+            updateInstallButtons();
+            // Re-verifica em 1, 3 e 8 segundos (caso o navegador demore a disparar o evento)
+            setTimeout(updateInstallButtons, 1000);
+            setTimeout(updateInstallButtons, 3000);
+            setTimeout(updateInstallButtons, 8000);
+        });
+        window.addEventListener('load', updateInstallButtons);
     </script>
 
     <script>
@@ -1206,7 +1114,6 @@
         const STATE_COLLECTION = 'appState';
         const STATE_DOC = 'main';
 
-        // ==================== DADOS E CONFIG ====================
         const MODULES = [
             { key: 'dashboard', label: 'Dashboard', icon: 'fa-chart-line', actions: ['ver'] },
             { key: 'alunos', label: 'Alunos', icon: 'fa-users', actions: ['ver', 'criar', 'editar', 'excluir'] },
@@ -1238,7 +1145,6 @@
         let cameraStream = null;
         let cameraTarget = null;
 
-        // ==================== UTILITÁRIOS ====================
         function genId() { return Date.now().toString(36) + Math.random().toString(36).substr(2, 5); }
         function esc(str) { return String(str ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;'); }
         function val(id) { return document.getElementById(id).value.trim(); }
@@ -1249,9 +1155,7 @@
             if (value.includes(',')) { value = value.replace(/\./g, '').replace(',', '.'); }
             return parseFloat(value) || 0;
         }
-        function formatCurrency(v) {
-            return 'R$ ' + Number(v || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-        }
+        function formatCurrency(v) { return 'R$ ' + Number(v || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
         function formatDate(dateStr) { if (!dateStr) return ''; const [y, m, d] = dateStr.split('-'); return `${d}/${m}/${y}`; }
         function formatDateTime(isoStr) {
             if (!isoStr) return '-';
@@ -1382,7 +1286,6 @@
             }
         }
 
-        // ==================== PERMISSÕES ====================
         function can(moduleKey, action = 'ver') {
             if (!currentUser) return false;
             if (currentUser.role === 'admin') return true;
@@ -1421,7 +1324,6 @@
             return perms;
         }
 
-        // ==================== FULLSCREEN ====================
         function enterFullscreen() {
             const elem = document.documentElement;
             if (elem.requestFullscreen) elem.requestFullscreen().catch(() => {});
@@ -1436,7 +1338,6 @@
             document.getElementById('exitFullscreenBtn').style.display = 'none';
         }
 
-        // ==================== CÂMERA ====================
         async function openCamera(target) {
             cameraTarget = target;
             const modal = document.getElementById('cameraModal');
@@ -1472,16 +1373,17 @@
         function openCameraForStudent() { openCamera('student'); }
         function openCameraForUser() { openCamera('user'); }
 
-        // ==================== LOGIN/LOGOUT ====================
         function showStudentLogin() {
             document.getElementById('loginPersonalBox').classList.add('hidden');
             document.getElementById('loginStudentBox').classList.remove('hidden');
             document.getElementById('studentLoginError').classList.add('hidden');
+            if (typeof updateInstallButtons === 'function') updateInstallButtons();
         }
         function showPersonalLogin() {
             document.getElementById('loginStudentBox').classList.add('hidden');
             document.getElementById('loginPersonalBox').classList.remove('hidden');
             document.getElementById('loginError').classList.add('hidden');
+            if (typeof updateInstallButtons === 'function') updateInstallButtons();
         }
         function showUserPhotoPreview() {
             const username = val('loginUsername');
@@ -1563,6 +1465,7 @@
                 document.getElementById('sidebar').classList.remove('open');
                 closeLightbox();
                 exitFullscreen();
+                if (typeof updateInstallButtons === 'function') updateInstallButtons();
             } else {
                 if (currentUser) { logAction('Logout', `Usuário ${currentUser.username} saiu`, 'dashboard'); saveState(); }
                 currentUser = null;
@@ -1574,10 +1477,10 @@
                 document.getElementById('sidebar').classList.remove('open');
                 closeLightbox();
                 exitFullscreen();
+                if (typeof updateInstallButtons === 'function') updateInstallButtons();
             }
         }
 
-        // ==================== NAVEGAÇÃO ====================
         function toggleSidebar() { if (!currentStudent) document.getElementById('sidebar').classList.toggle('open'); }
         function renderNav() {
             const nav = document.getElementById('sidebarNav');
@@ -1646,16 +1549,13 @@
             if (section === 'auditoria') renderAuditoria();
         }
 
-        // ==================== MODAL CONTROLS ====================
         function openModal(id) { const m = document.getElementById(id); if (m) m.classList.add('show'); }
         function closeModal(id) { const m = document.getElementById(id); if (m) m.classList.remove('show'); }
 
-        // ==================== VALIDAÇÃO DE CONFLITO ====================
         function checkScheduleConflict(alunoId, data, hora, excludeId = null) {
             return state.schedule.some(a => a.alunoId === alunoId && a.data === data && a.hora === hora && a.status !== 'Cancelada' && a.id !== excludeId);
         }
 
-        // ==================== DASHBOARD ====================
         function renderDashboard() {
             const totalAlunos = state.students.length;
             const totalAcademias = state.academias.length;
@@ -1703,7 +1603,6 @@
             document.getElementById('dashboardScheduleTable').innerHTML = html || '<tr><td colspan="5">Nenhuma aula futura.</td></tr>';
         }
 
-        // ==================== ALUNOS ====================
         function fillAcademiaSelect(selectId, selectedId) {
             const select = document.getElementById(selectId);
             if (!select) return;
@@ -1931,7 +1830,6 @@
             tbody.innerHTML = html || '<tr><td colspan="8">Nenhum aluno encontrado.</td></tr>';
         }
 
-        // ==================== ACADEMIAS ====================
         function openAcademyForm(id) {
             if (id) { if (!can('academias', 'editar')) { toast('Sem permissão para editar.', 'error'); return; } }
             else { if (!can('academias', 'criar')) { toast('Sem permissão para criar.', 'error'); return; } }
@@ -1988,7 +1886,6 @@
             tbody.innerHTML = html || '<tr><td colspan="5">Nenhuma academia cadastrada.</td></tr>';
         }
 
-        // ==================== AGENDA ====================
         function openScheduleForm(id) {
             if (id) { if (!can('agenda', 'editar')) { toast('Sem permissão para editar.', 'error'); return; } }
             else { if (!can('agenda', 'criar')) { toast('Sem permissão para criar.', 'error'); return; } }
@@ -2113,7 +2010,6 @@
             tbody.innerHTML = html || `<tr><td colspan="8">Nenhuma aula encontrada.</td></tr>`;
         }
 
-        // ==================== AGENDA RECORRENTE ====================
         function openRecurringScheduleForm() {
             if (!can('agenda', 'criar')) { toast('Sem permissão para criar.', 'error'); return; }
             document.getElementById('recurringScheduleForm').reset();
@@ -2161,7 +2057,6 @@
             toast(`Geradas ${newEntries.length} aulas recorrentes!`);
         }
 
-        // ==================== TREINOS ====================
         function fillWorkoutAcademiaSelect(selectedId) { fillAcademiaSelect('workoutAcademia', selectedId); }
         function fillWorkoutAlunoSelect(selectedId) {
             const select = document.getElementById('workoutAluno');
@@ -2268,7 +2163,6 @@
             weekly.innerHTML = weekHtml;
         }
 
-        // ==================== ÁREA DO ALUNO ====================
         function renderAlunoArea() {
             const area = document.getElementById('studentArea');
             if (!currentStudent) return;
@@ -2328,7 +2222,6 @@
             area.innerHTML = html;
         }
 
-        // ==================== ÁLBUM ====================
         function handleAlbumPhoto(event) {
             const file = event.target.files[0];
             if (!file) return;
@@ -2409,7 +2302,6 @@
         function openLightbox(src) { document.getElementById('lightboxImage').src = src; document.getElementById('lightbox').classList.remove('hidden'); }
         function closeLightbox() { document.getElementById('lightbox').classList.add('hidden'); document.getElementById('lightboxImage').src = ''; }
 
-        // ==================== FLUXO DE CAIXA ====================
         function setCashflowFilter(filter) {
             cashflowFilter = filter;
             document.querySelectorAll('#cashflowFilterButtons .btn').forEach(btn => {
@@ -2506,7 +2398,6 @@
             updateCashflowSummary();
         }
 
-        // ==================== CONTAS A PAGAR E RECEBER ====================
         function clearContasFilter() {
             document.getElementById('contasFilterText').value = '';
             document.getElementById('contasFilterDate').value = '';
@@ -2675,7 +2566,6 @@
             }
         }
 
-        // ==================== FILTRO ====================
         function fillFiltroAcademia() {
             const select = document.getElementById('filtroAcademia');
             let html = '<option value="">Todas</option>';
@@ -2767,7 +2657,6 @@
             tbody.innerHTML = html;
         }
 
-        // ==================== USUÁRIOS ====================
         function openUserForm(id) {
             if (id) { if (!can('usuarios', 'editar')) { toast('Sem permissão para editar.', 'error'); return; } }
             else { if (!can('usuarios', 'criar')) { toast('Sem permissão para criar.', 'error'); return; } }
@@ -2865,7 +2754,6 @@
             tbody.innerHTML = html || '<tr><td colspan="6">Nenhum usuário encontrado.</td></tr>';
         }
 
-        // ==================== AUDITORIA ====================
         function renderAuditoria() {
             const tbody = document.getElementById('auditLogsTableBody');
             if (!tbody) return;
@@ -2894,7 +2782,6 @@
             toast('Logs de auditoria limpos.', 'warning');
         }
 
-        // ==================== AGENDA GRADE ====================
         function setAgendaView(view) {
             const listContainer = document.getElementById('agendaListContainer');
             const gradeContainer = document.getElementById('agendaGradeContainer');
@@ -2970,7 +2857,6 @@
             document.getElementById('availabilityGridContainer').innerHTML = html;
         }
 
-        // ==================== INICIALIZAÇÃO ====================
         async function initApp() {
             await loadState();
             renderNav();
