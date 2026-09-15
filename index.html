@@ -4,13 +4,62 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Mestre Paulo - Personal Trainer Pro</title>
+
+    <!-- ==================== PWA ==================== -->
+    <meta name="description" content="Sistema de Gestão para Personal Trainer Mestre Paulo">
+    <meta name="theme-color" content="#d4af37">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Mestre Paulo">
+    <meta name="application-name" content="Mestre Paulo">
+    <link rel="icon" type="image/png" href="icone.png">
+    <link rel="apple-touch-icon" href="icone.png">
+    <link rel="apple-touch-icon" sizes="152x152" href="icone.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="icone.png">
+    <link rel="apple-touch-icon" sizes="167x167" href="icone.png">
+    <link id="manifestLink" rel="manifest">
+
+    <script>
+    // Gera o manifest dinamicamente (Blob) — evita precisar de arquivo externo
+    (function () {
+        try {
+            var manifest = {
+                name: "Mestre Paulo - Personal Trainer Pro",
+                short_name: "Mestre Paulo",
+                description: "Sistema de Gestão para Personal Trainer",
+                start_url: "./",
+                scope: "./",
+                display: "standalone",
+                orientation: "portrait",
+                background_color: "#121212",
+                theme_color: "#d4af37",
+                lang: "pt-BR",
+                icons: [
+                    { src: "icone.png", sizes: "192x192", type: "image/png", purpose: "any" },
+                    { src: "icone.png", sizes: "512x512", type: "image/png", purpose: "any maskable" }
+                ]
+            };
+            var str = JSON.stringify(manifest);
+            var link = document.getElementById('manifestLink');
+            try {
+                var blob = new Blob([str], { type: 'application/manifest+json' });
+                link.href = URL.createObjectURL(blob);
+            } catch (e) {
+                link.href = 'data:application/manifest+json;charset=utf-8,' + encodeURIComponent(str);
+            }
+        } catch (e) { console.warn('Manifest setup:', e); }
+    })();
+    </script>
+    <!-- ============================================= -->
+
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    
+
     <!-- Firebase Compat Scripts -->
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore-compat.js"></script>
-    
+
     <style>
         :root {
             --bg-dark: #121212;
@@ -33,47 +82,28 @@
             --transition: all 0.3s ease;
         }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Poppins', sans-serif;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
 
-        body {
-            background-color: var(--bg-dark);
-            color: var(--text);
-            min-height: 100vh;
-        }
+        body { background-color: var(--bg-dark); color: var(--text); min-height: 100vh; }
 
         .hidden { display: none !important; }
 
         /* LOGIN */
         #loginScreen {
-            position: fixed;
-            inset: 0;
+            position: fixed; inset: 0;
             background: linear-gradient(135deg, rgba(10,10,10,0.75) 0%, rgba(0,0,0,0.85) 100%),
                         url('fundo-login.jpg') center center / cover no-repeat fixed;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 9999;
-            width: 100%;
-            height: 100vh;
-            overflow-y: auto;
+            display: flex; align-items: center; justify-content: center;
+            z-index: 9999; width: 100%; height: 100vh; overflow-y: auto;
         }
 
         .login-box {
             background: rgba(30, 30, 30, 0.92);
-            backdrop-filter: blur(6px);
-            -webkit-backdrop-filter: blur(6px);
-            padding: 40px 30px;
-            border-radius: 20px;
+            backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+            padding: 40px 30px; border-radius: 20px;
             box-shadow: 0 0 40px rgba(212,175,55,0.3);
-            width: 100%;
-            max-width: 400px;
-            border: 1px solid var(--accent);
-            position: relative;
+            width: 100%; max-width: 400px;
+            border: 1px solid var(--accent); position: relative;
         }
         .login-box h1 { font-size: 28px; text-align: center; color: var(--accent); margin-bottom: 5px; }
         .login-box p { text-align: center; color: var(--text-light); margin-bottom: 30px; font-size: 14px; }
@@ -109,107 +139,60 @@
         #app { display: flex; min-height: 100vh; width: 100%; }
 
         .sidebar {
-            width: var(--sidebar-width);
-            background: var(--bg-sidebar);
-            color: var(--text);
-            display: flex;
-            flex-direction: column;
-            position: fixed;
-            top: 0; left: 0; bottom: 0;
-            z-index: 100;
-            transition: transform 0.3s;
-            box-shadow: 2px 0 10px rgba(0,0,0,0.5);
+            width: var(--sidebar-width); background: var(--bg-sidebar); color: var(--text);
+            display: flex; flex-direction: column;
+            position: fixed; top: 0; left: 0; bottom: 0; z-index: 100;
+            transition: transform 0.3s; box-shadow: 2px 0 10px rgba(0,0,0,0.5);
         }
         .sidebar-brand {
-            padding: 20px;
-            font-size: 22px;
-            font-weight: 700;
-            color: var(--accent);
-            border-bottom: 1px solid var(--border);
-            display: flex;
-            align-items: center;
-            gap: 10px;
+            padding: 20px; font-size: 22px; font-weight: 700; color: var(--accent);
+            border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 10px;
         }
         .sidebar-brand i { color: var(--accent); }
         .sidebar-nav { flex: 1; padding: 15px 10px; overflow-y: auto; }
         .nav-item {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 12px 15px;
-            background: transparent;
-            border: none;
-            color: var(--text-light);
-            font-size: 14px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: var(--transition);
-            width: 100%;
-            text-align: left;
-            border-radius: 8px;
-            margin-bottom: 4px;
+            display: flex; align-items: center; gap: 12px; padding: 12px 15px;
+            background: transparent; border: none; color: var(--text-light);
+            font-size: 14px; font-weight: 500; cursor: pointer; transition: var(--transition);
+            width: 100%; text-align: left; border-radius: 8px; margin-bottom: 4px;
         }
         .nav-item i { font-size: 18px; width: 24px; text-align: center; color: var(--accent); }
         .nav-item:hover { background: rgba(212,175,55,0.1); color: var(--accent); }
         .nav-item.active { background: var(--accent); color: #000; font-weight: 600; }
         .nav-item.active i { color: #000; }
         .sidebar-footer {
-            padding: 15px 20px;
-            border-top: 1px solid var(--border);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 10px;
+            padding: 15px 20px; border-top: 1px solid var(--border);
+            display: flex; flex-direction: column; align-items: stretch; gap: 10px;
         }
-        .user-info { font-size: 13px; font-weight: 600; }
+        .user-info { font-size: 13px; font-weight: 600; text-align: center; }
         .user-info span { display: block; color: var(--text-light); font-weight: 400; font-size: 11px; }
 
         .main-content {
-            flex: 1;
-            margin-left: var(--sidebar-width);
-            display: flex;
-            flex-direction: column;
-            min-height: 100vh;
+            flex: 1; margin-left: var(--sidebar-width);
+            display: flex; flex-direction: column; min-height: 100vh;
             width: calc(100% - var(--sidebar-width));
         }
         .topbar {
-            background: var(--bg-card);
-            padding: 15px 20px;
+            background: var(--bg-card); padding: 15px 20px;
             border-bottom: 1px solid var(--border);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            position: sticky;
-            top: 0;
-            z-index: 50;
+            display: flex; align-items: center; justify-content: space-between;
+            position: sticky; top: 0; z-index: 50;
         }
         .topbar h2 { font-size: 22px; font-weight: 700; color: var(--accent); }
 
-        .section {
-            display: none;
-            padding: 20px;
-            animation: fadeIn 0.3s;
-            width: 100%;
-        }
+        .section { display: none; padding: 20px; animation: fadeIn 0.3s; width: 100%; }
         .section.active { display: block; }
 
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
         .card {
-            background: var(--bg-card);
-            border-radius: var(--radius);
-            box-shadow: var(--shadow);
-            padding: 20px;
-            margin-bottom: 20px;
+            background: var(--bg-card); border-radius: var(--radius);
+            box-shadow: var(--shadow); padding: 20px; margin-bottom: 20px;
             border: 1px solid var(--border);
         }
         .card-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 20px;
-            flex-wrap: wrap;
-            gap: 10px;
+            display: flex; align-items: center; justify-content: space-between;
+            margin-bottom: 20px; flex-wrap: wrap; gap: 10px;
         }
         .card-header h3 { font-size: 20px; font-weight: 700; color: var(--accent); }
 
@@ -235,58 +218,35 @@
 
         .dashboard-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; margin-bottom: 20px; }
         .stat-card {
-            background: var(--bg-card);
-            border-radius: var(--radius);
-            padding: 20px;
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            border: 1px solid var(--border);
-            transition: var(--transition);
+            background: var(--bg-card); border-radius: var(--radius);
+            padding: 20px; display: flex; align-items: center; gap: 15px;
+            border: 1px solid var(--border); transition: var(--transition);
         }
         .stat-card:hover { transform: translateY(-5px); box-shadow: var(--shadow-lg); border-color: var(--accent); }
         .stat-icon {
-            width: 50px; height: 50px;
-            border-radius: 10px;
-            background: var(--accent);
-            display: flex; align-items: center; justify-content: center;
+            width: 50px; height: 50px; border-radius: 10px;
+            background: var(--accent); display: flex; align-items: center; justify-content: center;
             font-size: 24px; color: #000;
         }
         .stat-info h4 { font-size: 24px; font-weight: 700; }
         .stat-info p { color: var(--text-light); font-size: 12px; }
 
         .modal {
-            display: none;
-            position: fixed;
-            inset: 0;
-            background: rgba(0,0,0,0.8);
-            z-index: 200;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-            width: 100%;
-            height: 100vh;
+            display: none; position: fixed; inset: 0;
+            background: rgba(0,0,0,0.8); z-index: 200;
+            align-items: center; justify-content: center; padding: 20px;
+            width: 100%; height: 100vh;
         }
         .modal.show { display: flex; }
         .modal-content {
-            background: var(--bg-card);
-            border-radius: var(--radius);
-            width: 100%;
-            max-width: 600px;
-            max-height: 90vh;
-            overflow-y: auto;
-            border: 1px solid var(--accent);
+            background: var(--bg-card); border-radius: var(--radius);
+            width: 100%; max-width: 600px; max-height: 90vh;
+            overflow-y: auto; border: 1px solid var(--accent);
         }
         .modal-header {
-            padding: 15px 20px;
-            border-bottom: 1px solid var(--border);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            position: sticky;
-            top: 0;
-            background: var(--bg-card);
-            z-index: 10;
+            padding: 15px 20px; border-bottom: 1px solid var(--border);
+            display: flex; align-items: center; justify-content: space-between;
+            position: sticky; top: 0; background: var(--bg-card); z-index: 10;
         }
         .modal-header h3 { font-size: 18px; font-weight: 700; color: var(--accent); }
         .modal-close { background: none; border: none; font-size: 24px; cursor: pointer; color: var(--text-light); }
@@ -305,11 +265,8 @@
 
         .album-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 16px; }
         .album-item {
-            background: var(--bg-card);
-            border-radius: var(--radius);
-            overflow: hidden;
-            border: 1px solid var(--border);
-            transition: var(--transition);
+            background: var(--bg-card); border-radius: var(--radius);
+            overflow: hidden; border: 1px solid var(--border); transition: var(--transition);
         }
         .album-item:hover { transform: translateY(-4px); box-shadow: var(--shadow-lg); border-color: var(--accent); }
         .album-item img { width: 100%; height: 180px; object-fit: cover; cursor: pointer; }
@@ -379,64 +336,31 @@
 
         .cashflow-filter-buttons { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 10px; }
 
-        /* Filtros para tabelas */
-        .filter-container {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            margin-bottom: 15px;
-            align-items: end;
-        }
-        .filter-container .form-group {
-            margin-bottom: 0;
-            flex: 1;
-            min-width: 150px;
-        }
-        .filter-container .btn {
-            margin-bottom: 0;
-        }
+        .filter-container { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 15px; align-items: end; }
+        .filter-container .form-group { margin-bottom: 0; flex: 1; min-width: 150px; }
+        .filter-container .btn { margin-bottom: 0; }
 
         #exitFullscreenBtn {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            z-index: 500;
-            background: var(--accent);
-            color: #000;
-            border: none;
-            border-radius: 50%;
-            width: 50px;
-            height: 50px;
-            font-size: 22px;
-            cursor: pointer;
+            position: fixed; bottom: 20px; right: 20px; z-index: 500;
+            background: var(--accent); color: #000; border: none;
+            border-radius: 50%; width: 50px; height: 50px;
+            font-size: 22px; cursor: pointer;
             box-shadow: 0 4px 15px rgba(212,175,55,0.5);
-            display: none;
-            align-items: center;
-            justify-content: center;
+            display: none; align-items: center; justify-content: center;
         }
         #exitFullscreenBtn:hover { background: var(--accent-hover); }
 
         @media (max-width: 768px) {
-            body {
-                width: 100%;
-                overflow-x: hidden;
-            }
+            body { width: 100%; overflow-x: hidden; }
             .sidebar { transform: translateX(-100%); width: 280px; }
             .sidebar.open { transform: translateX(0); }
-            .main-content { 
-                margin-left: 0; 
-                width: 100%;
-            }
+            .main-content { margin-left: 0; width: 100%; }
             .topbar { padding: 10px 15px; }
             .topbar h2 { font-size: 18px; }
             .section { padding: 10px; width: 100%; }
             .card { padding: 15px; }
             .dashboard-cards { grid-template-columns: 1fr; }
-            .modal-content { 
-                max-width: 100%; 
-                margin: 10px;
-                max-height: 95vh;
-            }
+            .modal-content { max-width: 100%; margin: 10px; max-height: 95vh; }
             .modal { padding: 10px; }
             .permissions-container { grid-template-columns: 1fr; }
             #studentModal .photo-preview { width: 100px; height: 100px; }
@@ -444,17 +368,9 @@
             .sidebar-brand { padding: 15px; font-size: 20px; }
             table { font-size: 12px; }
             table th, table td { padding: 8px 10px; }
-            .filter-container {
-                flex-direction: column;
-                align-items: stretch;
-            }
-            .filter-container .form-group {
-                min-width: 100%;
-            }
-            .login-box {
-                margin: 10px;
-                padding: 30px 20px;
-            }
+            .filter-container { flex-direction: column; align-items: stretch; }
+            .filter-container .form-group { min-width: 100%; }
+            .login-box { margin: 10px; padding: 30px 20px; }
         }
     </style>
 </head>
@@ -517,7 +433,12 @@
                     <span id="loggedUserName"></span>
                     <span id="loggedUserRole"></span>
                 </div>
-                <button class="btn btn-sm btn-outline" style="color:#fff;border-color:var(--border);" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Sair</button>
+                <button class="btn btn-sm btn-primary" id="installAppBtn" onclick="installApp()" style="display:none; justify-content:center;">
+                    <i class="fas fa-download"></i> Instalar App
+                </button>
+                <button class="btn btn-sm btn-outline" style="color:#fff;border-color:var(--border); justify-content:center;" onclick="logout()">
+                    <i class="fas fa-sign-out-alt"></i> Sair
+                </button>
             </div>
         </div>
 
@@ -548,8 +469,7 @@
                         <h3><i class="fas fa-users"></i> Alunos</h3>
                         <button class="btn btn-primary" id="btnAddStudent" onclick="openStudentForm()"><i class="fas fa-plus"></i> Novo Aluno</button>
                     </div>
-                    
-                    <!-- Filtro para Alunos -->
+
                     <div class="filter-container">
                         <div class="form-group">
                             <label><i class="fas fa-search"></i> Buscar por texto</label>
@@ -571,7 +491,7 @@
                         </div>
                         <button class="btn btn-outline" onclick="clearAlunosFilter()"><i class="fas fa-times"></i> Limpar</button>
                     </div>
-                    
+
                     <div class="table-container">
                         <table>
                             <thead><tr><th>Foto</th><th>Nome</th><th>Academia</th><th>CPF</th><th>Celular</th><th>Data Cadastro</th><th>Valor</th><th>Ações</th></tr></thead>
@@ -610,7 +530,6 @@
                         <button class="btn btn-sm btn-outline" id="btnAgendaViewGrade" onclick="setAgendaView('grade')"><i class="fas fa-table"></i> Grade de Horários</button>
                     </div>
                     <div id="agendaListContainer">
-                        <!-- Filtro para Agenda -->
                         <div class="filter-container">
                             <div class="form-group">
                                 <label><i class="fas fa-search"></i> Buscar por texto</label>
@@ -635,7 +554,7 @@
                             </div>
                             <button class="btn btn-outline" onclick="clearAgendaFilter()"><i class="fas fa-times"></i> Limpar</button>
                         </div>
-                        
+
                         <div class="table-container">
                             <table>
                                 <thead>
@@ -711,7 +630,7 @@
                         <h3><i class="fas fa-money-bill-wave"></i> Fluxo de Caixa</h3>
                         <button class="btn btn-primary" id="btnAddCashflow" onclick="openCashflowForm()"><i class="fas fa-plus"></i> Novo Lançamento</button>
                     </div>
-                    
+
                     <div class="cashflow-summary" id="cashflowSummary">
                         <div class="cashflow-summary-card entrada">
                             <div class="label"><i class="fas fa-arrow-down"></i> Entradas</div>
@@ -742,7 +661,6 @@
                     </div>
                 </div>
 
-                <!-- Contas a Pagar e Receber -->
                 <div class="card">
                     <div class="card-header">
                         <h3><i class="fas fa-file-invoice-dollar"></i> Contas a Pagar e Receber (Futuras)</h3>
@@ -750,8 +668,7 @@
                             <button class="btn btn-primary" id="btnAddConta" onclick="openContaForm()"><i class="fas fa-plus"></i> Nova Conta</button>
                         </div>
                     </div>
-                    
-                    <!-- Filtro para Contas a Pagar e Receber -->
+
                     <div class="filter-container">
                         <div class="form-group">
                             <label><i class="fas fa-search"></i> Buscar por texto</label>
@@ -773,7 +690,7 @@
                         </div>
                         <button class="btn btn-outline" onclick="clearContasFilter()"><i class="fas fa-times"></i> Limpar Filtro</button>
                     </div>
-                    
+
                     <div class="table-container">
                         <table>
                             <thead>
@@ -857,8 +774,7 @@
             <section id="section-usuarios" class="section">
                 <div class="card">
                     <div class="card-header"><h3><i class="fas fa-user-cog"></i> Usuários e Permissões</h3><button class="btn btn-primary" id="btnAddUser" onclick="openUserForm()"><i class="fas fa-plus"></i> Novo Usuário</button></div>
-                    
-                    <!-- Filtro para Usuários -->
+
                     <div class="filter-container">
                         <div class="form-group">
                             <label><i class="fas fa-search"></i> Buscar por texto</label>
@@ -883,7 +799,7 @@
                         </div>
                         <button class="btn btn-outline" onclick="clearUsersFilter()"><i class="fas fa-times"></i> Limpar</button>
                     </div>
-                    
+
                     <div class="table-container">
                         <table>
                             <thead><tr><th>Foto</th><th>Usuário</th><th>Nome</th><th>Perfil</th><th>Ativo</th><th>Ações</th></tr></thead>
@@ -900,8 +816,7 @@
                         <h3><i class="fas fa-history"></i> Auditoria de Usuários</h3>
                         <button class="btn btn-danger" id="btnClearAuditLogs" onclick="clearAuditLogs()" style="display:none;"><i class="fas fa-trash"></i> Limpar Logs</button>
                     </div>
-                    
-                    <!-- Filtro para Auditoria -->
+
                     <div class="filter-container">
                         <div class="form-group">
                             <label><i class="fas fa-search"></i> Buscar por texto</label>
@@ -934,7 +849,7 @@
                         </div>
                         <button class="btn btn-outline" onclick="clearAuditFilter()"><i class="fas fa-times"></i> Limpar</button>
                     </div>
-                    
+
                     <div class="table-container">
                         <table class="audit-log-table">
                             <thead>
@@ -959,7 +874,7 @@
         </div>
     </div>
 
-    <!-- Modais -->
+    <!-- Modais (iguais ao original) -->
     <!-- Modal de Aluno -->
     <div class="modal" id="studentModal">
         <div class="modal-content">
@@ -1190,6 +1105,91 @@
         <i class="fas fa-compress"></i>
     </button>
 
+    <!-- ==================== PWA: Install + Service Worker ==================== -->
+    <script>
+        // ---------- Install Prompt ----------
+        var deferredPrompt = null;
+
+        window.addEventListener('beforeinstallprompt', function (e) {
+            e.preventDefault();
+            deferredPrompt = e;
+            var btn = document.getElementById('installAppBtn');
+            if (btn) btn.style.display = 'inline-flex';
+        });
+
+        function installApp() {
+            var btn = document.getElementById('installAppBtn');
+            var isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+            if (isStandalone) {
+                try { toast('O app já está instalado!', 'success'); } catch (e) { alert('O app já está instalado!'); }
+                return;
+            }
+            if (!deferredPrompt) {
+                var msg = 'Para instalar: abra o menu do navegador e escolha "Instalar aplicativo" ou "Adicionar à tela inicial".';
+                try { toast(msg, 'warning'); } catch (e) { alert(msg); }
+                return;
+            }
+            deferredPrompt.prompt();
+            deferredPrompt.userChoice.then(function (choiceResult) {
+                if (choiceResult.outcome === 'accepted') {
+                    try { toast('App instalado com sucesso!'); } catch (e) {}
+                    if (btn) btn.style.display = 'none';
+                }
+                deferredPrompt = null;
+            }).catch(function () { deferredPrompt = null; });
+        }
+
+        window.addEventListener('appinstalled', function () {
+            deferredPrompt = null;
+            var btn = document.getElementById('installAppBtn');
+            if (btn) btn.style.display = 'none';
+            try { toast('App instalado com sucesso!'); } catch (e) {}
+        });
+
+        // Esconde o botão se já estiver em modo standalone
+        (function () {
+            try {
+                if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true) {
+                    var btn = document.getElementById('installAppBtn');
+                    if (btn) btn.style.display = 'none';
+                }
+            } catch (e) {}
+        })();
+
+        // ---------- Service Worker ----------
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', function () {
+                var swCode =
+                    "const CACHE_NAME='mestre-paulo-v1';" +
+                    "self.addEventListener('install',function(e){self.skipWaiting();});" +
+                    "self.addEventListener('activate',function(e){e.waitUntil(self.clients.claim());});" +
+                    "self.addEventListener('fetch',function(e){" +
+                        "if(e.request.method!=='GET')return;" +
+                        "e.respondWith(fetch(e.request).catch(function(){return caches.match(e.request);}));" +
+                    "});";
+
+                // 1) Tenta registrar sw.js externo (melhor compatibilidade)
+                navigator.serviceWorker.register('./sw.js', { scope: './' })
+                    .then(function (reg) { console.log('SW registrado (externo):', reg.scope); })
+                    .catch(function (err) {
+                        console.warn('SW externo não encontrado. Tentando inline...', err && err.message);
+                        // 2) Fallback: tenta registrar via Blob (funciona em alguns browsers)
+                        try {
+                            var blob = new Blob([swCode], { type: 'application/javascript' });
+                            var url = URL.createObjectURL(blob);
+                            navigator.serviceWorker.register(url).then(function (reg) {
+                                console.log('SW registrado (inline):', reg.scope);
+                            }).catch(function (e) {
+                                console.warn('SW inline indisponível:', e && e.message);
+                            });
+                        } catch (e) {
+                            console.warn('SW setup falhou:', e && e.message);
+                        }
+                    });
+            });
+        }
+    </script>
+
     <script>
         // ==================== FIREBASE INIT ====================
         const firebaseConfig = {
@@ -1223,15 +1223,8 @@
         const ACTION_LABELS = { ver: 'Ver', criar: 'Criar', editar: 'Editar', excluir: 'Excluir' };
 
         let state = {
-            users: [],
-            students: [],
-            academias: [],
-            schedule: [],
-            workouts: [],
-            album: [],
-            cashflow: [],
-            contasFuturas: [],
-            auditLogs: []
+            users: [], students: [], academias: [], schedule: [], workouts: [],
+            album: [], cashflow: [], contasFuturas: [], auditLogs: []
         };
         let currentUser = null;
         let currentStudent = null;
@@ -1253,13 +1246,11 @@
             let value = String(str || '').trim();
             if (!value) return 0;
             value = value.replace(/R\$\s?/g, '');
-            if (value.includes(',')) {
-                value = value.replace(/\./g, '').replace(',', '.');
-            }
+            if (value.includes(',')) { value = value.replace(/\./g, '').replace(',', '.'); }
             return parseFloat(value) || 0;
         }
-        function formatCurrency(v) { 
-            return 'R$ ' + Number(v || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); 
+        function formatCurrency(v) {
+            return 'R$ ' + Number(v || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
         }
         function formatDate(dateStr) { if (!dateStr) return ''; const [y, m, d] = dateStr.split('-'); return `${d}/${m}/${y}`; }
         function formatDateTime(isoStr) {
@@ -1273,6 +1264,7 @@
         function getWeekdayFromDate(dateStr) { const d = new Date(dateStr + 'T00:00:00'); return isNaN(d) ? '-' : getWeekdayName(d.getDay()); }
         function toast(msg, type = 'success') {
             const container = document.getElementById('toastContainer');
+            if (!container) return;
             const el = document.createElement('div');
             el.className = `toast ${type}`;
             el.textContent = msg;
@@ -1291,16 +1283,10 @@
             if (!state.auditLogs) state.auditLogs = [];
             const userIdentifier = currentUser ? currentUser.username : (currentStudent ? currentStudent.nome : 'Sistema');
             state.auditLogs.push({
-                id: genId(),
-                timestamp: new Date().toISOString(),
-                user: userIdentifier,
-                action: action,
-                module: moduleKey,
-                details: details || ''
+                id: genId(), timestamp: new Date().toISOString(),
+                user: userIdentifier, action: action, module: moduleKey, details: details || ''
             });
-            if (state.auditLogs.length > 500) {
-                state.auditLogs = state.auditLogs.slice(-500);
-            }
+            if (state.auditLogs.length > 500) state.auditLogs = state.auditLogs.slice(-500);
         }
         function loadState() {
             return db.collection(STATE_COLLECTION).doc(STATE_DOC).get()
@@ -1321,15 +1307,13 @@
                             if (u.password) u.password = u.password.toUpperCase();
                             if (!u.foto) u.foto = '';
                         });
-                        state.students.forEach(s => { 
+                        state.students.forEach(s => {
                             if (!s.evolucaoFotos) s.evolucaoFotos = [];
                             if (s.mensalidadeFixa === undefined) s.mensalidadeFixa = 0;
                             if (!s.foto) s.foto = '';
                         });
                         state.workouts.forEach(w => {
-                            if (!w.diasSemana && w.diaSemana !== undefined) {
-                                w.diasSemana = [w.diaSemana];
-                            }
+                            if (!w.diasSemana && w.diaSemana !== undefined) w.diasSemana = [w.diaSemana];
                             if (!w.diasSemana) w.diasSemana = [];
                             if (w.horario === undefined) w.horario = '';
                             if (w.academiaId === undefined) w.academiaId = null;
@@ -1351,79 +1335,50 @@
         function seedData() {
             state.users = [{ id: genId(), username: 'PAULO', password: '585851', nome: 'Paulo', role: 'admin', active: true, permissions: {}, foto: '' }];
             state.academias = [{ id: genId(), nome: 'Academia Exemplo', endereco: 'Rua das Flores, 123', telefone: '(11) 99999-0000', responsavel: 'Carlos' }];
-            state.students = [];
-            state.schedule = [];
-            state.workouts = [];
-            state.album = [];
-            state.cashflow = [];
-            state.contasFuturas = [];
-            state.auditLogs = [];
+            state.students = []; state.schedule = []; state.workouts = [];
+            state.album = []; state.cashflow = []; state.contasFuturas = []; state.auditLogs = [];
         }
 
         function ensureStudentUsers() {
             state.students.forEach(student => {
-                if (!state.users.some(u => u.alunoId === student.id)) {
-                    createUserForStudent(student);
-                }
+                if (!state.users.some(u => u.alunoId === student.id)) createUserForStudent(student);
             });
         }
-
         function slugify(text) {
             if (!text) return 'ALUNO';
             return text.normalize('NFD').replace(/[\u0300-\u036f]/g, '')
                 .toUpperCase().replace(/[^A-Z0-9]/g, '').trim() || 'ALUNO';
         }
-
         function generateStudentUsername(nome, existingUsers, alunoId = null) {
             let base = slugify(nome);
             let username = base;
             let counter = 1;
-            while (existingUsers.some(u => u.username === username && u.id !== alunoId)) {
-                username = base + counter;
-                counter++;
-            }
+            while (existingUsers.some(u => u.username === username && u.id !== alunoId)) { username = base + counter; counter++; }
             return username;
         }
-
         function getPhoneWithoutDDD(phone) {
             let digits = String(phone || '').replace(/\D/g, '');
-            if (digits.length >= 10) {
-                digits = digits.substring(2);
-            }
+            if (digits.length >= 10) digits = digits.substring(2);
             return digits;
         }
-
         function createUserForStudent(student) {
             const username = generateStudentUsername(student.nome, state.users, student.id ? null : undefined);
             const password = getPhoneWithoutDDD(student.telefone).toUpperCase();
             const newUser = {
-                id: genId(),
-                username: username.toUpperCase(),
-                password: password,
-                nome: student.nome,
-                role: 'aluno',
-                active: true,
-                permissions: {},
-                alunoId: student.id,
-                foto: student.foto || ''
+                id: genId(), username: username.toUpperCase(), password: password,
+                nome: student.nome, role: 'aluno', active: true, permissions: {},
+                alunoId: student.id, foto: student.foto || ''
             };
             state.users.push(newUser);
             return newUser;
         }
-
         function updateUserForStudent(student) {
             const user = state.users.find(u => u.alunoId === student.id);
             if (user) {
                 const newPassword = getPhoneWithoutDDD(student.telefone).toUpperCase();
-                if (user.password !== newPassword) {
-                    user.password = newPassword;
-                }
-                if (user.nome !== student.nome) {
-                    user.nome = student.nome;
-                }
-                if (student.foto && user.foto !== student.foto) {
-                    user.foto = student.foto;
-                }
+                if (user.password !== newPassword) user.password = newPassword;
+                if (user.nome !== student.nome) user.nome = student.nome;
+                if (student.foto && user.foto !== student.foto) user.foto = student.foto;
             }
         }
 
@@ -1469,24 +1424,15 @@
         // ==================== FULLSCREEN ====================
         function enterFullscreen() {
             const elem = document.documentElement;
-            if (elem.requestFullscreen) {
-                elem.requestFullscreen().catch(() => {});
-            } else if (elem.webkitRequestFullscreen) {
-                elem.webkitRequestFullscreen();
-            } else if (elem.msRequestFullscreen) {
-                elem.msRequestFullscreen();
-            }
+            if (elem.requestFullscreen) elem.requestFullscreen().catch(() => {});
+            else if (elem.webkitRequestFullscreen) elem.webkitRequestFullscreen();
+            else if (elem.msRequestFullscreen) elem.msRequestFullscreen();
             document.getElementById('exitFullscreenBtn').style.display = 'flex';
         }
-
         function exitFullscreen() {
-            if (document.fullscreenElement) {
-                document.exitFullscreen().catch(() => {});
-            } else if (document.webkitFullscreenElement) {
-                document.webkitExitFullscreen();
-            } else if (document.msFullscreenElement) {
-                document.msExitFullscreen();
-            }
+            if (document.fullscreenElement) document.exitFullscreen().catch(() => {});
+            else if (document.webkitFullscreenElement) document.webkitExitFullscreen();
+            else if (document.msFullscreenElement) document.msExitFullscreen();
             document.getElementById('exitFullscreenBtn').style.display = 'none';
         }
 
@@ -1507,16 +1453,11 @@
                 closeCamera();
             }
         }
-
         function closeCamera() {
-            if (cameraStream) {
-                cameraStream.getTracks().forEach(track => track.stop());
-                cameraStream = null;
-            }
+            if (cameraStream) { cameraStream.getTracks().forEach(track => track.stop()); cameraStream = null; }
             document.getElementById('cameraModal').classList.remove('show');
             cameraTarget = null;
         }
-
         function capturePhoto() {
             const video = document.getElementById('cameraVideo');
             const canvas = document.getElementById('cameraCanvas');
@@ -1524,23 +1465,12 @@
             canvas.height = video.videoHeight;
             canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);
             const dataUrl = canvas.toDataURL('image/jpeg', 0.8);
-            if (cameraTarget === 'student') {
-                studentFotoData = dataUrl;
-                document.getElementById('studentFotoPreview').src = dataUrl;
-            } else if (cameraTarget === 'user') {
-                userFotoData = dataUrl;
-                document.getElementById('userFotoPreview').src = dataUrl;
-            }
+            if (cameraTarget === 'student') { studentFotoData = dataUrl; document.getElementById('studentFotoPreview').src = dataUrl; }
+            else if (cameraTarget === 'user') { userFotoData = dataUrl; document.getElementById('userFotoPreview').src = dataUrl; }
             closeCamera();
         }
-
-        function openCameraForStudent() {
-            openCamera('student');
-        }
-
-        function openCameraForUser() {
-            openCamera('user');
-        }
+        function openCameraForStudent() { openCamera('student'); }
+        function openCameraForUser() { openCamera('user'); }
 
         // ==================== LOGIN/LOGOUT ====================
         function showStudentLogin() {
@@ -1553,22 +1483,14 @@
             document.getElementById('loginPersonalBox').classList.remove('hidden');
             document.getElementById('loginError').classList.add('hidden');
         }
-
         function showUserPhotoPreview() {
             const username = val('loginUsername');
             const user = state.users.find(u => u.username.toUpperCase() === username && u.role !== 'aluno');
             const img = document.getElementById('loginUserPhoto');
             const placeholder = document.getElementById('loginUserPhotoPlaceholder');
-            if (user && user.foto) {
-                img.src = user.foto;
-                img.classList.remove('hidden');
-                placeholder.textContent = '';
-            } else {
-                img.classList.add('hidden');
-                placeholder.textContent = user ? 'Sem foto cadastrada' : '';
-            }
+            if (user && user.foto) { img.src = user.foto; img.classList.remove('hidden'); placeholder.textContent = ''; }
+            else { img.classList.add('hidden'); placeholder.textContent = user ? 'Sem foto cadastrada' : ''; }
         }
-
         function handleStudentLogin(e) {
             e.preventDefault();
             const username = val('studentLoginUsername').toUpperCase();
@@ -1601,7 +1523,6 @@
             navigate('aluno');
             toast('Bem-vindo, ' + student.nome + '!');
         }
-
         function handleLogin(e) {
             e.preventDefault();
             const username = val('loginUsername').toUpperCase();
@@ -1628,7 +1549,6 @@
             navigate(firstPermitted ? firstPermitted.key : 'dashboard');
             toast('Bem-vindo, ' + (currentUser.nome || currentUser.username) + '!');
         }
-
         function logout() {
             if (currentStudent) {
                 logAction('Logout Aluno', `Aluno ${currentStudent.nome} saiu`, 'aluno');
@@ -1644,10 +1564,7 @@
                 closeLightbox();
                 exitFullscreen();
             } else {
-                if (currentUser) {
-                    logAction('Logout', `Usuário ${currentUser.username} saiu`, 'dashboard');
-                    saveState();
-                }
+                if (currentUser) { logAction('Logout', `Usuário ${currentUser.username} saiu`, 'dashboard'); saveState(); }
                 currentUser = null;
                 document.getElementById('app').classList.add('hidden');
                 document.getElementById('loginScreen').classList.remove('hidden');
@@ -1661,9 +1578,7 @@
         }
 
         // ==================== NAVEGAÇÃO ====================
-        function toggleSidebar() {
-            if (!currentStudent) document.getElementById('sidebar').classList.toggle('open');
-        }
+        function toggleSidebar() { if (!currentStudent) document.getElementById('sidebar').classList.toggle('open'); }
         function renderNav() {
             const nav = document.getElementById('sidebarNav');
             let html = '';
@@ -1693,11 +1608,9 @@
             if (el) el.classList.add('active');
             const mod = MODULES.find(m => m.key === section);
             document.getElementById('pageTitle').textContent = mod ? mod.label : '';
-
             document.getElementById('sidebar').classList.remove('open');
             closeLightbox();
 
-            // Mostrar/esconder botões de acordo com permissões
             const btnAluno = document.getElementById('btnAddStudent');
             if (btnAluno) btnAluno.style.display = can('alunos', 'criar') ? '' : 'none';
             const btnAcademia = document.getElementById('btnAddAcademy');
@@ -1734,24 +1647,12 @@
         }
 
         // ==================== MODAL CONTROLS ====================
-        function openModal(id) {
-            const modal = document.getElementById(id);
-            if (modal) modal.classList.add('show');
-        }
-        function closeModal(id) {
-            const modal = document.getElementById(id);
-            if (modal) modal.classList.remove('show');
-        }
+        function openModal(id) { const m = document.getElementById(id); if (m) m.classList.add('show'); }
+        function closeModal(id) { const m = document.getElementById(id); if (m) m.classList.remove('show'); }
 
-        // ==================== VALIDAÇÃO DE CONFLITO DE AGENDA ====================
+        // ==================== VALIDAÇÃO DE CONFLITO ====================
         function checkScheduleConflict(alunoId, data, hora, excludeId = null) {
-            return state.schedule.some(a => 
-                a.alunoId === alunoId && 
-                a.data === data && 
-                a.hora === hora && 
-                a.status !== 'Cancelada' && 
-                a.id !== excludeId
-            );
+            return state.schedule.some(a => a.alunoId === alunoId && a.data === data && a.hora === hora && a.status !== 'Cancelada' && a.id !== excludeId);
         }
 
         // ==================== DASHBOARD ====================
@@ -1789,7 +1690,6 @@
                 <div class="stat-card"><div class="stat-icon"><i class="fas fa-money-bill-wave"></i></div><div class="stat-info"><h4>${formatCurrency(receitaMes)}</h4><p>Receita do Mês</p></div></div>
                 <div class="stat-card"><div class="stat-icon"><i class="fas fa-chart-line"></i></div><div class="stat-info"><h4>${formatCurrency(entradaMes - saidaMes)}</h4><p>Saldo do Mês (Caixa)</p></div></div>
             `;
-
             const sorted = [...state.schedule]
                 .filter(a => new Date(a.data + 'T' + a.hora) >= new Date())
                 .sort((a, b) => (a.data + 'T' + a.hora).localeCompare(b.data + 'T' + b.hora))
@@ -1808,31 +1708,23 @@
             const select = document.getElementById(selectId);
             if (!select) return;
             let html = '<option value="">Selecione...</option>';
-            state.academias.forEach(a => {
-                html += `<option value="${a.id}" ${selectedId === a.id ? 'selected' : ''}>${esc(a.nome)}</option>`;
-            });
+            state.academias.forEach(a => { html += `<option value="${a.id}" ${selectedId === a.id ? 'selected' : ''}>${esc(a.nome)}</option>`; });
             select.innerHTML = html;
         }
         function fillStudentSelect(selectId, selectedId) {
             const select = document.getElementById(selectId);
             if (!select) return;
             let html = '<option value="">Selecione...</option>';
-            state.students.forEach(s => {
-                html += `<option value="${s.id}" ${selectedId === s.id ? 'selected' : ''}>${esc(s.nome)}</option>`;
-            });
+            state.students.forEach(s => { html += `<option value="${s.id}" ${selectedId === s.id ? 'selected' : ''}>${esc(s.nome)}</option>`; });
             select.innerHTML = html;
         }
-
         function fillAlunosFilterAcademia() {
             const select = document.getElementById('alunosFilterAcademia');
             if (!select) return;
             let html = '<option value="">Todas</option>';
-            state.academias.forEach(a => {
-                html += `<option value="${a.id}">${esc(a.nome)}</option>`;
-            });
+            state.academias.forEach(a => { html += `<option value="${a.id}">${esc(a.nome)}</option>`; });
             select.innerHTML = html;
         }
-
         function clearAlunosFilter() {
             document.getElementById('alunosFilterText').value = '';
             document.getElementById('alunosFilterDate').value = '';
@@ -1840,7 +1732,6 @@
             document.getElementById('alunosFilterValorMin').value = '';
             renderStudents();
         }
-
         function clearAgendaFilter() {
             document.getElementById('agendaFilterText').value = '';
             document.getElementById('agendaFilterDate').value = '';
@@ -1848,14 +1739,12 @@
             document.getElementById('agendaFilterStatus').value = '';
             renderSchedule();
         }
-
         function clearUsersFilter() {
             document.getElementById('usersFilterText').value = '';
             document.getElementById('usersFilterRole').value = '';
             document.getElementById('usersFilterActive').value = '';
             renderUsers();
         }
-
         function clearAuditFilter() {
             document.getElementById('auditFilterText').value = '';
             document.getElementById('auditFilterDateStart').value = '';
@@ -1863,7 +1752,6 @@
             document.getElementById('auditFilterModule').value = '';
             renderAuditoria();
         }
-
         function handleEvolutionPhoto(event) {
             const file = event.target.files[0];
             if (!file) return;
@@ -1880,12 +1768,7 @@
                     const ctx = canvas.getContext('2d');
                     ctx.drawImage(img, 0, 0, width, height);
                     const fotoData = canvas.toDataURL('image/jpeg', 0.8);
-                    studentEvolucaoFotos.push({
-                        id: genId(),
-                        data: formatDateInput(new Date()),
-                        foto: fotoData,
-                        legenda: ''
-                    });
+                    studentEvolucaoFotos.push({ id: genId(), data: formatDateInput(new Date()), foto: fotoData, legenda: '' });
                     renderEvolutionThumbs();
                 };
                 img.src = e.target.result;
@@ -1893,26 +1776,16 @@
             reader.readAsDataURL(file);
             event.target.value = '';
         }
-
         function renderEvolutionThumbs() {
             const container = document.getElementById('evolutionThumbs');
             if (!container) return;
             let html = '';
             studentEvolucaoFotos.forEach(foto => {
-                html += `
-                    <div class="evolution-thumb">
-                        <img src="${esc(foto.foto)}" alt="Evolução" onclick="openLightbox('${esc(foto.foto)}')">
-                        <button type="button" class="remove-evo" onclick="removeEvolutionPhoto('${foto.id}')">&times;</button>
-                    </div>`;
+                html += `<div class="evolution-thumb"><img src="${esc(foto.foto)}" alt="Evolução" onclick="openLightbox('${esc(foto.foto)}')"><button type="button" class="remove-evo" onclick="removeEvolutionPhoto('${foto.id}')">&times;</button></div>`;
             });
             container.innerHTML = html || '<p style="color:var(--text-light);">Nenhuma foto adicionada.</p>';
         }
-
-        function removeEvolutionPhoto(id) {
-            studentEvolucaoFotos = studentEvolucaoFotos.filter(f => f.id !== id);
-            renderEvolutionThumbs();
-        }
-
+        function removeEvolutionPhoto(id) { studentEvolucaoFotos = studentEvolucaoFotos.filter(f => f.id !== id); renderEvolutionThumbs(); }
         function openStudentForm(id) {
             if (id) { if (!can('alunos', 'editar')) { toast('Sem permissão para editar.', 'error'); return; } }
             else { if (!can('alunos', 'criar')) { toast('Sem permissão para criar.', 'error'); return; } }
@@ -1944,8 +1817,6 @@
             }
             openModal('studentModal');
         }
-
-        // Nova função para upload de imagem do PC (solicitada)
         function handleStudentFotoUpload(event) {
             const file = event.target.files[0];
             if (!file) return;
@@ -1958,8 +1829,7 @@
                     const max = 800;
                     if (width > height && width > max) { height *= max / width; width = max; }
                     else if (height > max) { width *= max / height; height = max; }
-                    canvas.width = width;
-                    canvas.height = height;
+                    canvas.width = width; canvas.height = height;
                     const ctx = canvas.getContext('2d');
                     ctx.drawImage(img, 0, 0, width, height);
                     const dataUrl = canvas.toDataURL('image/jpeg', 0.8);
@@ -1971,7 +1841,6 @@
             reader.readAsDataURL(file);
             event.target.value = '';
         }
-
         function saveStudent(e) {
             e.preventDefault();
             if (editingId && !can('alunos', 'editar')) return;
@@ -1989,16 +1858,8 @@
             const observacoes = val('studentObservacoes');
             const foto = studentFotoData || '';
             const evolucaoFotos = studentEvolucaoFotos;
-
-            if (valorAula > 0 && mensalidadeFixa > 0) {
-                toast('Preencha apenas uma opção: "Valor por Aula" OU "Mensalidade Fixa".', 'error');
-                return;
-            }
-            if (valorAula <= 0 && mensalidadeFixa <= 0) {
-                toast('Informe um valor maior que zero para "Valor por Aula" ou "Mensalidade Fixa".', 'error');
-                return;
-            }
-
+            if (valorAula > 0 && mensalidadeFixa > 0) { toast('Preencha apenas uma opção: "Valor por Aula" OU "Mensalidade Fixa".', 'error'); return; }
+            if (valorAula <= 0 && mensalidadeFixa <= 0) { toast('Informe um valor maior que zero para "Valor por Aula" ou "Mensalidade Fixa".', 'error'); return; }
             if (editingId) {
                 const idx = state.students.findIndex(s => s.id === editingId);
                 if (idx > -1) {
@@ -2006,24 +1867,17 @@
                     updateUserForStudent(state.students[idx]);
                     logAction('Editar Aluno', `Aluno ${nome} editado`, 'alunos');
                 }
-                saveState();
-                closeModal('studentModal');
-                renderStudents();
-                fillStudentSelect('workoutAluno');
+                saveState(); closeModal('studentModal'); renderStudents(); fillStudentSelect('workoutAluno');
                 toast('Aluno salvo com sucesso!');
             } else {
                 const newStudent = { id: genId(), nome, cpf, dataCadastro, academiaId, objetivo, telefone, email, valorAula, mensalidadeFixa, observacoes, foto, evolucaoFotos };
                 state.students.push(newStudent);
                 const user = createUserForStudent(newStudent);
                 logAction('Criar Aluno', `Aluno ${nome} criado. Usuário: ${user.username}`, 'alunos');
-                saveState();
-                closeModal('studentModal');
-                renderStudents();
-                fillStudentSelect('workoutAluno');
+                saveState(); closeModal('studentModal'); renderStudents(); fillStudentSelect('workoutAluno');
                 toast(`Aluno salvo! Usuário: ${user.username} | Senha: ${user.password}`, 'success');
             }
         }
-
         function deleteStudent(id) {
             if (!can('alunos', 'excluir')) { toast('Sem permissão para excluir.', 'error'); return; }
             if (!confirmAdminDeletion()) return;
@@ -2032,82 +1886,42 @@
             state.students = state.students.filter(s => s.id !== id);
             state.workouts = state.workouts.filter(w => w.alunoId !== id);
             state.users = state.users.filter(u => u.alunoId !== id);
-            saveState(); renderStudents(); renderWorkouts(); fillStudentSelect('workoutAluno'); renderUsers(); toast('Aluno excluído.', 'warning');
+            saveState(); renderStudents(); renderWorkouts(); fillStudentSelect('workoutAluno'); renderUsers();
+            toast('Aluno excluído.', 'warning');
         }
-
-        function confirmAdminDeletion() {
-            return confirmAdminAction('Digite a senha do Administrador para excluir este registro:');
-        }
-
+        function confirmAdminDeletion() { return confirmAdminAction('Digite a senha do Administrador para excluir este registro:'); }
         function confirmAdminAction(message) {
-            // Se o usuário logado já é Administrador, não exige senha
             if (currentUser && currentUser.role === 'admin') return true;
             const admin = state.users.find(u => u.role === 'admin');
-            if (!admin) {
-                toast('Nenhum administrador encontrado no sistema.', 'error');
-                return false;
-            }
+            if (!admin) { toast('Nenhum administrador encontrado no sistema.', 'error'); return false; }
             const senha = window.prompt(`🔐 Confirmação de Segurança\n${message}`);
             if (senha === null) return false;
-            if (senha.toUpperCase() !== admin.password.toUpperCase()) {
-                toast('Senha do administrador incorreta!', 'error');
-                return false;
-            }
+            if (senha.toUpperCase() !== admin.password.toUpperCase()) { toast('Senha do administrador incorreta!', 'error'); return false; }
             return true;
         }
-
         function renderStudents() {
             const tbody = document.getElementById('studentsTableBody');
             const filterText = (document.getElementById('alunosFilterText')?.value || '').toLowerCase();
             const filterDate = document.getElementById('alunosFilterDate')?.value || '';
             const filterAcademia = document.getElementById('alunosFilterAcademia')?.value || '';
             const filterValorMin = parseCurrency(document.getElementById('alunosFilterValorMin')?.value || '');
-            
             let filtered = [...state.students];
-            
-            if (filterText) {
-                filtered = filtered.filter(s => 
-                    s.nome.toLowerCase().includes(filterText) || 
-                    (s.cpf || '').toLowerCase().includes(filterText) || 
-                    (s.telefone || '').toLowerCase().includes(filterText) || 
-                    (s.email || '').toLowerCase().includes(filterText) ||
-                    (s.objetivo || '').toLowerCase().includes(filterText)
-                );
-            }
-            if (filterDate) {
-                filtered = filtered.filter(s => s.dataCadastro === filterDate);
-            }
-            if (filterAcademia) {
-                filtered = filtered.filter(s => s.academiaId === filterAcademia);
-            }
-            if (filterValorMin > 0) {
-                filtered = filtered.filter(s => {
-                    const valorAula = parseFloat(s.valorAula) || 0;
-                    const mensalidadeFixa = parseFloat(s.mensalidadeFixa) || 0;
-                    return valorAula >= filterValorMin || mensalidadeFixa >= filterValorMin;
-                });
-            }
-            
+            if (filterText) filtered = filtered.filter(s => s.nome.toLowerCase().includes(filterText) || (s.cpf || '').toLowerCase().includes(filterText) || (s.telefone || '').toLowerCase().includes(filterText) || (s.email || '').toLowerCase().includes(filterText) || (s.objetivo || '').toLowerCase().includes(filterText));
+            if (filterDate) filtered = filtered.filter(s => s.dataCadastro === filterDate);
+            if (filterAcademia) filtered = filtered.filter(s => s.academiaId === filterAcademia);
+            if (filterValorMin > 0) filtered = filtered.filter(s => (parseFloat(s.valorAula) || 0) >= filterValorMin || (parseFloat(s.mensalidadeFixa) || 0) >= filterValorMin);
             let html = '';
             filtered.forEach(s => {
                 const academia = state.academias.find(a => a.id === s.academiaId);
                 const foto = s.foto ? `<img class="thumb" src="${esc(s.foto)}" alt="Foto">` : '<div class="thumb"><i class="fas fa-user"></i></div>';
                 let valorDisplay = '';
-                if (s.valorAula > 0) {
-                    valorDisplay = `Aula: ${formatCurrency(s.valorAula)}`;
-                } else if (s.mensalidadeFixa > 0) {
-                    valorDisplay = `Mensal: ${formatCurrency(s.mensalidadeFixa)}`;
-                } else {
-                    valorDisplay = '-';
-                }
+                if (s.valorAula > 0) valorDisplay = `Aula: ${formatCurrency(s.valorAula)}`;
+                else if (s.mensalidadeFixa > 0) valorDisplay = `Mensal: ${formatCurrency(s.mensalidadeFixa)}`;
+                else valorDisplay = '-';
                 html += `<tr>
-                    <td>${foto}</td>
-                    <td>${esc(s.nome)}</td>
-                    <td>${esc(academia ? academia.nome : '-')}</td>
-                    <td>${esc(s.cpf || '-')}</td>
-                    <td>${esc(s.telefone || '-')}</td>
-                    <td>${formatDate(s.dataCadastro || '')}</td>
-                    <td>${valorDisplay}</td>
+                    <td>${foto}</td><td>${esc(s.nome)}</td><td>${esc(academia ? academia.nome : '-')}</td>
+                    <td>${esc(s.cpf || '-')}</td><td>${esc(s.telefone || '-')}</td>
+                    <td>${formatDate(s.dataCadastro || '')}</td><td>${valorDisplay}</td>
                     <td>
                         <button class="btn btn-sm btn-outline" onclick="openStudentForm('${s.id}')" ${can('alunos', 'editar') ? '' : 'disabled'}><i class="fas fa-edit"></i></button>
                         <button class="btn btn-sm btn-danger" onclick="deleteStudent('${s.id}')" ${can('alunos', 'excluir') ? '' : 'disabled'}><i class="fas fa-trash"></i></button>
@@ -2144,16 +1958,13 @@
             const responsavel = val('academyResponsavel');
             if (editingId) {
                 const idx = state.academias.findIndex(a => a.id === editingId);
-                if (idx > -1) {
-                    state.academias[idx] = { ...state.academias[idx], nome, endereco, telefone, responsavel };
-                    logAction('Editar Academia', `Academia ${nome} editada`, 'academias');
-                }
+                if (idx > -1) { state.academias[idx] = { ...state.academias[idx], nome, endereco, telefone, responsavel }; logAction('Editar Academia', `Academia ${nome} editada`, 'academias'); }
             } else {
-                const nova = { id: genId(), nome, endereco, telefone, responsavel };
-                state.academias.push(nova);
+                state.academias.push({ id: genId(), nome, endereco, telefone, responsavel });
                 logAction('Criar Academia', `Academia ${nome} criada`, 'academias');
             }
-            saveState(); closeModal('academyModal'); renderAcademies(); toast('Academia salva com sucesso!');
+            saveState(); closeModal('academyModal'); renderAcademies();
+            toast('Academia salva com sucesso!');
         }
         function deleteAcademy(id) {
             if (!can('academias', 'excluir')) { toast('Sem permissão para excluir.', 'error'); return; }
@@ -2162,7 +1973,8 @@
             if (academia) logAction('Excluir Academia', `Academia ${academia.nome} excluída`, 'academias');
             state.academias = state.academias.filter(a => a.id !== id);
             state.workouts.forEach(w => { if (w.academiaId === id) w.academiaId = null; });
-            saveState(); renderAcademies(); renderWorkouts(); toast('Academia excluída.', 'warning');
+            saveState(); renderAcademies(); renderWorkouts();
+            toast('Academia excluída.', 'warning');
         }
         function renderAcademies() {
             const tbody = document.getElementById('academiesTableBody');
@@ -2182,8 +1994,7 @@
             else { if (!can('agenda', 'criar')) { toast('Sem permissão para criar.', 'error'); return; } }
             editingId = id || null;
             document.getElementById('scheduleForm').reset();
-            fillStudentSelect('scheduleAluno');
-            fillAcademiaSelect('scheduleAcademia');
+            fillStudentSelect('scheduleAluno'); fillAcademiaSelect('scheduleAcademia');
             if (id) {
                 const a = state.schedule.find(a => a.id === id);
                 if (!a) return;
@@ -2192,73 +2003,37 @@
                 document.getElementById('scheduleAluno').value = a.alunoId;
                 document.getElementById('scheduleAcademia').value = a.academiaId;
                 document.getElementById('scheduleStatus').value = a.status;
-            } else {
-                document.getElementById('scheduleStatus').value = 'Agendada';
-            }
+            } else { document.getElementById('scheduleStatus').value = 'Agendada'; }
             openModal('scheduleModal');
         }
-
         function saveSchedule(e) {
             e.preventDefault();
             if (editingId && !can('agenda', 'editar')) return;
             if (!editingId && !can('agenda', 'criar')) return;
-
-            const data = val('scheduleData');
-            const hora = val('scheduleHora');
-            const alunoId = val('scheduleAluno');
-            const academiaId = val('scheduleAcademia');
+            const data = val('scheduleData'), hora = val('scheduleHora');
+            const alunoId = val('scheduleAluno'), academiaId = val('scheduleAcademia');
             const status = val('scheduleStatus');
-
-            if (!data || !hora || !alunoId || !academiaId) {
-                toast('Preencha todos os campos obrigatórios.', 'error');
-                return;
-            }
-
-            if (checkScheduleConflict(alunoId, data, hora, editingId)) {
-                toast('Aula já cadastrada para este aluno neste dia e horário!', 'error');
-                return;
-            }
-
-            let oldAlunoId = null;
-            let oldAnoMes = null;
+            if (!data || !hora || !alunoId || !academiaId) { toast('Preencha todos os campos obrigatórios.', 'error'); return; }
+            if (checkScheduleConflict(alunoId, data, hora, editingId)) { toast('Aula já cadastrada para este aluno neste dia e horário!', 'error'); return; }
+            let oldAlunoId = null, oldAnoMes = null;
             if (editingId) {
                 const oldAula = state.schedule.find(a => a.id === editingId);
-                if (oldAula) {
-                    oldAlunoId = oldAula.alunoId;
-                    oldAnoMes = oldAula.data.slice(0, 7);
-                }
+                if (oldAula) { oldAlunoId = oldAula.alunoId; oldAnoMes = oldAula.data.slice(0, 7); }
             }
-
             const novoAnoMes = data.slice(0, 7);
-
             if (editingId) {
                 const idx = state.schedule.findIndex(a => a.id === editingId);
-                if (idx > -1) {
-                    state.schedule[idx] = { ...state.schedule[idx], data, hora, alunoId, academiaId, status };
-                    logAction('Editar Aula', `Aula ${data} ${hora} editada`, 'agenda');
-                }
-                if (oldAlunoId && oldAnoMes && (oldAlunoId !== alunoId || oldAnoMes !== novoAnoMes)) {
-                    recalcularMensalidade(oldAlunoId, oldAnoMes);
-                }
-                if (alunoId && novoAnoMes) {
-                    recalcularMensalidade(alunoId, novoAnoMes);
-                }
+                if (idx > -1) { state.schedule[idx] = { ...state.schedule[idx], data, hora, alunoId, academiaId, status }; logAction('Editar Aula', `Aula ${data} ${hora} editada`, 'agenda'); }
+                if (oldAlunoId && oldAnoMes && (oldAlunoId !== alunoId || oldAnoMes !== novoAnoMes)) recalcularMensalidade(oldAlunoId, oldAnoMes);
+                if (alunoId && novoAnoMes) recalcularMensalidade(alunoId, novoAnoMes);
             } else {
-                const nova = { id: genId(), data, hora, alunoId, academiaId, status };
-                state.schedule.push(nova);
+                state.schedule.push({ id: genId(), data, hora, alunoId, academiaId, status });
                 logAction('Criar Aula', `Aula ${data} ${hora} criada`, 'agenda');
-                if (alunoId && novoAnoMes) {
-                    recalcularMensalidade(alunoId, novoAnoMes);
-                }
+                if (alunoId && novoAnoMes) recalcularMensalidade(alunoId, novoAnoMes);
             }
-
-            saveState();
-            closeModal('scheduleModal');
-            renderSchedule();
-            renderContasFuturas();
+            saveState(); closeModal('scheduleModal'); renderSchedule(); renderContasFuturas();
             toast('Aula agendada com sucesso!');
         }
-
         function deleteSchedule(id) {
             if (!can('agenda', 'excluir')) { toast('Sem permissão para excluir.', 'error'); return; }
             if (!confirmAdminDeletion()) return;
@@ -2266,23 +2041,15 @@
             if (!aula) return;
             const { alunoId, data } = aula;
             state.schedule = state.schedule.filter(a => a.id !== id);
-            if (alunoId) {
-                const anoMes = data.slice(0, 7);
-                recalcularMensalidade(alunoId, anoMes);
-            }
+            if (alunoId) recalcularMensalidade(alunoId, data.slice(0, 7));
             logAction('Excluir Aula', `Aula ${aula.data} ${aula.hora} excluída`, 'agenda');
-            saveState();
-            renderSchedule();
-            renderContasFuturas();
+            saveState(); renderSchedule(); renderContasFuturas();
             toast('Agendamento excluído.', 'warning');
         }
-
         function toggleSelectAllSchedule() {
             const selectAll = document.getElementById('selectAllSchedule');
-            const checkboxes = document.querySelectorAll('#scheduleTableBody input[type="checkbox"][data-id]');
-            checkboxes.forEach(cb => cb.checked = selectAll.checked);
+            document.querySelectorAll('#scheduleTableBody input[type="checkbox"][data-id]').forEach(cb => cb.checked = selectAll.checked);
         }
-
         function deleteSelectedSchedule() {
             if (!can('agenda', 'excluir')) { toast('Sem permissão para excluir.', 'error'); return; }
             const checkboxes = document.querySelectorAll('#scheduleTableBody input[type="checkbox"]:checked[data-id]');
@@ -2290,58 +2057,35 @@
             if (!confirmAdminDeletion()) return;
             const idsToDelete = [];
             checkboxes.forEach(cb => idsToDelete.push(cb.getAttribute('data-id')));
-
             const aulasSelecionadas = state.schedule.filter(a => idsToDelete.includes(a.id));
             const gruposRecalculo = {};
-
             aulasSelecionadas.forEach(a => {
                 if (a.alunoId) {
-                    const anoMes = a.data.slice(0, 7);
-                    const chave = a.alunoId + '|' + anoMes;
-                    if (!gruposRecalculo[chave]) gruposRecalculo[chave] = { alunoId: a.alunoId, anoMes };
+                    const chave = a.alunoId + '|' + a.data.slice(0, 7);
+                    if (!gruposRecalculo[chave]) gruposRecalculo[chave] = { alunoId: a.alunoId, anoMes: a.data.slice(0, 7) };
                 }
             });
-
             state.schedule = state.schedule.filter(a => !idsToDelete.includes(a.id));
-
-            Object.values(gruposRecalculo).forEach(g => {
-                recalcularMensalidade(g.alunoId, g.anoMes);
-            });
-
+            Object.values(gruposRecalculo).forEach(g => recalcularMensalidade(g.alunoId, g.anoMes));
             logAction('Excluir Aulas em Lote', `${aulasSelecionadas.length} aulas excluídas`, 'agenda');
-            saveState();
-            renderSchedule();
-            renderContasFuturas();
+            saveState(); renderSchedule(); renderContasFuturas();
             toast(`${idsToDelete.length} aula(s) excluída(s) com sucesso!`, 'warning');
         }
-
         function renderSchedule() {
             const tbody = document.getElementById('scheduleTableBody');
             const filterText = (document.getElementById('agendaFilterText')?.value || '').toLowerCase();
             const filterDate = document.getElementById('agendaFilterDate')?.value || '';
             const filterHora = document.getElementById('agendaFilterHora')?.value || '';
             const filterStatus = document.getElementById('agendaFilterStatus')?.value || '';
-            
             let filtered = [...state.schedule];
-            
-            if (filterText) {
-                filtered = filtered.filter(a => {
-                    const aluno = state.students.find(s => s.id === a.alunoId);
-                    const acad = state.academias.find(g => g.id === a.academiaId);
-                    return (aluno && aluno.nome.toLowerCase().includes(filterText)) || 
-                           (acad && acad.nome.toLowerCase().includes(filterText));
-                });
-            }
-            if (filterDate) {
-                filtered = filtered.filter(a => a.data === filterDate);
-            }
-            if (filterHora) {
-                filtered = filtered.filter(a => a.hora === filterHora);
-            }
-            if (filterStatus) {
-                filtered = filtered.filter(a => a.status === filterStatus);
-            }
-            
+            if (filterText) filtered = filtered.filter(a => {
+                const aluno = state.students.find(s => s.id === a.alunoId);
+                const acad = state.academias.find(g => g.id === a.academiaId);
+                return (aluno && aluno.nome.toLowerCase().includes(filterText)) || (acad && acad.nome.toLowerCase().includes(filterText));
+            });
+            if (filterDate) filtered = filtered.filter(a => a.data === filterDate);
+            if (filterHora) filtered = filtered.filter(a => a.hora === filterHora);
+            if (filterStatus) filtered = filtered.filter(a => a.status === filterStatus);
             const sorted = filtered.sort((a, b) => (a.data + 'T' + a.hora).localeCompare(b.data + 'T' + b.hora));
             let html = '';
             const canDelete = can('agenda', 'excluir');
@@ -2356,9 +2100,7 @@
                 const weekday = getWeekdayFromDate(a.data);
                 html += `<tr>
                     <td>${canDelete ? `<input type="checkbox" data-id="${a.id}" title="Selecionar">` : ''}</td>
-                    <td>${formatDate(a.data)}</td>
-                    <td>${esc(weekday)}</td>
-                    <td>${esc(a.hora)}</td>
+                    <td>${formatDate(a.data)}</td><td>${esc(weekday)}</td><td>${esc(a.hora)}</td>
                     <td>${esc(aluno ? aluno.nome : 'Aluno removido')}</td>
                     <td>${esc(acad ? acad.nome : 'Academia removida')}</td>
                     <td><span class="badge ${badgeClass}">${esc(a.status)}</span></td>
@@ -2375,8 +2117,7 @@
         function openRecurringScheduleForm() {
             if (!can('agenda', 'criar')) { toast('Sem permissão para criar.', 'error'); return; }
             document.getElementById('recurringScheduleForm').reset();
-            fillStudentSelect('recurringAluno');
-            fillAcademiaSelect('recurringAcademia');
+            fillStudentSelect('recurringAluno'); fillAcademiaSelect('recurringAcademia');
             const now = new Date();
             const firstDay = new Date(now.getFullYear(), now.getMonth(), 1);
             const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0);
@@ -2385,80 +2126,48 @@
             document.getElementById('recurringStatus').value = 'Agendada';
             openModal('recurringScheduleModal');
         }
-
         function saveRecurringSchedule(e) {
             e.preventDefault();
             if (!can('agenda', 'criar')) { toast('Sem permissão para criar.', 'error'); return; }
-            const alunoId = val('recurringAluno');
-            const academiaId = val('recurringAcademia');
+            const alunoId = val('recurringAluno'), academiaId = val('recurringAcademia');
             const hora = val('recurringHora');
-            const startDate = val('recurringStartDate');
-            const endDate = val('recurringEndDate');
+            const startDate = val('recurringStartDate'), endDate = val('recurringEndDate');
             const status = val('recurringStatus');
             const selectedDays = [];
             document.querySelectorAll('#recurringScheduleForm input[type="checkbox"]:checked').forEach(cb => selectedDays.push(parseInt(cb.value)));
-            if (!alunoId || !academiaId || !hora || !startDate || !endDate || selectedDays.length === 0) {
-                toast('Preencha todos os campos e selecione pelo menos um dia da semana.', 'error');
-                return;
-            }
-            const start = new Date(startDate + 'T00:00:00');
-            const end = new Date(endDate + 'T00:00:00');
+            if (!alunoId || !academiaId || !hora || !startDate || !endDate || selectedDays.length === 0) { toast('Preencha todos os campos e selecione pelo menos um dia da semana.', 'error'); return; }
+            const start = new Date(startDate + 'T00:00:00'), end = new Date(endDate + 'T00:00:00');
             if (start > end) { toast('A data final deve ser posterior à inicial.', 'error'); return; }
-            
             const newEntries = [];
             let current = new Date(start);
             while (current <= end) {
                 if (selectedDays.includes(current.getDay())) {
                     const dateStr = formatDateInput(current);
-                    if (checkScheduleConflict(alunoId, dateStr, hora)) {
-                        toast(`Aula já cadastrada para ${formatDate(dateStr)} às ${hora}!`, 'error');
-                        return;
-                    }
-                    newEntries.push({ id: genId(), data: dateStr, hora: hora, alunoId: alunoId, academiaId: academiaId, status: status });
+                    if (checkScheduleConflict(alunoId, dateStr, hora)) { toast(`Aula já cadastrada para ${formatDate(dateStr)} às ${hora}!`, 'error'); return; }
+                    newEntries.push({ id: genId(), data: dateStr, hora, alunoId, academiaId, status });
                 }
                 current.setDate(current.getDate() + 1);
             }
             if (newEntries.length === 0) { toast('Nenhum dia selecionado dentro do período.', 'warning'); return; }
-            
             state.schedule.push(...newEntries);
             logAction('Aulas Recorrentes', `Geradas ${newEntries.length} aulas recorrentes`, 'agenda');
-
-            // ============================================================
-            // Para aulas recorrentes, gerar em "Contas a Pagar e Receber"
-            // APENAS o PRIMEIRO vencimento por aluno (o mês mais antigo).
-            // Os próximos vencimentos serão gerados somente quando o
-            // vencimento anterior for marcado como PAGO.
-            // ============================================================
             const earliestByAluno = {};
             newEntries.forEach(a => {
                 const anoMes = a.data.slice(0, 7);
-                if (!earliestByAluno[a.alunoId] || anoMes < earliestByAluno[a.alunoId]) {
-                    earliestByAluno[a.alunoId] = anoMes;
-                }
+                if (!earliestByAluno[a.alunoId] || anoMes < earliestByAluno[a.alunoId]) earliestByAluno[a.alunoId] = anoMes;
             });
-            Object.keys(earliestByAluno).forEach(alunoIdKey => {
-                recalcularMensalidade(alunoIdKey, earliestByAluno[alunoIdKey]);
-            });
-            // ============================================================
-
-            saveState();
-            closeModal('recurringScheduleModal');
-            renderSchedule();
-            renderContasFuturas();
+            Object.keys(earliestByAluno).forEach(alunoIdKey => recalcularMensalidade(alunoIdKey, earliestByAluno[alunoIdKey]));
+            saveState(); closeModal('recurringScheduleModal'); renderSchedule(); renderContasFuturas();
             toast(`Geradas ${newEntries.length} aulas recorrentes!`);
         }
 
         // ==================== TREINOS ====================
-        function fillWorkoutAcademiaSelect(selectedId) {
-            fillAcademiaSelect('workoutAcademia', selectedId);
-        }
+        function fillWorkoutAcademiaSelect(selectedId) { fillAcademiaSelect('workoutAcademia', selectedId); }
         function fillWorkoutAlunoSelect(selectedId) {
             const select = document.getElementById('workoutAluno');
             if (!select) return;
             let html = '<option value="">Todos os alunos (geral)</option>';
-            state.students.forEach(s => {
-                html += `<option value="${s.id}" ${selectedId === s.id ? 'selected' : ''}>${esc(s.nome)}</option>`;
-            });
+            state.students.forEach(s => { html += `<option value="${s.id}" ${selectedId === s.id ? 'selected' : ''}>${esc(s.nome)}</option>`; });
             select.innerHTML = html;
         }
         function openWorkoutForm(id) {
@@ -2467,8 +2176,7 @@
             editingId = id || null;
             document.getElementById('workoutForm').reset();
             document.querySelectorAll('#workoutDiasContainer input[type="checkbox"]').forEach(cb => cb.checked = false);
-            fillWorkoutAlunoSelect(null);
-            fillWorkoutAcademiaSelect(null);
+            fillWorkoutAlunoSelect(null); fillWorkoutAcademiaSelect(null);
             if (id) {
                 const w = state.workouts.find(w => w.id === id);
                 if (!w) return;
@@ -2477,25 +2185,18 @@
                 document.getElementById('workoutHorario').value = w.horario || '';
                 document.getElementById('workoutAcademia').value = w.academiaId || '';
                 const dias = w.diasSemana || (w.diaSemana !== undefined ? [w.diaSemana] : []);
-                document.querySelectorAll('#workoutDiasContainer input[type="checkbox"]').forEach(cb => {
-                    cb.checked = dias.includes(parseInt(cb.value));
-                });
+                document.querySelectorAll('#workoutDiasContainer input[type="checkbox"]').forEach(cb => { cb.checked = dias.includes(parseInt(cb.value)); });
                 document.getElementById('workoutAluno').value = w.alunoId || '';
                 document.getElementById('workoutExercicios').value = w.exercicios || '';
-                fillWorkoutAlunoSelect(w.alunoId || '');
-                fillWorkoutAcademiaSelect(w.academiaId || '');
-            } else {
-                fillWorkoutAlunoSelect('');
-                fillWorkoutAcademiaSelect('');
-            }
+                fillWorkoutAlunoSelect(w.alunoId || ''); fillWorkoutAcademiaSelect(w.academiaId || '');
+            } else { fillWorkoutAlunoSelect(''); fillWorkoutAcademiaSelect(''); }
             openModal('workoutModal');
         }
         function saveWorkout(e) {
             e.preventDefault();
             if (editingId && !can('treinos', 'editar')) return;
             if (!editingId && !can('treinos', 'criar')) return;
-            const nome = val('workoutNome');
-            const grupo = val('workoutGrupo');
+            const nome = val('workoutNome'), grupo = val('workoutGrupo');
             const horario = val('workoutHorario');
             const academiaId = val('workoutAcademia') || null;
             const alunoId = val('workoutAluno') || null;
@@ -2506,16 +2207,13 @@
             if (diasSemana.length === 0) { toast('Selecione pelo menos um dia da semana.', 'error'); return; }
             if (editingId) {
                 const idx = state.workouts.findIndex(w => w.id === editingId);
-                if (idx > -1) {
-                    state.workouts[idx] = { ...state.workouts[idx], nome, grupo, horario, academiaId, diasSemana, alunoId, exercicios };
-                    logAction('Editar Treino', `Treino ${nome} editado`, 'treinos');
-                }
+                if (idx > -1) { state.workouts[idx] = { ...state.workouts[idx], nome, grupo, horario, academiaId, diasSemana, alunoId, exercicios }; logAction('Editar Treino', `Treino ${nome} editado`, 'treinos'); }
             } else {
-                const novo = { id: genId(), nome, grupo, horario, academiaId, diasSemana, alunoId, exercicios };
-                state.workouts.push(novo);
+                state.workouts.push({ id: genId(), nome, grupo, horario, academiaId, diasSemana, alunoId, exercicios });
                 logAction('Criar Treino', `Treino ${nome} criado`, 'treinos');
             }
-            saveState(); closeModal('workoutModal'); renderWorkouts(); toast('Treino salvo com sucesso!');
+            saveState(); closeModal('workoutModal'); renderWorkouts();
+            toast('Treino salvo com sucesso!');
         }
         function deleteWorkout(id) {
             if (!can('treinos', 'excluir')) { toast('Sem permissão para excluir.', 'error'); return; }
@@ -2523,7 +2221,8 @@
             const treino = state.workouts.find(w => w.id === id);
             if (treino) logAction('Excluir Treino', `Treino ${treino.nome} excluído`, 'treinos');
             state.workouts = state.workouts.filter(w => w.id !== id);
-            saveState(); renderWorkouts(); toast('Treino excluído.', 'warning');
+            saveState(); renderWorkouts();
+            toast('Treino excluído.', 'warning');
         }
         function renderWorkouts() {
             const tbody = document.getElementById('workoutsTableBody');
@@ -2536,12 +2235,8 @@
                 const dias = w.diasSemana || (w.diaSemana !== undefined ? [w.diaSemana] : []);
                 const diasStr = dias.map(d => getWeekdayName(d)).join(', ');
                 html += `<tr>
-                    <td>${esc(w.nome)}</td>
-                    <td>${esc(w.grupo)}</td>
-                    <td>${esc(diasStr)}</td>
-                    <td>${esc(w.horario || '-')}</td>
-                    <td>${esc(academiaNome)}</td>
-                    <td>${esc(alunoNome)}</td>
+                    <td>${esc(w.nome)}</td><td>${esc(w.grupo)}</td><td>${esc(diasStr)}</td>
+                    <td>${esc(w.horario || '-')}</td><td>${esc(academiaNome)}</td><td>${esc(alunoNome)}</td>
                     <td>
                         <button class="btn btn-sm btn-outline" onclick="openWorkoutForm('${w.id}')" ${can('treinos', 'editar') ? '' : 'disabled'}><i class="fas fa-edit"></i></button>
                         <button class="btn btn-sm btn-danger" onclick="deleteWorkout('${w.id}')" ${can('treinos', 'excluir') ? '' : 'disabled'}><i class="fas fa-trash"></i></button>
@@ -2558,9 +2253,8 @@
                     return dias.includes(day);
                 });
                 weekHtml += `<div class="day-card"><h4>${getWeekdayName(day)}</h4>`;
-                if (dayWorkouts.length === 0) {
-                    weekHtml += '<small style="color:var(--text-light);">Nenhum treino</small>';
-                } else {
+                if (dayWorkouts.length === 0) weekHtml += '<small style="color:var(--text-light);">Nenhum treino</small>';
+                else {
                     dayWorkouts.forEach(w => {
                         const aluno = state.students.find(s => s.id === w.alunoId);
                         const alunoNome = aluno ? aluno.nome : 'Todos';
@@ -2584,11 +2278,8 @@
                 const dias = w.diasSemana || (w.diaSemana !== undefined ? [w.diaSemana] : []);
                 return dias.includes(today);
             });
-
             let html = `<h2>`;
-            if (currentStudent.foto) {
-                html += `<img class="student-avatar" src="${esc(currentStudent.foto)}" alt="Foto">`;
-            }
+            if (currentStudent.foto) html += `<img class="student-avatar" src="${esc(currentStudent.foto)}" alt="Foto">`;
             html += `Olá, ${esc(currentStudent.nome)}!</h2>`;
             if (todayWorkouts.length > 0) {
                 html += `<div class="highlight"><h3><i class="fas fa-fire"></i> Treino de Hoje (${getWeekdayName(today)})</h3>`;
@@ -2611,9 +2302,8 @@
                     return dias.includes(day);
                 });
                 html += `<div class="day-card"><h4>${getWeekdayName(day)}</h4>`;
-                if (dayWorkouts.length === 0) {
-                    html += '<small style="color:var(--text-light);">Nenhum treino</small>';
-                } else {
+                if (dayWorkouts.length === 0) html += '<small style="color:var(--text-light);">Nenhum treino</small>';
+                else {
                     dayWorkouts.forEach(w => {
                         const academia = state.academias.find(a => a.id === w.academiaId);
                         const academiaNome = academia ? academia.nome : '-';
@@ -2624,26 +2314,16 @@
                 }
                 html += '</div>';
             });
-
             html += '<h3 style="margin-top: 25px;"><i class="fas fa-camera"></i> Minhas Fotos de Evolução</h3>';
             const evolucaoFotos = currentStudent.evolucaoFotos || [];
-            if (evolucaoFotos.length === 0) {
-                html += '<p style="color:var(--text-light);">Nenhuma foto de evolução adicionada ainda.</p>';
-            } else {
+            if (evolucaoFotos.length === 0) html += '<p style="color:var(--text-light);">Nenhuma foto de evolução adicionada ainda.</p>';
+            else {
                 html += '<div class="evolutions-grid">';
                 evolucaoFotos.forEach(foto => {
-                    html += `
-                        <div class="evolution-card">
-                            <img src="${esc(foto.foto)}" alt="Evolução" onclick="openLightbox('${esc(foto.foto)}')">
-                            <div class="evo-info">
-                                <p>${esc(foto.legenda || 'Sem legenda')}</p>
-                                <small>${esc(formatDate(foto.data))}</small>
-                            </div>
-                        </div>`;
+                    html += `<div class="evolution-card"><img src="${esc(foto.foto)}" alt="Evolução" onclick="openLightbox('${esc(foto.foto)}')"><div class="evo-info"><p>${esc(foto.legenda || 'Sem legenda')}</p><small>${esc(formatDate(foto.data))}</small></div></div>`;
                 });
                 html += '</div>';
             }
-
             html += `<button class="btn btn-outline" onclick="logout()" style="margin-top:20px;"><i class="fas fa-sign-out-alt"></i> Sair</button>`;
             area.innerHTML = html;
         }
@@ -2662,8 +2342,7 @@
                     if (width > height && width > max) { height *= max / width; width = max; }
                     else if (height > max) { width *= max / height; height = max; }
                     canvas.width = width; canvas.height = height;
-                    const ctx = canvas.getContext('2d');
-                    ctx.drawImage(img, 0, 0, width, height);
+                    canvas.getContext('2d').drawImage(img, 0, 0, width, height);
                     albumFotoData = canvas.toDataURL('image/jpeg', 0.8);
                     document.getElementById('albumFotoPreview').src = albumFotoData;
                 };
@@ -2693,24 +2372,17 @@
             e.preventDefault();
             if (editingId && !can('album', 'editar')) return;
             if (!editingId && !can('album', 'criar')) return;
-            const titulo = val('albumTitulo');
-            const descricao = val('albumDescricao');
+            const titulo = val('albumTitulo'), descricao = val('albumDescricao');
             const foto = albumFotoData || '';
             if (!foto) { toast('Selecione uma foto para o álbum.', 'error'); return; }
             if (editingId) {
                 const idx = state.album.findIndex(item => item.id === editingId);
-                if (idx > -1) {
-                    state.album[idx] = { ...state.album[idx], titulo, descricao, foto };
-                    logAction('Editar Foto Álbum', `Foto ${titulo || 'sem título'} editada`, 'album');
-                }
+                if (idx > -1) { state.album[idx] = { ...state.album[idx], titulo, descricao, foto }; logAction('Editar Foto Álbum', `Foto ${titulo || 'sem título'} editada`, 'album'); }
             } else {
-                const nova = { id: genId(), titulo, descricao, foto, data: new Date().toISOString() };
-                state.album.push(nova);
+                state.album.push({ id: genId(), titulo, descricao, foto, data: new Date().toISOString() });
                 logAction('Adicionar Foto Álbum', `Foto ${titulo || 'sem título'} adicionada`, 'album');
             }
-            saveState();
-            closeModal('albumModal');
-            renderAlbum();
+            saveState(); closeModal('albumModal'); renderAlbum();
             toast('Foto salva no álbum com sucesso!');
         }
         function deleteAlbum(id) {
@@ -2719,95 +2391,59 @@
             const item = state.album.find(i => i.id === id);
             if (item) logAction('Excluir Foto Álbum', `Foto ${item.titulo || 'sem título'} excluída`, 'album');
             state.album = state.album.filter(item => item.id !== id);
-            saveState(); renderAlbum(); toast('Foto excluída do álbum.', 'warning');
+            saveState(); renderAlbum();
+            toast('Foto excluída do álbum.', 'warning');
         }
         function renderAlbum() {
             const grid = document.getElementById('albumGrid');
             if (!grid) return;
             let html = '';
-            if (state.album.length === 0) {
-                html = '<p style="color:var(--text-light);">Nenhuma foto no álbum. Clique em "+ Nova Foto" para adicionar.</p>';
-            } else {
+            if (state.album.length === 0) html = '<p style="color:var(--text-light);">Nenhuma foto no álbum. Clique em "+ Nova Foto" para adicionar.</p>';
+            else {
                 state.album.forEach(item => {
-                    html += `
-                    <div class="album-item">
-                        <img src="${esc(item.foto)}" alt="${esc(item.titulo || 'Foto')}" onclick="openLightbox(this.src)" style="cursor: pointer;">
-                        <div class="album-item-info">
-                            <h4>${esc(item.titulo || 'Sem título')}</h4>
-                            <p>${esc(item.descricao || 'Sem descrição')}</p>
-                            <div class="album-item-actions">
-                                <button class="btn btn-sm btn-outline" onclick="openAlbumForm('${item.id}')" ${can('album', 'editar') ? '' : 'disabled'}><i class="fas fa-edit"></i></button>
-                                <button class="btn btn-sm btn-danger" onclick="deleteAlbum('${item.id}')" ${can('album', 'excluir') ? '' : 'disabled'}><i class="fas fa-trash"></i></button>
-                            </div>
-                        </div>
-                    </div>`;
+                    html += `<div class="album-item"><img src="${esc(item.foto)}" alt="${esc(item.titulo || 'Foto')}" onclick="openLightbox(this.src)" style="cursor: pointer;"><div class="album-item-info"><h4>${esc(item.titulo || 'Sem título')}</h4><p>${esc(item.descricao || 'Sem descrição')}</p><div class="album-item-actions"><button class="btn btn-sm btn-outline" onclick="openAlbumForm('${item.id}')" ${can('album', 'editar') ? '' : 'disabled'}><i class="fas fa-edit"></i></button><button class="btn btn-sm btn-danger" onclick="deleteAlbum('${item.id}')" ${can('album', 'excluir') ? '' : 'disabled'}><i class="fas fa-trash"></i></button></div></div></div>`;
                 });
             }
             grid.innerHTML = html;
         }
-        function openLightbox(src) {
-            const lightbox = document.getElementById('lightbox');
-            const img = document.getElementById('lightboxImage');
-            img.src = src;
-            lightbox.classList.remove('hidden');
-        }
-        function closeLightbox() {
-            document.getElementById('lightbox').classList.add('hidden');
-            document.getElementById('lightboxImage').src = '';
-        }
+        function openLightbox(src) { document.getElementById('lightboxImage').src = src; document.getElementById('lightbox').classList.remove('hidden'); }
+        function closeLightbox() { document.getElementById('lightbox').classList.add('hidden'); document.getElementById('lightboxImage').src = ''; }
 
         // ==================== FLUXO DE CAIXA ====================
         function setCashflowFilter(filter) {
             cashflowFilter = filter;
-            const buttons = document.querySelectorAll('#cashflowFilterButtons .btn');
-            buttons.forEach(btn => {
+            document.querySelectorAll('#cashflowFilterButtons .btn').forEach(btn => {
                 btn.classList.remove('active');
-                if (btn.getAttribute('data-filter') === filter) {
-                    btn.classList.add('active');
-                }
+                if (btn.getAttribute('data-filter') === filter) btn.classList.add('active');
             });
             renderCashflow();
         }
-
         function getFilteredCashflow() {
-            const hoje = new Date();
-            const hojeStr = formatDateInput(hoje);
+            const hoje = new Date(), hojeStr = formatDateInput(hoje);
             let filtered = [...state.cashflow];
-            
-            if (cashflowFilter === 'hoje') {
-                filtered = filtered.filter(c => c.data === hojeStr);
-            } else if (cashflowFilter === 'semana') {
+            if (cashflowFilter === 'hoje') filtered = filtered.filter(c => c.data === hojeStr);
+            else if (cashflowFilter === 'semana') {
                 const diaSemana = hoje.getDay();
                 const diff = (diaSemana === 0 ? -6 : 1 - diaSemana);
-                const segunda = new Date(hoje);
-                segunda.setDate(hoje.getDate() + diff);
+                const segunda = new Date(hoje); segunda.setDate(hoje.getDate() + diff);
                 const segundaStr = formatDateInput(segunda);
-                const domingo = new Date(segunda);
-                domingo.setDate(segunda.getDate() + 6);
+                const domingo = new Date(segunda); domingo.setDate(segunda.getDate() + 6);
                 const domingoStr = formatDateInput(domingo);
                 filtered = filtered.filter(c => c.data >= segundaStr && c.data <= domingoStr);
             } else if (cashflowFilter === 'mes') {
                 const mesAtual = hojeStr.slice(0, 7);
                 filtered = filtered.filter(c => c.data.slice(0, 7) === mesAtual);
             }
-            
             return filtered;
         }
-
         function updateCashflowSummary() {
             const filtered = getFilteredCashflow();
-            let totalEntrada = 0;
-            let totalSaida = 0;
-            filtered.forEach(c => {
-                totalEntrada += parseFloat(c.entrada) || 0;
-                totalSaida += parseFloat(c.saida) || 0;
-            });
-            const saldo = totalEntrada - totalSaida;
+            let totalEntrada = 0, totalSaida = 0;
+            filtered.forEach(c => { totalEntrada += parseFloat(c.entrada) || 0; totalSaida += parseFloat(c.saida) || 0; });
             document.getElementById('cashflowTotalEntrada').textContent = formatCurrency(totalEntrada);
             document.getElementById('cashflowTotalSaida').textContent = formatCurrency(totalSaida);
-            document.getElementById('cashflowSaldo').textContent = formatCurrency(saldo);
+            document.getElementById('cashflowSaldo').textContent = formatCurrency(totalEntrada - totalSaida);
         }
-
         function openCashflowForm(id) {
             if (id) { if (!can('fluxocaixa', 'editar')) { toast('Sem permissão para editar.', 'error'); return; } }
             else { if (!can('fluxocaixa', 'criar')) { toast('Sem permissão para criar.', 'error'); return; } }
@@ -2831,25 +2467,20 @@
             e.preventDefault();
             if (editingId && !can('fluxocaixa', 'editar')) return;
             if (!editingId && !can('fluxocaixa', 'criar')) return;
-            const data = val('cashflowData');
-            const descricao = val('cashflowDescricao');
-            const entrada = parseCurrency(val('cashflowEntrada'));
-            const saida = parseCurrency(val('cashflowSaida'));
+            const data = val('cashflowData'), descricao = val('cashflowDescricao');
+            const entrada = parseCurrency(val('cashflowEntrada')), saida = parseCurrency(val('cashflowSaida'));
             const forma_pgto = val('cashflowFormaPgto');
             if (!data || !descricao) { toast('Informe data e descrição.', 'error'); return; }
             if (entrada === 0 && saida === 0) { toast('Informe ao menos uma entrada ou saída.', 'error'); return; }
             if (editingId) {
                 const idx = state.cashflow.findIndex(c => c.id === editingId);
-                if (idx > -1) {
-                    state.cashflow[idx] = { ...state.cashflow[idx], data, descricao, entrada, saida, forma_pgto };
-                    logAction('Editar Lançamento', `Lançamento ${descricao} editado`, 'fluxocaixa');
-                }
+                if (idx > -1) { state.cashflow[idx] = { ...state.cashflow[idx], data, descricao, entrada, saida, forma_pgto }; logAction('Editar Lançamento', `Lançamento ${descricao} editado`, 'fluxocaixa'); }
             } else {
-                const novo = { id: genId(), data, descricao, entrada, saida, forma_pgto };
-                state.cashflow.push(novo);
+                state.cashflow.push({ id: genId(), data, descricao, entrada, saida, forma_pgto });
                 logAction('Criar Lançamento', `Lançamento ${descricao} criado`, 'fluxocaixa');
             }
-            saveState(); closeModal('cashflowModal'); renderCashflow(); toast('Lançamento salvo com sucesso!');
+            saveState(); closeModal('cashflowModal'); renderCashflow();
+            toast('Lançamento salvo com sucesso!');
         }
         function deleteCashflow(id) {
             if (!can('fluxocaixa', 'excluir')) { toast('Sem permissão para excluir.', 'error'); return; }
@@ -2857,7 +2488,8 @@
             const lanc = state.cashflow.find(c => c.id === id);
             if (lanc) logAction('Excluir Lançamento', `Lançamento ${lanc.descricao} excluído`, 'fluxocaixa');
             state.cashflow = state.cashflow.filter(c => c.id !== id);
-            saveState(); renderCashflow(); toast('Lançamento excluído.', 'warning');
+            saveState(); renderCashflow();
+            toast('Lançamento excluído.', 'warning');
         }
         function renderCashflow() {
             const tbody = document.getElementById('cashflowTableBody');
@@ -2881,7 +2513,6 @@
             document.getElementById('contasFilterStatus').value = '';
             renderContasFuturas();
         }
-
         function openContaForm(id) {
             if (id) { if (!can('fluxocaixa', 'editar')) { toast('Sem permissão para editar.', 'error'); return; } }
             else { if (!can('fluxocaixa', 'criar')) { toast('Sem permissão para criar.', 'error'); return; } }
@@ -2903,24 +2534,19 @@
             e.preventDefault();
             if (editingId && !can('fluxocaixa', 'editar')) return;
             if (!editingId && !can('fluxocaixa', 'criar')) return;
-            const descricao = val('contaDescricao');
-            const tipo = val('contaTipo');
+            const descricao = val('contaDescricao'), tipo = val('contaTipo');
             const valor = parseCurrency(val('contaValor'));
-            const vencimento = val('contaVencimento');
-            const status = val('contaStatus');
+            const vencimento = val('contaVencimento'), status = val('contaStatus');
             if (!descricao || !tipo || valor <= 0 || !vencimento) { toast('Preencha todos os campos obrigatórios.', 'error'); return; }
             if (editingId) {
                 const idx = state.contasFuturas.findIndex(c => c.id === editingId);
-                if (idx > -1) {
-                    state.contasFuturas[idx] = { ...state.contasFuturas[idx], descricao, tipo, valor, vencimento, status };
-                    logAction('Editar Conta', `Conta ${descricao} editada`, 'fluxocaixa');
-                }
+                if (idx > -1) { state.contasFuturas[idx] = { ...state.contasFuturas[idx], descricao, tipo, valor, vencimento, status }; logAction('Editar Conta', `Conta ${descricao} editada`, 'fluxocaixa'); }
             } else {
-                const nova = { id: genId(), descricao, tipo, valor, vencimento, status };
-                state.contasFuturas.push(nova);
+                state.contasFuturas.push({ id: genId(), descricao, tipo, valor, vencimento, status });
                 logAction('Criar Conta', `Conta ${descricao} criada`, 'fluxocaixa');
             }
-            saveState(); closeModal('contaModal'); renderContasFuturas(); toast('Conta salva com sucesso!');
+            saveState(); closeModal('contaModal'); renderContasFuturas();
+            toast('Conta salva com sucesso!');
         }
         function deleteConta(id) {
             if (!can('fluxocaixa', 'excluir')) { toast('Sem permissão para excluir.', 'error'); return; }
@@ -2928,90 +2554,34 @@
             const conta = state.contasFuturas.find(c => c.id === id);
             if (conta) logAction('Excluir Conta', `Conta ${conta.descricao} excluída`, 'fluxocaixa');
             state.contasFuturas = state.contasFuturas.filter(c => c.id !== id);
-            saveState(); renderContasFuturas(); toast('Conta excluída.', 'warning');
+            saveState(); renderContasFuturas();
+            toast('Conta excluída.', 'warning');
         }
-
-        // ============================================================
-        // Verifica se existe um próximo mês com aulas para o aluno
-        // e, em caso afirmativo, gera o próximo vencimento (uma única vez).
-        // ============================================================
         function lancarProximoVencimento(contaPaga) {
-            if (!contaPaga) return;
-            if (contaPaga.tipo !== 'Receber') return;
-            if (!contaPaga.alunoId || !contaPaga.anoMes) return;
-
-            const proximosMeses = [...new Set(
-                state.schedule
-                    .filter(a =>
-                        a.alunoId === contaPaga.alunoId &&
-                        a.status !== 'Cancelada' &&
-                        a.data.slice(0, 7) > contaPaga.anoMes
-                    )
-                    .map(a => a.data.slice(0, 7))
-            )].sort();
-
+            if (!contaPaga || contaPaga.tipo !== 'Receber' || !contaPaga.alunoId || !contaPaga.anoMes) return;
+            const proximosMeses = [...new Set(state.schedule.filter(a => a.alunoId === contaPaga.alunoId && a.status !== 'Cancelada' && a.data.slice(0, 7) > contaPaga.anoMes).map(a => a.data.slice(0, 7)))].sort();
             if (proximosMeses.length === 0) return;
-
             const proximoAnoMes = proximosMeses[0];
-            const jaExiste = state.contasFuturas.some(c =>
-                c.alunoId === contaPaga.alunoId &&
-                c.anoMes === proximoAnoMes &&
-                c.tipo === 'Receber'
-            );
+            const jaExiste = state.contasFuturas.some(c => c.alunoId === contaPaga.alunoId && c.anoMes === proximoAnoMes && c.tipo === 'Receber');
             if (jaExiste) return;
-
             recalcularMensalidade(contaPaga.alunoId, proximoAnoMes);
         }
-        // ============================================================
-
         function marcarContaComoPaga(id) {
-            if (!can('fluxocaixa', 'editar') || !can('fluxocaixa', 'criar')) {
-                toast('Sem permissão para realizar esta operação.', 'error');
-                return;
-            }
+            if (!can('fluxocaixa', 'editar') || !can('fluxocaixa', 'criar')) { toast('Sem permissão para realizar esta operação.', 'error'); return; }
             const conta = state.contasFuturas.find(c => c.id === id);
-            if (!conta) {
-                toast('Conta não encontrada.', 'error');
-                return;
-            }
-            if (conta.status === 'Pago') {
-                toast('Esta conta já está marcada como PAGA.', 'warning');
-                return;
-            }
+            if (!conta) { toast('Conta não encontrada.', 'error'); return; }
+            if (conta.status === 'Pago') { toast('Esta conta já está marcada como PAGA.', 'warning'); return; }
             if (!confirmAdminAction(`Digite a senha do Administrador para marcar a conta "${conta.descricao}" como PAGA e lançar no fluxo de caixa:`)) return;
             const dataHoje = formatDateInput(new Date());
             const valor = parseFloat(conta.valor) || 0;
             const descricao = conta.descricao;
             const formaPgto = 'Dinheiro';
-            if (conta.tipo === 'Pagar') {
-                state.cashflow.push({
-                    id: genId(),
-                    data: dataHoje,
-                    descricao: `Pagamento: ${descricao}`,
-                    entrada: 0,
-                    saida: valor,
-                    forma_pgto: formaPgto
-                });
-            } else if (conta.tipo === 'Receber') {
-                state.cashflow.push({
-                    id: genId(),
-                    data: dataHoje,
-                    descricao: `Recebimento: ${descricao}`,
-                    entrada: valor,
-                    saida: 0,
-                    forma_pgto: formaPgto
-                });
-            }
+            if (conta.tipo === 'Pagar') state.cashflow.push({ id: genId(), data: dataHoje, descricao: `Pagamento: ${descricao}`, entrada: 0, saida: valor, forma_pgto: formaPgto });
+            else if (conta.tipo === 'Receber') state.cashflow.push({ id: genId(), data: dataHoje, descricao: `Recebimento: ${descricao}`, entrada: valor, saida: 0, forma_pgto: formaPgto });
             conta.status = 'Pago';
-
-            // Após marcar este vencimento como PAGO, lançar o próximo
-            // vencimento (se existir) para o mesmo aluno.
             lancarProximoVencimento(conta);
-
             logAction('Conta Paga', `Conta ${descricao} marcada como paga e lançada no fluxo de caixa`, 'fluxocaixa');
-            saveState();
-            renderContasFuturas();
-            renderCashflow();
+            saveState(); renderContasFuturas(); renderCashflow();
             toast(`Conta "${descricao}" marcada como PAGA e lançada no fluxo de caixa!`);
         }
         function renderContasFuturas() {
@@ -3019,24 +2589,10 @@
             const filterText = (document.getElementById('contasFilterText')?.value || '').toLowerCase();
             const filterDate = document.getElementById('contasFilterDate')?.value || '';
             const filterStatus = document.getElementById('contasFilterStatus')?.value || '';
-            
             let filtered = [...state.contasFuturas];
-            
-            if (filterText) {
-                filtered = filtered.filter(c => 
-                    c.descricao.toLowerCase().includes(filterText) || 
-                    c.tipo.toLowerCase().includes(filterText)
-                );
-            }
-            if (filterDate) {
-                filtered = filtered.filter(c => c.vencimento === filterDate);
-            }
-            if (filterStatus) {
-                filtered = filtered.filter(c => c.status === filterStatus);
-            }
-            
-            // Ordenação: status "Pago" sempre por último (embaixo).
-            // Pendentes/Vencidos/Recebidos ficam em cima, ordenados por vencimento.
+            if (filterText) filtered = filtered.filter(c => c.descricao.toLowerCase().includes(filterText) || c.tipo.toLowerCase().includes(filterText));
+            if (filterDate) filtered = filtered.filter(c => c.vencimento === filterDate);
+            if (filterStatus) filtered = filtered.filter(c => c.status === filterStatus);
             const sorted = filtered.sort((a, b) => {
                 const aPago = a.status === 'Pago' ? 1 : 0;
                 const bPago = b.status === 'Pago' ? 1 : 0;
@@ -3052,11 +2608,8 @@
                 const isPago = c.status === 'Pago';
                 const canMarkPago = can('fluxocaixa', 'editar') && can('fluxocaixa', 'criar') && !isPago;
                 html += `<tr>
-                    <td>${esc(c.descricao)}</td>
-                    <td>${esc(c.tipo)}</td>
-                    <td>${formatCurrency(c.valor)}</td>
-                    <td>${formatDate(c.vencimento)}</td>
-                    <td><span class="badge ${badgeClass}">${esc(c.status)}</span></td>
+                    <td>${esc(c.descricao)}</td><td>${esc(c.tipo)}</td><td>${formatCurrency(c.valor)}</td>
+                    <td>${formatDate(c.vencimento)}</td><td><span class="badge ${badgeClass}">${esc(c.status)}</span></td>
                     <td>
                         <button class="btn btn-sm btn-outline" onclick="openContaForm('${c.id}')" ${can('fluxocaixa', 'editar') ? '' : 'disabled'}><i class="fas fa-edit"></i></button>
                         <button class="btn btn-sm btn-success" onclick="marcarContaComoPaga('${c.id}')" ${canMarkPago ? '' : 'disabled'}><i class="fas fa-check"></i> PAGO</button>
@@ -3066,116 +2619,59 @@
             });
             tbody.innerHTML = html || '<tr><td colspan="6">Nenhuma conta futura cadastrada.</td></tr>';
         }
-
-        // ==================== GERAR MENSALIDADES ====================
         function gerarMensalidades() {
             if (!can('fluxocaixa', 'criar')) { toast('Sem permissão para gerar mensalidades.', 'error'); return; }
-            const hoje = new Date();
-            const hojeStr = formatDateInput(hoje);
-            let geradas = 0;
-            let ignoradas = 0;
-
+            const hoje = new Date(), hojeStr = formatDateInput(hoje);
+            let geradas = 0, ignoradas = 0;
             const agrupadas = {};
             state.schedule.forEach(a => {
-                if (a.status === 'Cancelada') return;
-                if (a.data < hojeStr) return;
+                if (a.status === 'Cancelada' || a.data < hojeStr) return;
                 const aluno = state.students.find(s => s.id === a.alunoId);
                 if (!aluno) return;
                 const chave = aluno.id + '|' + a.data.slice(0,7);
                 if (!agrupadas[chave]) agrupadas[chave] = { aluno, mes: a.data.slice(0,7), count: 0 };
                 agrupadas[chave].count++;
             });
-
             Object.values(agrupadas).forEach(({ aluno, mes, count }) => {
                 const valorAula = parseFloat(aluno.valorAula) || 0;
                 const mensalidadeFixa = parseFloat(aluno.mensalidadeFixa) || 0;
-                let valorTotal = 0;
-                let descricao = '';
-                
-                if (mensalidadeFixa > 0) {
-                    valorTotal = mensalidadeFixa;
-                    const [ano, numMes] = mes.split('-').map(Number);
-                    descricao = `Mensalidade Fixa de ${aluno.nome} - ${String(numMes).padStart(2,'0')}/${ano}`;
-                } else if (valorAula > 0) {
-                    if (valorAula <= 0) { ignoradas++; return; }
-                    valorTotal = count * valorAula;
-                    const [ano, numMes] = mes.split('-').map(Number);
-                    descricao = `Mensalidade de ${aluno.nome} - ${String(numMes).padStart(2,'0')}/${ano}`;
-                } else {
-                    ignoradas++;
-                    return;
-                }
-
+                let valorTotal = 0, descricao = '';
+                if (mensalidadeFixa > 0) { valorTotal = mensalidadeFixa; const [ano, numMes] = mes.split('-').map(Number); descricao = `Mensalidade Fixa de ${aluno.nome} - ${String(numMes).padStart(2,'0')}/${ano}`; }
+                else if (valorAula > 0) { valorTotal = count * valorAula; const [ano, numMes] = mes.split('-').map(Number); descricao = `Mensalidade de ${aluno.nome} - ${String(numMes).padStart(2,'0')}/${ano}`; }
+                else { ignoradas++; return; }
                 const [ano, numMes] = mes.split('-').map(Number);
                 const diaCadastro = parseInt(aluno.dataCadastro ? aluno.dataCadastro.slice(8,10) : String(hoje.getDate()).padStart(2,'0'));
                 const lastDay = new Date(ano, numMes, 0).getDate();
                 const diaVenc = Math.min(diaCadastro, lastDay);
                 const vencimento = `${ano}-${String(numMes).padStart(2,'0')}-${String(diaVenc).padStart(2,'0')}`;
                 if (vencimento < hojeStr) { ignoradas++; return; }
-
                 const jaExiste = state.contasFuturas.some(c => c.descricao === descricao && c.tipo === 'Receber');
                 if (jaExiste) { ignoradas++; return; }
-                state.contasFuturas.push({
-                    id: genId(),
-                    descricao,
-                    tipo: 'Receber',
-                    valor: valorTotal,
-                    vencimento,
-                    status: 'Pendente',
-                    alunoId: aluno.id,
-                    anoMes: mes
-                });
+                state.contasFuturas.push({ id: genId(), descricao, tipo: 'Receber', valor: valorTotal, vencimento, status: 'Pendente', alunoId: aluno.id, anoMes: mes });
                 geradas++;
             });
-
-            saveState();
-            renderContasFuturas();
+            saveState(); renderContasFuturas();
             logAction('Gerar Mensalidades', `Geradas ${geradas} mensalidades, ${ignoradas} ignoradas`, 'fluxocaixa');
             toast(`Mensalidades geradas: ${geradas} | Ignoradas: ${ignoradas}`, geradas > 0 ? 'success' : 'warning');
         }
-
-        // ==================== RECALCULAR MENSALIDADE ====================
         function recalcularMensalidade(alunoId, anoMes) {
             const aluno = state.students.find(s => s.id === alunoId);
             if (!aluno) return;
-
             state.contasFuturas = state.contasFuturas.filter(c => !(c.alunoId === alunoId && c.anoMes === anoMes && c.tipo === 'Receber' && (c.status === 'Pendente' || c.status === 'Vencido')));
-
             const aulasNoMes = state.schedule.filter(a => a.alunoId === alunoId && a.status !== 'Cancelada' && a.data.slice(0,7) === anoMes).length;
             if (aulasNoMes === 0) return;
-
             const valorAula = parseFloat(aluno.valorAula) || 0;
             const mensalidadeFixa = parseFloat(aluno.mensalidadeFixa) || 0;
-            let valorTotal = 0;
-            let descricao = '';
-
-            if (mensalidadeFixa > 0) {
-                valorTotal = mensalidadeFixa;
-                const [ano, numMes] = anoMes.split('-').map(Number);
-                descricao = `Mensalidade Fixa de ${aluno.nome} - ${String(numMes).padStart(2,'0')}/${ano}`;
-            } else if (valorAula > 0) {
-                valorTotal = aulasNoMes * valorAula;
-                const [ano, numMes] = anoMes.split('-').map(Number);
-                descricao = `Mensalidade de ${aluno.nome} - ${String(numMes).padStart(2,'0')}/${ano}`;
-            }
-
+            let valorTotal = 0, descricao = '';
+            if (mensalidadeFixa > 0) { valorTotal = mensalidadeFixa; const [ano, numMes] = anoMes.split('-').map(Number); descricao = `Mensalidade Fixa de ${aluno.nome} - ${String(numMes).padStart(2,'0')}/${ano}`; }
+            else if (valorAula > 0) { valorTotal = aulasNoMes * valorAula; const [ano, numMes] = anoMes.split('-').map(Number); descricao = `Mensalidade de ${aluno.nome} - ${String(numMes).padStart(2,'0')}/${ano}`; }
             if (valorTotal > 0) {
                 const [ano, numMes] = anoMes.split('-').map(Number);
                 const diaCadastro = parseInt(aluno.dataCadastro ? aluno.dataCadastro.slice(8,10) : String(new Date().getDate()).padStart(2,'0'));
                 const lastDay = new Date(ano, numMes, 0).getDate();
                 const diaVenc = Math.min(diaCadastro, lastDay);
                 const vencimento = `${ano}-${String(numMes).padStart(2,'0')}-${String(diaVenc).padStart(2,'0')}`;
-
-                state.contasFuturas.push({
-                    id: genId(),
-                    descricao,
-                    tipo: 'Receber',
-                    valor: valorTotal,
-                    vencimento,
-                    status: 'Pendente',
-                    alunoId,
-                    anoMes
-                });
+                state.contasFuturas.push({ id: genId(), descricao, tipo: 'Receber', valor: valorTotal, vencimento, status: 'Pendente', alunoId, anoMes });
             }
         }
 
@@ -3186,49 +2682,30 @@
             state.academias.forEach(a => html += `<option value="${a.id}">${esc(a.nome)}</option>`);
             select.innerHTML = html;
         }
-
         function aplicarFiltro() {
             if (!can('filtro', 'ver')) { toast('Acesso negado ao filtro.', 'error'); return; }
-
             const moduloSelecionado = val('filtroModulo');
-            const dataIni = val('filtroDataInicio');
-            const dataFim = val('filtroDataFim');
+            const dataIni = val('filtroDataInicio'), dataFim = val('filtroDataFim');
             const cpf = val('filtroCpf').replace(/\D/g, '');
             const celular = val('filtroCelular').replace(/\D/g, '');
             const academiaId = val('filtroAcademia');
             const entradaMin = parseFloat(val('filtroEntradaMin')) || 0;
             const saidaMin = parseFloat(val('filtroSaidaMin')) || 0;
             const descricao = val('filtroDescricao').toLowerCase();
-
             let modulesToSearch = [];
             if (moduloSelecionado === 'todos') {
                 const temFiltroEspecifico = dataIni || dataFim || cpf || celular || academiaId || entradaMin > 0 || saidaMin > 0 || descricao;
-                if (!temFiltroEspecifico) {
-                    toast('Selecione um módulo ou preencha pelo menos um filtro para pesquisar.', 'warning');
-                    return;
-                }
+                if (!temFiltroEspecifico) { toast('Selecione um módulo ou preencha pelo menos um filtro para pesquisar.', 'warning'); return; }
                 modulesToSearch = ['alunos', 'academias', 'agenda', 'album', 'fluxocaixa', 'treinos'];
-            } else {
-                modulesToSearch = [moduloSelecionado];
-            }
-
+            } else modulesToSearch = [moduloSelecionado];
             const results = [];
-
             if (modulesToSearch.includes('alunos')) {
                 state.students.forEach(s => {
                     const acad = state.academias.find(a => a.id === s.academiaId);
                     let match = true;
-                    if (cpf) {
-                        const cpfAluno = (s.cpf || '').replace(/\D/g, '');
-                        if (!cpfAluno.includes(cpf)) match = false;
-                    }
-                    if (celular) {
-                        const celAluno = (s.telefone || '').replace(/\D/g, '');
-                        if (!celAluno.includes(celular)) match = false;
-                    }
-                    if (academiaId) {
-                        if (s.academiaId !== academiaId) match = false;
-                    }
+                    if (cpf && !(s.cpf || '').replace(/\D/g, '').includes(cpf)) match = false;
+                    if (celular && !(s.telefone || '').replace(/\D/g, '').includes(celular)) match = false;
+                    if (academiaId && s.academiaId !== academiaId) match = false;
                     if (match) {
                         let valorDisplay = '';
                         if (s.valorAula > 0) valorDisplay = `Aula: ${formatCurrency(s.valorAula)}`;
@@ -3237,15 +2714,11 @@
                     }
                 });
             }
-
             if (modulesToSearch.includes('academias')) {
                 state.academias.forEach(a => {
-                    if (!academiaId || a.id === academiaId) {
-                        results.push({ tipo: 'Academia', data: '', descricao: a.nome, detalhes: `Endereço: ${a.endereco || '-'} | Tel: ${a.telefone || '-'}`, valor: `Responsável: ${a.responsavel || '-'}`, academia: a.nome });
-                    }
+                    if (!academiaId || a.id === academiaId) results.push({ tipo: 'Academia', data: '', descricao: a.nome, detalhes: `Endereço: ${a.endereco || '-'} | Tel: ${a.telefone || '-'}`, valor: `Responsável: ${a.responsavel || '-'}`, academia: a.nome });
                 });
             }
-
             if (modulesToSearch.includes('agenda')) {
                 state.schedule.forEach(a => {
                     const aluno = state.students.find(s => s.id === a.alunoId);
@@ -3259,7 +2732,6 @@
                     if (match) results.push({ tipo: 'Aula', data: a.data, descricao: a.hora, detalhes: aluno ? aluno.nome : 'Aluno removido', valor: a.status, academia: acad ? acad.nome : '-' });
                 });
             }
-
             if (modulesToSearch.includes('album')) {
                 state.album.forEach(item => {
                     if ((!dataIni || !item.data || item.data.slice(0,10) >= dataIni) && (!dataFim || !item.data || item.data.slice(0,10) <= dataFim) && (!descricao || (item.descricao && item.descricao.toLowerCase().includes(descricao)))) {
@@ -3267,7 +2739,6 @@
                     }
                 });
             }
-
             if (modulesToSearch.includes('fluxocaixa')) {
                 state.cashflow.forEach(c => {
                     if ((!dataIni || c.data >= dataIni) && (!dataFim || c.data <= dataFim) && (entradaMin === 0 || (c.entrada || 0) >= entradaMin) && (saidaMin === 0 || (c.saida || 0) >= saidaMin) && (!descricao || c.descricao.toLowerCase().includes(descricao)) && !academiaId) {
@@ -3275,7 +2746,6 @@
                     }
                 });
             }
-
             if (modulesToSearch.includes('treinos')) {
                 state.workouts.forEach(w => {
                     if (!descricao || w.nome.toLowerCase().includes(descricao) || w.grupo.toLowerCase().includes(descricao)) {
@@ -3287,24 +2757,12 @@
                     }
                 });
             }
-
             results.sort((a, b) => (a.data || '').localeCompare(b.data || '') || a.tipo.localeCompare(b.tipo));
-
             const tbody = document.getElementById('filtroResultsTable');
-            if (results.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="6">Nenhum resultado encontrado.</td></tr>';
-                return;
-            }
+            if (results.length === 0) { tbody.innerHTML = '<tr><td colspan="6">Nenhum resultado encontrado.</td></tr>'; return; }
             let html = '';
             results.forEach(r => {
-                html += `<tr>
-                    <td>${esc(r.tipo)}</td>
-                    <td>${r.data ? formatDate(r.data) : '-'}</td>
-                    <td>${esc(r.descricao)}</td>
-                    <td>${esc(r.detalhes)}</td>
-                    <td>${esc(r.valor)}</td>
-                    <td>${esc(r.academia || '-')}</td>
-                </tr>`;
+                html += `<tr><td>${esc(r.tipo)}</td><td>${r.data ? formatDate(r.data) : '-'}</td><td>${esc(r.descricao)}</td><td>${esc(r.detalhes)}</td><td>${esc(r.valor)}</td><td>${esc(r.academia || '-')}</td></tr>`;
             });
             tbody.innerHTML = html;
         }
@@ -3332,9 +2790,7 @@
                 userFotoData = u.foto || '';
                 document.getElementById('userFotoPreview').src = userFotoData;
                 renderPermissionMatrix(u);
-            } else {
-                renderPermissionMatrix(null);
-            }
+            } else renderPermissionMatrix(null);
             openModal('userModal');
         }
         function saveUser(e) {
@@ -3349,33 +2805,21 @@
             const foto = userFotoData || '';
             if (!username) { toast('Informe o usuário.', 'error'); return; }
             if (role === 'aluno' && !nome) { toast('Para usuários do tipo Aluno, informe o nome completo.', 'error'); return; }
-
             if (editingId) {
                 const existing = state.users.find(u => u.id === editingId);
                 if (!existing) return;
-                if (state.users.some(u => u.username.toUpperCase() === username && u.id !== editingId)) {
-                    toast('Já existe um usuário com esse nome.', 'error');
-                    return;
-                }
-                existing.username = username;
-                existing.nome = nome;
-                existing.role = role;
-                existing.active = active;
+                if (state.users.some(u => u.username.toUpperCase() === username && u.id !== editingId)) { toast('Já existe um usuário com esse nome.', 'error'); return; }
+                existing.username = username; existing.nome = nome; existing.role = role; existing.active = active;
                 if (password) existing.password = password;
                 existing.foto = foto;
-                if (role === 'admin') { existing.permissions = {}; }
-                else if (role === 'aluno') { existing.permissions = {}; }
-                else { existing.permissions = collectPermissions(); }
-                if (currentUser && currentUser.id === editingId) { currentUser = existing; }
+                if (role === 'admin' || role === 'aluno') existing.permissions = {};
+                else existing.permissions = collectPermissions();
+                if (currentUser && currentUser.id === editingId) currentUser = existing;
                 logAction('Editar Usuário', `Usuário ${username} editado`, 'usuarios');
             } else {
                 if (!password) { toast('A senha é obrigatória para novo usuário.', 'error'); return; }
-                if (state.users.some(u => u.username.toUpperCase() === username)) {
-                    toast('Já existe um usuário com esse nome.', 'error');
-                    return;
-                }
-                const newUser = { id: genId(), username, password, nome, role, active, permissions: role === 'admin' || role === 'aluno' ? {} : collectPermissions(), foto };
-                state.users.push(newUser);
+                if (state.users.some(u => u.username.toUpperCase() === username)) { toast('Já existe um usuário com esse nome.', 'error'); return; }
+                state.users.push({ id: genId(), username, password, nome, role, active, permissions: role === 'admin' || role === 'aluno' ? {} : collectPermissions(), foto });
                 logAction('Criar Usuário', `Usuário ${username} criado`, 'usuarios');
             }
             saveState(); closeModal('userModal'); renderUsers(); renderNav();
@@ -3392,33 +2836,19 @@
             const user = state.users.find(u => u.id === id);
             if (user) logAction('Excluir Usuário', `Usuário ${user.username} excluído`, 'usuarios');
             state.users = state.users.filter(u => u.id !== id);
-            saveState(); renderUsers(); toast('Usuário excluído.', 'warning');
+            saveState(); renderUsers();
+            toast('Usuário excluído.', 'warning');
         }
         function renderUsers() {
             const tbody = document.getElementById('usersTableBody');
             const filterText = (document.getElementById('usersFilterText')?.value || '').toLowerCase();
             const filterRole = document.getElementById('usersFilterRole')?.value || '';
             const filterActive = document.getElementById('usersFilterActive')?.value || '';
-            
             let filtered = [...state.users];
-            
-            if (filterText) {
-                filtered = filtered.filter(u => 
-                    u.username.toLowerCase().includes(filterText) || 
-                    (u.nome || '').toLowerCase().includes(filterText)
-                );
-            }
-            if (filterRole) {
-                filtered = filtered.filter(u => u.role === filterRole);
-            }
-            if (filterActive) {
-                if (filterActive === 'ativo') {
-                    filtered = filtered.filter(u => u.active !== false);
-                } else if (filterActive === 'inativo') {
-                    filtered = filtered.filter(u => u.active === false);
-                }
-            }
-            
+            if (filterText) filtered = filtered.filter(u => u.username.toLowerCase().includes(filterText) || (u.nome || '').toLowerCase().includes(filterText));
+            if (filterRole) filtered = filtered.filter(u => u.role === filterRole);
+            if (filterActive === 'ativo') filtered = filtered.filter(u => u.active !== false);
+            else if (filterActive === 'inativo') filtered = filtered.filter(u => u.active === false);
             let html = '';
             filtered.forEach(u => {
                 let perfilBadge = '';
@@ -3443,44 +2873,15 @@
             const filterDateStart = document.getElementById('auditFilterDateStart')?.value || '';
             const filterDateEnd = document.getElementById('auditFilterDateEnd')?.value || '';
             const filterModule = document.getElementById('auditFilterModule')?.value || '';
-            
             let logs = [...(state.auditLogs || [])];
-            
-            if (filterText) {
-                logs = logs.filter(log => 
-                    (log.user || '').toLowerCase().includes(filterText) || 
-                    (log.action || '').toLowerCase().includes(filterText) || 
-                    (log.module || '').toLowerCase().includes(filterText) || 
-                    (log.details || '').toLowerCase().includes(filterText)
-                );
-            }
-            if (filterDateStart) {
-                logs = logs.filter(log => {
-                    const logDate = new Date(log.timestamp);
-                    return formatDateInput(logDate) >= filterDateStart;
-                });
-            }
-            if (filterDateEnd) {
-                logs = logs.filter(log => {
-                    const logDate = new Date(log.timestamp);
-                    return formatDateInput(logDate) <= filterDateEnd;
-                });
-            }
-            if (filterModule) {
-                logs = logs.filter(log => log.module === filterModule);
-            }
-            
+            if (filterText) logs = logs.filter(log => (log.user || '').toLowerCase().includes(filterText) || (log.action || '').toLowerCase().includes(filterText) || (log.module || '').toLowerCase().includes(filterText) || (log.details || '').toLowerCase().includes(filterText));
+            if (filterDateStart) logs = logs.filter(log => formatDateInput(new Date(log.timestamp)) >= filterDateStart);
+            if (filterDateEnd) logs = logs.filter(log => formatDateInput(new Date(log.timestamp)) <= filterDateEnd);
+            if (filterModule) logs = logs.filter(log => log.module === filterModule);
             logs.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
-            
             let html = '';
             logs.forEach(log => {
-                html += `<tr>
-                    <td class="log-time">${formatDateTime(log.timestamp)}</td>
-                    <td>${esc(log.user || 'Sistema')}</td>
-                    <td>${esc(log.action || '-')}</td>
-                    <td>${esc(log.module || '-')}</td>
-                    <td>${esc(log.details || '-')}</td>
-                </tr>`;
+                html += `<tr><td class="log-time">${formatDateTime(log.timestamp)}</td><td>${esc(log.user || 'Sistema')}</td><td>${esc(log.action || '-')}</td><td>${esc(log.module || '-')}</td><td>${esc(log.details || '-')}</td></tr>`;
             });
             tbody.innerHTML = html || '<tr><td colspan="5">Nenhum registro encontrado.</td></tr>';
         }
@@ -3488,16 +2889,8 @@
             if (!can('auditoria', 'excluir')) { toast('Sem permissão para limpar logs.', 'error'); return; }
             if (!confirm('Tem certeza que deseja limpar todos os registros de auditoria?')) return;
             const userIdentifier = currentUser ? currentUser.username : 'Sistema';
-            state.auditLogs = [{
-                id: genId(),
-                timestamp: new Date().toISOString(),
-                user: userIdentifier,
-                action: 'Limpar Logs',
-                module: 'auditoria',
-                details: 'Todos os registros anteriores foram removidos'
-            }];
-            saveState();
-            renderAuditoria();
+            state.auditLogs = [{ id: genId(), timestamp: new Date().toISOString(), user: userIdentifier, action: 'Limpar Logs', module: 'auditoria', details: 'Todos os registros anteriores foram removidos' }];
+            saveState(); renderAuditoria();
             toast('Logs de auditoria limpos.', 'warning');
         }
 
@@ -3525,60 +2918,37 @@
                 document.getElementById('gradeWeekStart').value = formatDateInput(monday);
             }
         }
-
         function generateAvailabilityGrid() {
             const weekStart = val('gradeWeekStart');
             const startTime = val('gradeStartTime');
             const endTime = val('gradeEndTime');
             const duration = parseInt(val('gradeDuration'));
-            if (!weekStart || !startTime || !endTime || !duration || duration <= 0) {
-                toast('Preencha todos os campos corretamente.', 'error');
-                return;
-            }
-            function timeToMinutes(timeStr) {
-                const [h, m] = timeStr.split(':').map(Number);
-                return h * 60 + m;
-            }
+            if (!weekStart || !startTime || !endTime || !duration || duration <= 0) { toast('Preencha todos os campos corretamente.', 'error'); return; }
+            function timeToMinutes(timeStr) { const [h, m] = timeStr.split(':').map(Number); return h * 60 + m; }
             let startMin = timeToMinutes(startTime);
             let endMin = timeToMinutes(endTime);
-            if (startMin >= endMin) {
-                toast('Hora inicial deve ser menor que a final.', 'error');
-                return;
-            }
+            if (startMin >= endMin) { toast('Hora inicial deve ser menor que a final.', 'error'); return; }
             if ((endMin - startMin) % duration !== 0) {
                 toast('A diferença de tempo deve ser múltipla da duração.', 'warning');
                 const totalSlots = Math.ceil((endMin - startMin) / duration);
                 endMin = startMin + totalSlots * duration;
-                const endH = Math.floor(endMin / 60);
-                const endM = endMin % 60;
-                document.getElementById('gradeEndTime').value = `${String(endH).padStart(2,'0')}:${String(endM).padStart(2,'0')}`;
+                document.getElementById('gradeEndTime').value = `${String(Math.floor(endMin/60)).padStart(2,'0')}:${String(endMin%60).padStart(2,'0')}`;
             }
-
             const days = ['Segunda-feira', 'Terça-feira', 'Quarta-feira', 'Quinta-feira', 'Sexta-feira', 'Sábado', 'Domingo'];
             const weekStartDate = new Date(weekStart + 'T00:00:00');
-            if (weekStartDate.getDay() !== 1) {
-                toast('A data inicial deve ser uma segunda-feira. Usando a data fornecida como início da semana.', 'warning');
-            }
-
-            let html = '<table class="availability-grid-table">';
-            html += '<thead><tr><th>Horário</th>';
-            days.forEach(day => {
-                html += `<th>${day}</th>`;
-            });
+            let html = '<table class="availability-grid-table"><thead><tr><th>Horário</th>';
+            days.forEach(day => html += `<th>${day}</th>`);
             html += '</tr></thead><tbody>';
-
             let slotStart = startMin;
             while (slotStart < endMin) {
                 const slotEnd = slotStart + duration;
                 const slotStartStr = `${String(Math.floor(slotStart/60)).padStart(2,'0')}:${String(slotStart%60).padStart(2,'0')}`;
                 const slotEndStr = `${String(Math.floor(slotEnd/60)).padStart(2,'0')}:${String(slotEnd%60).padStart(2,'0')}`;
                 html += `<tr><td>${slotStartStr} - ${slotEndStr}</td>`;
-
                 for (let i = 0; i < 7; i++) {
                     const currentDate = new Date(weekStartDate);
                     currentDate.setDate(weekStartDate.getDate() + i);
                     const dateStr = formatDateInput(currentDate);
-
                     const occupiedClasses = state.schedule.filter(a => {
                         if (a.data !== dateStr) return false;
                         if (a.status === 'Cancelada') return false;
@@ -3591,9 +2961,7 @@
                             return `${aluno ? aluno.nome : '?'} (${a.hora})`;
                         }).join(', ');
                         html += `<td class="ocupado" title="${esc(details)}">Ocupado</td>`;
-                    } else {
-                        html += '<td class="livre">Livre</td>';
-                    }
+                    } else html += '<td class="livre">Livre</td>';
                 }
                 html += '</tr>';
                 slotStart = slotEnd;
@@ -3609,9 +2977,7 @@
             renderDashboard();
             setAgendaView('list');
             fillAlunosFilterAcademia();
-            document.addEventListener('keydown', function(e) {
-                if (e.key === 'Escape') closeLightbox();
-            });
+            document.addEventListener('keydown', function(e) { if (e.key === 'Escape') closeLightbox(); });
             document.getElementById('loginScreen').classList.remove('hidden');
             enterFullscreen();
         }
