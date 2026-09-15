@@ -658,6 +658,52 @@
                 </div>
             </section>
 
+            <!-- ==================== NOVA ABA: HISTÓRICO MENSALIDADES ==================== -->
+            <section id="section-historicomensalidades" class="section">
+                <div class="card">
+                    <div class="card-header">
+                        <h3><i class="fas fa-history"></i> Histórico de Mensalidades</h3>
+                    </div>
+                    <div class="filter-container">
+                        <div class="form-group">
+                            <label><i class="fas fa-search"></i> Buscar por texto</label>
+                            <input type="text" id="histFilterText" placeholder="Descrição, tipo, forma de pagamento..." oninput="renderHistoricoMensalidades()">
+                        </div>
+                        <div class="form-group">
+                            <label><i class="fas fa-calendar"></i> Data Inicial (Pagamento)</label>
+                            <input type="date" id="histFilterDateStart" onchange="renderHistoricoMensalidades()">
+                        </div>
+                        <div class="form-group">
+                            <label><i class="fas fa-calendar"></i> Data Final (Pagamento)</label>
+                            <input type="date" id="histFilterDateEnd" onchange="renderHistoricoMensalidades()">
+                        </div>
+                        <button class="btn btn-outline" onclick="clearHistFilter()"><i class="fas fa-times"></i> Limpar</button>
+                    </div>
+                    <div class="cashflow-summary" id="histSummary">
+                        <div class="cashflow-summary-card entrada"><div class="label"><i class="fas fa-arrow-down"></i> Total Recebido</div><div class="value" id="histTotalRecebido">R$ 0,00</div></div>
+                        <div class="cashflow-summary-card saida"><div class="label"><i class="fas fa-arrow-up"></i> Total Pago</div><div class="value" id="histTotalPago">R$ 0,00</div></div>
+                        <div class="cashflow-summary-card saldo"><div class="label"><i class="fas fa-list"></i> Registros</div><div class="value" id="histTotalRegistros">0</div></div>
+                    </div>
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Descrição</th>
+                                    <th>Tipo</th>
+                                    <th>Valor</th>
+                                    <th>Vencimento</th>
+                                    <th>Data Pagamento</th>
+                                    <th>Forma Pgto</th>
+                                    <th>Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody id="historicoMensalidadesTableBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+            <!-- ==================== FIM NOVA ABA ==================== -->
+
             <section id="section-filtro" class="section">
                 <div class="card">
                     <div class="card-header"><h3><i class="fas fa-search"></i> Filtro Avançado</h3></div>
@@ -730,7 +776,9 @@
                             <select id="auditFilterModule" onchange="renderAuditoria()">
                                 <option value="">Todos</option><option value="dashboard">Dashboard</option><option value="alunos">Alunos</option>
                                 <option value="academias">Academias</option><option value="agenda">Agenda</option><option value="treinos">Treinos</option>
-                                <option value="album">Álbum</option><option value="fluxocaixa">Fluxo de Caixa</option><option value="filtro">Filtro</option>
+                                <option value="album">Álbum</option><option value="fluxocaixa">Fluxo de Caixa</option>
+                                <option value="historicomensalidades">Histórico Mensalidades</option>
+                                <option value="filtro">Filtro</option>
                                 <option value="usuarios">Usuários</option><option value="auditoria">Auditoria</option><option value="aluno">Área do Aluno</option>
                             </select>
                         </div>
@@ -975,7 +1023,6 @@
     <script>
         var deferredPrompt = null;
 
-        // Detecta se já está instalado (standalone)
         function isAppInstalled() {
             try {
                 if (window.matchMedia('(display-mode: standalone)').matches) return true;
@@ -986,7 +1033,6 @@
             return false;
         }
 
-        // Mostra/oculta os botões de instalação nas telas de login
         function updateInstallButtons() {
             var secP = document.getElementById('installSectionPersonal');
             var secS = document.getElementById('installSectionStudent');
@@ -994,20 +1040,17 @@
                 if (secP) secP.style.display = 'none';
                 if (secS) secS.style.display = 'none';
             } else {
-                // Mostra sempre nas telas de login (mesmo sem beforeinstallprompt)
                 if (secP) secP.style.display = 'block';
                 if (secS) secS.style.display = 'block';
             }
         }
 
-        // beforeinstallprompt
         window.addEventListener('beforeinstallprompt', function (e) {
             e.preventDefault();
             deferredPrompt = e;
             updateInstallButtons();
         });
 
-        // appinstalled → esconde botões
         window.addEventListener('appinstalled', function () {
             deferredPrompt = null;
             if (document.getElementById('installSectionPersonal')) document.getElementById('installSectionPersonal').style.display = 'none';
@@ -1015,14 +1058,12 @@
             try { toast('App instalado com sucesso! 🎉'); } catch (e) {}
         });
 
-        // Verifica mudança de display-mode
         try {
             window.matchMedia('(display-mode: standalone)').addEventListener('change', function () {
                 updateInstallButtons();
             });
         } catch (e) {}
 
-        // Função de instalar
         function installApp() {
             if (isAppInstalled()) {
                 try { toast('O app já está instalado!', 'success'); } catch (e) { alert('O app já está instalado!'); }
@@ -1044,7 +1085,6 @@
                 return;
             }
 
-            // Fallback: instruções manuais
             var msg = '';
             if (isIOS) {
                 msg = 'Para instalar no iPhone:\n\n1) Toque no ícone "Compartilhar" (□↑)\n2) Escolha "Adicionar à Tela de Início"\n3) Confirme';
@@ -1056,7 +1096,6 @@
             alert(msg);
         }
 
-        // ---------- Service Worker ----------
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', function () {
                 var swCode =
@@ -1087,10 +1126,8 @@
             });
         }
 
-        // Inicializa botões assim que o DOM carregar
         document.addEventListener('DOMContentLoaded', function () {
             updateInstallButtons();
-            // Re-verifica em 1, 3 e 8 segundos (caso o navegador demore a disparar o evento)
             setTimeout(updateInstallButtons, 1000);
             setTimeout(updateInstallButtons, 3000);
             setTimeout(updateInstallButtons, 8000);
@@ -1122,6 +1159,7 @@
             { key: 'treinos', label: 'Treinos', icon: 'fa-dumbbell', actions: ['ver', 'criar', 'editar', 'excluir'] },
             { key: 'album', label: 'Álbum', icon: 'fa-images', actions: ['ver', 'criar', 'editar', 'excluir'] },
             { key: 'fluxocaixa', label: 'Fluxo de Caixa', icon: 'fa-money-bill-wave', actions: ['ver', 'criar', 'editar', 'excluir'] },
+            { key: 'historicomensalidades', label: 'Histórico Mensalidades', icon: 'fa-history', actions: ['ver', 'criar', 'editar', 'excluir'] },
             { key: 'filtro', label: 'Filtro', icon: 'fa-search', actions: ['ver'] },
             { key: 'usuarios', label: 'Usuários', icon: 'fa-user-cog', actions: ['ver', 'criar', 'editar', 'excluir'] },
             { key: 'auditoria', label: 'Auditoria', icon: 'fa-history', actions: ['ver', 'excluir'] }
@@ -1131,7 +1169,7 @@
 
         let state = {
             users: [], students: [], academias: [], schedule: [], workouts: [],
-            album: [], cashflow: [], contasFuturas: [], auditLogs: []
+            album: [], cashflow: [], contasFuturas: [], historicoMensalidades: [], auditLogs: []
         };
         let currentUser = null;
         let currentStudent = null;
@@ -1205,6 +1243,7 @@
                         if (!state.album) state.album = [];
                         if (!state.cashflow) state.cashflow = [];
                         if (!state.contasFuturas) state.contasFuturas = [];
+                        if (!state.historicoMensalidades) state.historicoMensalidades = [];
                         if (!state.auditLogs) state.auditLogs = [];
                         state.users.forEach(u => {
                             if (u.username) u.username = u.username.toUpperCase();
@@ -1240,7 +1279,8 @@
             state.users = [{ id: genId(), username: 'PAULO', password: '585851', nome: 'Paulo', role: 'admin', active: true, permissions: {}, foto: '' }];
             state.academias = [{ id: genId(), nome: 'Academia Exemplo', endereco: 'Rua das Flores, 123', telefone: '(11) 99999-0000', responsavel: 'Carlos' }];
             state.students = []; state.schedule = []; state.workouts = [];
-            state.album = []; state.cashflow = []; state.contasFuturas = []; state.auditLogs = [];
+            state.album = []; state.cashflow = []; state.contasFuturas = [];
+            state.historicoMensalidades = []; state.auditLogs = [];
         }
 
         function ensureStudentUsers() {
@@ -1544,6 +1584,7 @@
             if (section === 'treinos') renderWorkouts();
             if (section === 'album') renderAlbum();
             if (section === 'fluxocaixa') { renderCashflow(); renderContasFuturas(); }
+            if (section === 'historicomensalidades') renderHistoricoMensalidades();
             if (section === 'filtro') { fillFiltroAcademia(); }
             if (section === 'usuarios') { renderUsers(); renderPermissionMatrix(null); }
             if (section === 'auditoria') renderAuditoria();
@@ -1650,6 +1691,12 @@
             document.getElementById('auditFilterDateEnd').value = '';
             document.getElementById('auditFilterModule').value = '';
             renderAuditoria();
+        }
+        function clearHistFilter() {
+            const t = document.getElementById('histFilterText'); if (t) t.value = '';
+            const d1 = document.getElementById('histFilterDateStart'); if (d1) d1.value = '';
+            const d2 = document.getElementById('histFilterDateEnd'); if (d2) d2.value = '';
+            renderHistoricoMensalidades();
         }
         function handleEvolutionPhoto(event) {
             const file = event.target.files[0];
@@ -1788,7 +1835,12 @@
             saveState(); renderStudents(); renderWorkouts(); fillStudentSelect('workoutAluno'); renderUsers();
             toast('Aluno excluído.', 'warning');
         }
-        function confirmAdminDeletion() { return confirmAdminAction('Digite a senha do Administrador para excluir este registro:'); }
+        function confirmAdminDeletion() {
+            if (currentUser && currentUser.role === 'admin') {
+                return window.confirm('Tem certeza que deseja excluir este registro? Esta ação não pode ser desfeita.');
+            }
+            return confirmAdminAction('Digite a senha do Administrador para excluir este registro:');
+        }
         function confirmAdminAction(message) {
             if (currentUser && currentUser.role === 'admin') return true;
             const admin = state.users.find(u => u.role === 'admin');
@@ -2421,6 +2473,51 @@
             }
             openModal('contaModal');
         }
+
+        // Move uma conta para o histórico de mensalidades + fluxo de caixa
+        function moverContaParaHistorico(id) {
+            const conta = state.contasFuturas.find(c => c.id === id);
+            if (!conta) return;
+            const dataHoje = formatDateInput(new Date());
+            const valor = parseFloat(conta.valor) || 0;
+            const descricao = conta.descricao;
+            const formaPgto = 'Dinheiro';
+
+            // 1) Lança no fluxo de caixa (comportamento anterior)
+            if (conta.tipo === 'Pagar') {
+                state.cashflow.push({ id: genId(), data: dataHoje, descricao: `Pagamento: ${descricao}`, entrada: 0, saida: valor, forma_pgto: formaPgto });
+            } else if (conta.tipo === 'Receber') {
+                state.cashflow.push({ id: genId(), data: dataHoje, descricao: `Recebimento: ${descricao}`, entrada: valor, saida: 0, forma_pgto: formaPgto });
+            }
+
+            // 2) Adiciona ao histórico de mensalidades
+            if (!state.historicoMensalidades) state.historicoMensalidades = [];
+            state.historicoMensalidades.push({
+                id: genId(),
+                descricao: descricao,
+                tipo: conta.tipo,
+                valor: valor,
+                vencimento: conta.vencimento,
+                dataPagamento: dataHoje,
+                status: 'Pago',
+                alunoId: conta.alunoId || null,
+                anoMes: conta.anoMes || null,
+                forma_pgto: formaPgto
+            });
+
+            // 3) Remove de Contas a Pagar e Receber (Futuras)
+            state.contasFuturas = state.contasFuturas.filter(c => c.id !== id);
+
+            // 4) Lança o próximo vencimento (comportamento anterior)
+            lancarProximoVencimento(conta);
+
+            logAction('Conta Paga', `Conta ${descricao} marcada como paga, lançada no fluxo de caixa e movida para Histórico de Mensalidades`, 'fluxocaixa');
+            saveState();
+            renderContasFuturas();
+            renderCashflow();
+            renderHistoricoMensalidades();
+        }
+
         function saveConta(e) {
             e.preventDefault();
             if (editingId && !can('fluxocaixa', 'editar')) return;
@@ -2429,15 +2526,35 @@
             const valor = parseCurrency(val('contaValor'));
             const vencimento = val('contaVencimento'), status = val('contaStatus');
             if (!descricao || !tipo || valor <= 0 || !vencimento) { toast('Preencha todos os campos obrigatórios.', 'error'); return; }
+
             if (editingId) {
                 const idx = state.contasFuturas.findIndex(c => c.id === editingId);
-                if (idx > -1) { state.contasFuturas[idx] = { ...state.contasFuturas[idx], descricao, tipo, valor, vencimento, status }; logAction('Editar Conta', `Conta ${descricao} editada`, 'fluxocaixa'); }
+                if (idx > -1) {
+                    const wasPago = state.contasFuturas[idx].status === 'Pago';
+                    state.contasFuturas[idx] = { ...state.contasFuturas[idx], descricao, tipo, valor, vencimento, status };
+                    logAction('Editar Conta', `Conta ${descricao} editada`, 'fluxocaixa');
+                    saveState(); closeModal('contaModal');
+                    if (status === 'Pago' && !wasPago) {
+                        moverContaParaHistorico(editingId);
+                        toast(`Conta "${descricao}" marcada como PAGA e movida para o Histórico de Mensalidades!`);
+                    } else {
+                        renderContasFuturas();
+                        toast('Conta salva com sucesso!');
+                    }
+                }
             } else {
-                state.contasFuturas.push({ id: genId(), descricao, tipo, valor, vencimento, status });
+                const nova = { id: genId(), descricao, tipo, valor, vencimento, status };
+                state.contasFuturas.push(nova);
                 logAction('Criar Conta', `Conta ${descricao} criada`, 'fluxocaixa');
+                saveState(); closeModal('contaModal');
+                if (status === 'Pago') {
+                    moverContaParaHistorico(nova.id);
+                    toast(`Conta "${descricao}" marcada como PAGA e movida para o Histórico de Mensalidades!`);
+                } else {
+                    renderContasFuturas();
+                    toast('Conta salva com sucesso!');
+                }
             }
-            saveState(); closeModal('contaModal'); renderContasFuturas();
-            toast('Conta salva com sucesso!');
         }
         function deleteConta(id) {
             if (!can('fluxocaixa', 'excluir')) { toast('Sem permissão para excluir.', 'error'); return; }
@@ -2463,17 +2580,8 @@
             if (!conta) { toast('Conta não encontrada.', 'error'); return; }
             if (conta.status === 'Pago') { toast('Esta conta já está marcada como PAGA.', 'warning'); return; }
             if (!confirmAdminAction(`Digite a senha do Administrador para marcar a conta "${conta.descricao}" como PAGA e lançar no fluxo de caixa:`)) return;
-            const dataHoje = formatDateInput(new Date());
-            const valor = parseFloat(conta.valor) || 0;
-            const descricao = conta.descricao;
-            const formaPgto = 'Dinheiro';
-            if (conta.tipo === 'Pagar') state.cashflow.push({ id: genId(), data: dataHoje, descricao: `Pagamento: ${descricao}`, entrada: 0, saida: valor, forma_pgto: formaPgto });
-            else if (conta.tipo === 'Receber') state.cashflow.push({ id: genId(), data: dataHoje, descricao: `Recebimento: ${descricao}`, entrada: valor, saida: 0, forma_pgto: formaPgto });
-            conta.status = 'Pago';
-            lancarProximoVencimento(conta);
-            logAction('Conta Paga', `Conta ${descricao} marcada como paga e lançada no fluxo de caixa`, 'fluxocaixa');
-            saveState(); renderContasFuturas(); renderCashflow();
-            toast(`Conta "${descricao}" marcada como PAGA e lançada no fluxo de caixa!`);
+            moverContaParaHistorico(id);
+            toast(`Conta "${conta.descricao}" marcada como PAGA, lançada no fluxo de caixa e movida para o Histórico!`);
         }
         function renderContasFuturas() {
             const tbody = document.getElementById('contasFuturasTableBody');
@@ -2510,6 +2618,70 @@
             });
             tbody.innerHTML = html || '<tr><td colspan="6">Nenhuma conta futura cadastrada.</td></tr>';
         }
+
+        // ==================== HISTÓRICO MENSALIDADES ====================
+        function renderHistoricoMensalidades() {
+            const tbody = document.getElementById('historicoMensalidadesTableBody');
+            if (!tbody) return;
+            const filterText = (document.getElementById('histFilterText')?.value || '').toLowerCase();
+            const filterDateStart = document.getElementById('histFilterDateStart')?.value || '';
+            const filterDateEnd = document.getElementById('histFilterDateEnd')?.value || '';
+
+            let filtered = [...(state.historicoMensalidades || [])];
+
+            if (filterText) {
+                filtered = filtered.filter(h => {
+                    const campos = [
+                        h.descricao, h.tipo, h.forma_pgto,
+                        h.vencimento, h.dataPagamento, h.status,
+                        String(h.valor || ''), formatCurrency(h.valor)
+                    ].map(v => String(v || '').toLowerCase());
+                    return campos.some(v => v.includes(filterText));
+                });
+            }
+            if (filterDateStart) filtered = filtered.filter(h => h.dataPagamento >= filterDateStart);
+            if (filterDateEnd) filtered = filtered.filter(h => h.dataPagamento <= filterDateEnd);
+
+            filtered.sort((a, b) => (b.dataPagamento || '').localeCompare(a.dataPagamento || ''));
+
+            let html = '';
+            let totalRecebido = 0, totalPago = 0;
+            filtered.forEach(h => {
+                const valor = parseFloat(h.valor) || 0;
+                if (h.tipo === 'Receber') totalRecebido += valor;
+                else if (h.tipo === 'Pagar') totalPago += valor;
+                html += `<tr>
+                    <td>${esc(h.descricao)}</td>
+                    <td>${esc(h.tipo)}</td>
+                    <td>${formatCurrency(h.valor)}</td>
+                    <td>${formatDate(h.vencimento)}</td>
+                    <td>${formatDate(h.dataPagamento)}</td>
+                    <td>${esc(h.forma_pgto || '-')}</td>
+                    <td>
+                        <button class="btn btn-sm btn-danger" onclick="deleteHistoricoMensalidade('${h.id}')" ${can('historicomensalidades', 'excluir') ? '' : 'disabled'}><i class="fas fa-trash"></i></button>
+                    </td>
+                </tr>`;
+            });
+            tbody.innerHTML = html || '<tr><td colspan="7">Nenhum registro no histórico.</td></tr>';
+
+            const elRec = document.getElementById('histTotalRecebido');
+            const elPag = document.getElementById('histTotalPago');
+            const elReg = document.getElementById('histTotalRegistros');
+            if (elRec) elRec.textContent = formatCurrency(totalRecebido);
+            if (elPag) elPag.textContent = formatCurrency(totalPago);
+            if (elReg) elReg.textContent = String(filtered.length);
+        }
+        function deleteHistoricoMensalidade(id) {
+            if (!can('historicomensalidades', 'excluir')) { toast('Sem permissão para excluir.', 'error'); return; }
+            if (!confirmAdminDeletion()) return;
+            const item = state.historicoMensalidades.find(h => h.id === id);
+            if (item) logAction('Excluir Histórico Mensalidade', `Registro ${item.descricao} excluído do histórico`, 'historicomensalidades');
+            state.historicoMensalidades = state.historicoMensalidades.filter(h => h.id !== id);
+            saveState(); renderHistoricoMensalidades();
+            toast('Registro excluído do histórico.', 'warning');
+        }
+        // ==================== FIM HISTÓRICO MENSALIDADES ====================
+
         function gerarMensalidades() {
             if (!can('fluxocaixa', 'criar')) { toast('Sem permissão para gerar mensalidades.', 'error'); return; }
             const hoje = new Date(), hojeStr = formatDateInput(hoje);
