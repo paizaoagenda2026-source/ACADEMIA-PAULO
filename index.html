@@ -2483,7 +2483,7 @@
             const descricao = conta.descricao;
             const formaPgto = 'Dinheiro';
 
-            // 1) Lança no fluxo de caixa (comportamento anterior)
+            // 1) Lança no fluxo de caixa
             if (conta.tipo === 'Pagar') {
                 state.cashflow.push({ id: genId(), data: dataHoje, descricao: `Pagamento: ${descricao}`, entrada: 0, saida: valor, forma_pgto: formaPgto });
             } else if (conta.tipo === 'Receber') {
@@ -2508,7 +2508,7 @@
             // 3) Remove de Contas a Pagar e Receber (Futuras)
             state.contasFuturas = state.contasFuturas.filter(c => c.id !== id);
 
-            // 4) Lança o próximo vencimento (comportamento anterior)
+            // 4) Lança o próximo vencimento
             lancarProximoVencimento(conta);
 
             logAction('Conta Paga', `Conta ${descricao} marcada como paga, lançada no fluxo de caixa e movida para Histórico de Mensalidades`, 'fluxocaixa');
@@ -3029,7 +3029,67 @@
             document.getElementById('availabilityGridContainer').innerHTML = html;
         }
 
+        // ==================== NAVEGAÇÃO POR ENTER ====================
+        // Permite pular para o próximo campo/select/botão ao pressionar Enter
+        // Se for o último elemento do formulário, dispara o botão de salvar/entrar
+        function setupEnterNavigation() {
+            document.addEventListener('keydown', function (e) {
+                if (e.key !== 'Enter') return;
+                if (e.shiftKey || e.ctrlKey || e.altKey || e.metaKey) return;
+
+                const target = e.target;
+                if (!target) return;
+
+                const tag = target.tagName;
+                // Textarea: Enter deve criar nova linha
+                if (tag === 'TEXTAREA') return;
+                // Botões e links: comportamento nativo do navegador (Enter já clica)
+                if (tag === 'BUTTON' || tag === 'A') return;
+                // Apenas inputs e selects
+                if (tag !== 'INPUT' && tag !== 'SELECT') return;
+                // Ignora checkbox e radio (usa espaço para marcar)
+                if (target.type === 'checkbox' || target.type === 'radio') return;
+                // Ignora se não estiver em nenhum container relevante
+                if (!target.offsetParent) return;
+
+                // Determina o container (form ou modal-content)
+                const container = target.closest('form') || target.closest('.modal-content') || target.closest('.login-box');
+                if (!container) return;
+
+                // Coleta os elementos focáveis visíveis, na ordem do DOM
+                const selector = 'input:not([type="hidden"]):not([disabled]), select:not([disabled]), textarea:not([disabled]), button:not([disabled])';
+                const focusables = Array.from(container.querySelectorAll(selector)).filter(el => el.offsetParent !== null);
+
+                const idx = focusables.indexOf(target);
+                if (idx === -1) return;
+
+                e.preventDefault();
+
+                if (idx < focusables.length - 1) {
+                    // Move para o próximo
+                    const next = focusables[idx + 1];
+                    next.focus();
+                    // Seleciona texto se for input editável
+                    if (next.tagName === 'INPUT' && ['text','password','email','date','time','number','tel','url','search'].includes(next.type)) {
+                        try { next.select(); } catch (err) {}
+                    }
+                } else {
+                    // Último elemento: procura botão de submit dentro do container
+                    let submitBtn = container.querySelector('button[type="submit"]');
+                    if (!submitBtn) {
+                        // Fallback: procura qualquer botão de salvar (btn-success)
+                        submitBtn = container.querySelector('button.btn-success');
+                    }
+                    if (submitBtn) {
+                        submitBtn.click();
+                    }
+                }
+            });
+        }
+        // ==================== FIM NAVEGAÇÃO POR ENTER ====================
+
         async function initApp() {
+            setupEnterNavigation();
             await loadState();
             renderNav();
             renderDashboard();
