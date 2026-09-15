@@ -1828,12 +1828,36 @@
             if (!can('alunos', 'excluir')) { toast('Sem permissão para excluir.', 'error'); return; }
             if (!confirmAdminDeletion()) return;
             const student = state.students.find(s => s.id === id);
-            if (student) logAction('Excluir Aluno', `Aluno ${student.nome} excluído`, 'alunos');
+            if (!student) return;
+
+            const nomeAluno = student.nome;
+
+            // 1) Remove o cadastro do aluno
             state.students = state.students.filter(s => s.id !== id);
-            state.workouts = state.workouts.filter(w => w.alunoId !== id);
+
+            // 2) Remove o usuário vinculado ao aluno
             state.users = state.users.filter(u => u.alunoId !== id);
-            saveState(); renderStudents(); renderWorkouts(); fillStudentSelect('workoutAluno'); renderUsers();
-            toast('Aluno excluído.', 'warning');
+
+            // 3) Remove TODAS as aulas (agendamentos) do aluno na Agenda de Aulas (passadas, presentes e futuras)
+            state.schedule = state.schedule.filter(a => a.alunoId !== id);
+
+            // 4) Remove as mensalidades futuras (contas a receber/pagar) do aluno
+            state.contasFuturas = state.contasFuturas.filter(c => c.alunoId !== id);
+
+            // 5) Remove os treinos marcados para o aluno
+            state.workouts = state.workouts.filter(w => w.alunoId !== id);
+
+            logAction('Excluir Aluno', `Aluno ${nomeAluno} excluído (usuário, aulas, mensalidades e treinos removidos)`, 'alunos');
+
+            saveState();
+            renderStudents();
+            renderWorkouts();
+            fillStudentSelect('workoutAluno');
+            renderUsers();
+            renderSchedule();
+            renderContasFuturas();
+            renderDashboard();
+            toast('Aluno excluído, juntamente com usuário, aulas, mensalidades e treinos vinculados.', 'warning');
         }
         function confirmAdminDeletion() {
             if (currentUser && currentUser.role === 'admin') {
@@ -3030,8 +3054,6 @@
         }
 
         // ==================== NAVEGAÇÃO POR ENTER ====================
-        // Permite pular para o próximo campo/select/botão ao pressionar Enter
-        // Se for o último elemento do formulário, dispara o botão de salvar/entrar
         function setupEnterNavigation() {
             document.addEventListener('keydown', function (e) {
                 if (e.key !== 'Enter') return;
@@ -3041,22 +3063,15 @@
                 if (!target) return;
 
                 const tag = target.tagName;
-                // Textarea: Enter deve criar nova linha
                 if (tag === 'TEXTAREA') return;
-                // Botões e links: comportamento nativo do navegador (Enter já clica)
                 if (tag === 'BUTTON' || tag === 'A') return;
-                // Apenas inputs e selects
                 if (tag !== 'INPUT' && tag !== 'SELECT') return;
-                // Ignora checkbox e radio (usa espaço para marcar)
                 if (target.type === 'checkbox' || target.type === 'radio') return;
-                // Ignora se não estiver em nenhum container relevante
                 if (!target.offsetParent) return;
 
-                // Determina o container (form ou modal-content)
                 const container = target.closest('form') || target.closest('.modal-content') || target.closest('.login-box');
                 if (!container) return;
 
-                // Coleta os elementos focáveis visíveis, na ordem do DOM
                 const selector = 'input:not([type="hidden"]):not([disabled]), select:not([disabled]), textarea:not([disabled]), button:not([disabled])';
                 const focusables = Array.from(container.querySelectorAll(selector)).filter(el => el.offsetParent !== null);
 
@@ -3066,18 +3081,14 @@
                 e.preventDefault();
 
                 if (idx < focusables.length - 1) {
-                    // Move para o próximo
                     const next = focusables[idx + 1];
                     next.focus();
-                    // Seleciona texto se for input editável
                     if (next.tagName === 'INPUT' && ['text','password','email','date','time','number','tel','url','search'].includes(next.type)) {
                         try { next.select(); } catch (err) {}
                     }
                 } else {
-                    // Último elemento: procura botão de submit dentro do container
                     let submitBtn = container.querySelector('button[type="submit"]');
                     if (!submitBtn) {
-                        // Fallback: procura qualquer botão de salvar (btn-success)
                         submitBtn = container.querySelector('button.btn-success');
                     }
                     if (submitBtn) {
