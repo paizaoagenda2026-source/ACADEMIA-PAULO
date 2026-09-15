@@ -1613,10 +1613,21 @@
             return state.schedule.some(a => a.alunoId === alunoId && a.data === data && a.hora === hora && a.status !== 'Cancelada' && a.id !== excludeId);
         }
 
+        // ==================== DASHBOARD (CORRIGIDO) ====================
         function renderDashboard() {
             const totalAlunos = state.students.length;
             const totalAcademias = state.academias.length;
-            const totalAgendadas = state.schedule.filter(a => a.status === 'Agendada').length;
+
+            // *** CORREÇÃO: Contar apenas aulas FUTURAS com status "Agendada" ***
+            const agora = new Date();
+            const totalAgendadas = state.schedule.filter(a => {
+                if (a.status !== 'Agendada') return false;
+                if (!a.data || !a.hora) return false;
+                const dataHoraAula = new Date(a.data + 'T' + a.hora);
+                if (isNaN(dataHoraAula)) return false;
+                return dataHoraAula >= agora;
+            }).length;
+
             const totalFotos = state.album.length;
             const totalTreinos = state.workouts.length;
             const now = new Date();
@@ -1659,6 +1670,7 @@
             });
             document.getElementById('dashboardScheduleTable').innerHTML = html || '<tr><td colspan="5">Nenhuma aula futura.</td></tr>';
         }
+        // ==================== FIM DASHBOARD CORRIGIDO ====================
 
         function fillAcademiaSelect(selectId, selectedId) {
             const select = document.getElementById(selectId);
@@ -2069,8 +2081,7 @@
             const filterHora = document.getElementById('agendaFilterHora')?.value || '';
             const filterStatus = document.getElementById('agendaFilterStatus')?.value || '';
 
-            // *** NOVO: Somente aulas que ainda NÃO foram dadas ***
-            // Considera "já dada" toda aula cuja data+hora seja anterior ao momento atual.
+            // *** Somente aulas que ainda NÃO foram dadas ***
             const agora = new Date();
             let filtered = state.schedule.filter(a => {
                 if (!a.data || !a.hora) return false;
