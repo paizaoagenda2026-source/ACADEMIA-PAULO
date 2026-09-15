@@ -310,14 +310,30 @@
         .lightbox img { max-width: 95%; max-height: 95%; object-fit: contain; }
         .lightbox-close { position: absolute; top: 15px; right: 25px; font-size: 32px; color: #fff; cursor: pointer; }
 
-        .toast-container { position: fixed; bottom: 20px; right: 20px; z-index: 300; display: flex; flex-direction: column; gap: 8px; }
-        .toast {
-            background: #333; color: #fff; padding: 12px 18px; border-radius: 8px;
-            font-size: 13px; font-weight: 500; box-shadow: var(--shadow-lg);
+        /* ==================== TOASTS TRANSPARENTES ==================== */
+        .toast-container {
+            position: fixed; bottom: 20px; right: 20px; z-index: 300;
+            display: flex; flex-direction: column; gap: 8px;
+            pointer-events: none;
         }
-        .toast.success { background: var(--success); }
-        .toast.error { background: var(--danger); }
-        .toast.warning { background: var(--warning); }
+        .toast {
+            background: rgba(51, 51, 51, 0.35);
+            color: #fff;
+            padding: 12px 18px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 500;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            backdrop-filter: blur(6px);
+            -webkit-backdrop-filter: blur(6px);
+            border: 1px solid rgba(255,255,255,0.12);
+            opacity: 0.85;
+            pointer-events: none;
+        }
+        .toast.success { background: rgba(76, 175, 80, 0.35); border-color: rgba(76, 175, 80, 0.4); }
+        .toast.error   { background: rgba(244, 67, 54, 0.35); border-color: rgba(244, 67, 54, 0.4); }
+        .toast.warning { background: rgba(255, 152, 0, 0.35); border-color: rgba(255, 152, 0, 0.4); }
+        /* ============================================================= */
 
         .permissions-container { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 8px; }
         .perm-module { background: #2a2a2a; border-radius: 8px; padding: 10px; }
