@@ -58,6 +58,10 @@
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore-compat.js"></script>
 
+    <!-- ==================== FACE API (RECONHECIMENTO FACIAL) ==================== -->
+    <script src="https://cdn.jsdelivr.net/npm/@vladmandic/face-api@1.7.13/dist/face-api.js"></script>
+    <!-- ======================================================================= -->
+
     <style>
         :root {
             --bg-dark: #121212;
@@ -150,6 +154,20 @@
         @keyframes pulseInstall {
             0%, 100% { box-shadow: 0 4px 15px rgba(212,175,55,0.35); }
             50% { box-shadow: 0 4px 25px rgba(212,175,55,0.7); }
+        }
+
+        /* Botão Face Login */
+        .btn-face {
+            width: 100%; padding: 13px; font-size: 15px; justify-content: center;
+            background: linear-gradient(135deg, #1e88e5, #42a5f5);
+            color: #fff; font-weight: 700;
+            border: none;
+            box-shadow: 0 4px 15px rgba(30,136,229,0.35);
+        }
+        .btn-face:hover {
+            background: linear-gradient(135deg, #42a5f5, #64b5f6);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(30,136,229,0.55);
         }
 
         .login-separator {
@@ -442,6 +460,15 @@
                 </div>
                 <button type="submit" class="btn btn-primary login-btn"><i class="fas fa-sign-in-alt"></i> Entrar</button>
             </form>
+
+            <!-- BOTÃO LOGIN POR RECONHECIMENTO FACIAL -->
+            <div id="faceLoginSection" style="display:none; margin-top: 10px;">
+                <div class="login-separator">ou</div>
+                <button type="button" class="btn btn-face" onclick="openFaceLogin()">
+                    <i class="fas fa-face-smile"></i> 🔒 Entrar com Reconhecimento Facial
+                </button>
+            </div>
+
             <button class="btn btn-outline login-btn" style="margin-top:10px;" onclick="showStudentLogin()"><i class="fas fa-graduation-cap"></i> Sou Aluno</button>
 
             <!-- BOTÃO INSTALAR APP (TELA DE LOGIN PERSONAL) -->
@@ -771,7 +798,7 @@
                     </div>
                     <div class="table-container">
                         <table>
-                            <thead><tr><th>Foto</th><th>Usuário</th><th>Nome</th><th>Perfil</th><th>Ativo</th><th>Ações</th></tr></thead>
+                            <thead><tr><th>Foto</th><th>Usuário</th><th>Nome</th><th>Perfil</th><th>Rosto</th><th>Ativo</th><th>Ações</th></tr></thead>
                             <tbody id="usersTableBody"></tbody>
                         </table>
                     </div>
@@ -951,6 +978,25 @@
                         <img id="userFotoPreview" class="photo-preview" src="" alt="Foto" style="background:#333;">
                         <button type="button" class="btn btn-outline" onclick="openCameraForUser()"><i class="fas fa-camera"></i> Selfie</button>
                     </div>
+
+                    <!-- ==================== RECONHECIMENTO FACIAL ==================== -->
+                    <div class="form-group" style="margin-top: 10px; padding: 12px; background: #2a2a2a; border-radius: 8px; border: 1px solid var(--border);">
+                        <label><i class="fas fa-face-smile"></i> Reconhecimento Facial</label>
+                        <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-top: 8px;">
+                            <button type="button" class="btn btn-outline btn-sm" onclick="openCameraForFace()">
+                                <i class="fas fa-camera"></i> Cadastrar Rosto
+                            </button>
+                            <button type="button" class="btn btn-danger btn-sm" onclick="removeUserFace()" id="btnRemoveUserFace" style="display:none;">
+                                <i class="fas fa-trash"></i> Remover Rosto
+                            </button>
+                            <span id="userFaceStatus" style="color: var(--text-light); font-size: 12px;">Nenhum rosto cadastrado</span>
+                        </div>
+                        <p style="font-size: 11px; color: var(--text-light); margin-top: 6px;">
+                            Ao cadastrar o rosto, o usuário poderá entrar automaticamente pelo reconhecimento facial na tela de login.
+                        </p>
+                    </div>
+                    <!-- ============================================================= -->
+
                     <div class="form-group"><label>Usuário *</label><input type="text" id="userUsername" required placeholder="Nome de usuário" autocomplete="off" oninput="this.value = this.value.toUpperCase()"></div>
                     <div class="form-group"><label>Senha <span id="userPasswordHint" style="font-weight:400;color:var(--text-light);">*</span></label><input type="text" id="userPassword" placeholder="Digite a senha" autocomplete="new-password" oninput="this.value = this.value.toUpperCase()"></div>
                     <div class="form-group"><label>Nome completo</label><input type="text" id="userNome" placeholder="Nome do usuário"></div>
@@ -1019,6 +1065,40 @@
                 <div style="display: flex; gap: 10px; justify-content: center; margin-top: 15px;">
                     <button class="btn btn-primary" onclick="capturePhoto()"><i class="fas fa-camera"></i> Capturar</button>
                     <button class="btn btn-outline" onclick="closeCamera()"><i class="fas fa-times"></i> Cancelar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== MODAL: LOGIN POR RECONHECIMENTO FACIAL ==================== -->
+    <div class="modal" id="faceLoginModal">
+        <div class="modal-content" style="max-width: 500px;">
+            <div class="modal-header"><h3><i class="fas fa-face-smile"></i> Reconhecimento Facial</h3><button class="modal-close" onclick="closeFaceLogin()">&times;</button></div>
+            <div class="modal-body text-center">
+                <p style="color: var(--text-light); margin-bottom: 10px;">Posicione seu rosto em frente à câmera. A detecção é automática.</p>
+                <video id="faceLoginVideo" autoplay playsinline muted style="width: 100%; max-height: 320px; background: #000; border-radius: 8px; transform: scaleX(-1);"></video>
+                <canvas id="faceLoginCanvas" style="display:none;"></canvas>
+                <p id="faceLoginStatus" style="color: var(--accent); margin-top: 12px; min-height: 22px; font-weight: 600;">Carregando câmera...</p>
+                <div style="display: flex; gap: 10px; justify-content: center; margin-top: 15px;">
+                    <button class="btn btn-primary" onclick="captureFaceLogin()"><i class="fas fa-camera"></i> Capturar</button>
+                    <button class="btn btn-outline" onclick="closeFaceLogin()"><i class="fas fa-times"></i> Cancelar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== MODAL: CADASTRAR ROSTO ==================== -->
+    <div class="modal" id="faceRegisterModal">
+        <div class="modal-content" style="max-width: 500px;">
+            <div class="modal-header"><h3><i class="fas fa-face-smile"></i> Cadastrar Rosto</h3><button class="modal-close" onclick="closeFaceRegister()">&times;</button></div>
+            <div class="modal-body text-center">
+                <p style="color: var(--text-light); margin-bottom: 10px;">Posicione o rosto em frente à câmera, com boa iluminação.</p>
+                <video id="faceRegisterVideo" autoplay playsinline muted style="width: 100%; max-height: 320px; background: #000; border-radius: 8px; transform: scaleX(-1);"></video>
+                <canvas id="faceRegisterCanvas" style="display:none;"></canvas>
+                <p id="faceRegisterStatus" style="color: var(--accent); margin-top: 12px; min-height: 22px; font-weight: 600;">Carregando câmera...</p>
+                <div style="display: flex; gap: 10px; justify-content: center; margin-top: 15px;">
+                    <button class="btn btn-primary" onclick="captureFaceRegister()"><i class="fas fa-camera"></i> Capturar Rosto</button>
+                    <button class="btn btn-outline" onclick="closeFaceRegister()"><i class="fas fa-times"></i> Cancelar</button>
                 </div>
             </div>
         </div>
@@ -1199,6 +1279,323 @@
         let cameraStream = null;
         let cameraTarget = null;
 
+        // ==================== FACE RECOGNITION ====================
+        let faceModelsLoaded = false;
+        let faceModelsLoading = null;
+        let faceLoginStream = null;
+        let faceLoginInterval = null;
+        let faceRegisterStream = null;
+        let faceRegisterMode = null; // 'user' - cadastro de rosto de usuário
+        let currentFaceDescriptor = null;
+
+        async function loadFaceModels() {
+            if (faceModelsLoaded) return true;
+            if (faceModelsLoading) return faceModelsLoading;
+            if (typeof faceapi === 'undefined') {
+                console.warn('face-api.js não carregado.');
+                return false;
+            }
+            faceModelsLoading = (async () => {
+                const urls = [
+                    'https://cdn.jsdelivr.net/npm/@vladmandic/face-api@1.7.13/model',
+                    'https://cdn.jsdelivr.net/gh/justadudewhohacks/face-api.js@master/weights'
+                ];
+                for (const url of urls) {
+                    try {
+                        await Promise.all([
+                            faceapi.nets.tinyFaceDetector.loadFromUri(url),
+                            faceapi.nets.faceLandmark68Net.loadFromUri(url),
+                            faceapi.nets.faceRecognitionNet.loadFromUri(url)
+                        ]);
+                        faceModelsLoaded = true;
+                        console.log('Modelos faciais carregados de:', url);
+                        return true;
+                    } catch (e) {
+                        console.warn('Falha ao carregar modelos de:', url, e && e.message);
+                    }
+                }
+                faceModelsLoading = null;
+                return false;
+            })();
+            return faceModelsLoading;
+        }
+
+        function euclideanDistance(a, b) {
+            if (!a || !b || a.length !== b.length) return Infinity;
+            let sum = 0;
+            for (let i = 0; i < a.length; i++) {
+                const d = a[i] - b[i];
+                sum += d * d;
+            }
+            return Math.sqrt(sum);
+        }
+
+        function findBestFaceMatch(descriptor, threshold = 0.55) {
+            if (!descriptor) return null;
+            let best = null;
+            let bestDist = Infinity;
+            for (const user of state.users) {
+                if (!user.faceDescriptor) continue;
+                if (user.active === false) continue;
+                if (!Array.isArray(user.faceDescriptor) || user.faceDescriptor.length !== descriptor.length) continue;
+                const dist = euclideanDistance(descriptor, user.faceDescriptor);
+                if (dist < bestDist) { bestDist = dist; best = user; }
+            }
+            if (best && bestDist < threshold) return { user: best, distance: bestDist };
+            return null;
+        }
+
+        function hasAnyRegisteredFace() {
+            return state.users.some(u => u.faceDescriptor && u.active !== false);
+        }
+
+        function refreshFaceLoginSection() {
+            const sec = document.getElementById('faceLoginSection');
+            if (!sec) return;
+            sec.style.display = hasAnyRegisteredFace() ? 'block' : 'none';
+        }
+
+        async function openFaceLogin() {
+            if (!hasAnyRegisteredFace()) {
+                toast('Nenhum rosto cadastrado. Cadastre em Usuários.', 'warning');
+                return;
+            }
+            const ok = await loadFaceModels();
+            if (!ok) {
+                toast('Não foi possível carregar o modelo de reconhecimento facial. Verifique a conexão.', 'error');
+                return;
+            }
+            const modal = document.getElementById('faceLoginModal');
+            modal.classList.add('show');
+            document.getElementById('faceLoginStatus').textContent = 'Carregando câmera...';
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user', width: { ideal: 640 }, height: { ideal: 480 } }, audio: false });
+                faceLoginStream = stream;
+                const video = document.getElementById('faceLoginVideo');
+                video.srcObject = stream;
+                await video.play();
+                document.getElementById('faceLoginStatus').textContent = 'Aguardando reconhecimento...';
+                startFaceLoginDetection();
+            } catch (err) {
+                console.error('Erro ao acessar câmera:', err);
+                toast('Não foi possível acessar a câmera.', 'error');
+                closeFaceLogin();
+            }
+        }
+
+        function startFaceLoginDetection() {
+            if (faceLoginInterval) clearInterval(faceLoginInterval);
+            const statusEl = document.getElementById('faceLoginStatus');
+            faceLoginInterval = setInterval(async () => {
+                if (!faceLoginStream) return;
+                const video = document.getElementById('faceLoginVideo');
+                if (!video || !video.videoWidth) return;
+                try {
+                    const detection = await faceapi
+                        .detectSingleFace(video, new faceapi.TinyFaceDetectorOptions({ inputSize: 224, scoreThreshold: 0.4 }))
+                        .withFaceLandmarks()
+                        .withFaceDescriptor();
+                    if (detection) {
+                        const descriptor = Array.from(detection.descriptor);
+                        const match = findBestFaceMatch(descriptor);
+                        if (match) {
+                            clearInterval(faceLoginInterval);
+                            faceLoginInterval = null;
+                            statusEl.textContent = 'Reconhecido! Entrando...';
+                            setTimeout(() => performFaceLogin(match.user), 300);
+                        } else {
+                            statusEl.textContent = 'Rosto detectado, mas não reconhecido...';
+                        }
+                    } else {
+                        statusEl.textContent = 'Procurando rosto...';
+                    }
+                } catch (e) {
+                    // silencioso durante polling
+                }
+            }, 900);
+        }
+
+        async function captureFaceLogin() {
+            const video = document.getElementById('faceLoginVideo');
+            const canvas = document.getElementById('faceLoginCanvas');
+            const statusEl = document.getElementById('faceLoginStatus');
+            if (!video || !video.videoWidth) {
+                statusEl.textContent = 'Câmera não está pronta.';
+                return;
+            }
+            statusEl.textContent = 'Analisando rosto...';
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            const ctx = canvas.getContext('2d');
+            ctx.save();
+            ctx.scale(-1, 1);
+            ctx.drawImage(video, -canvas.width, 0);
+            ctx.restore();
+            try {
+                const detection = await faceapi
+                    .detectSingleFace(canvas, new faceapi.TinyFaceDetectorOptions({ inputSize: 320 }))
+                    .withFaceLandmarks()
+                    .withFaceDescriptor();
+                if (!detection) {
+                    statusEl.textContent = 'Rosto não detectado. Tente novamente.';
+                    return;
+                }
+                const descriptor = Array.from(detection.descriptor);
+                const match = findBestFaceMatch(descriptor);
+                if (!match) {
+                    statusEl.textContent = 'Rosto não reconhecido.';
+                    return;
+                }
+                performFaceLogin(match.user);
+            } catch (e) {
+                console.error(e);
+                statusEl.textContent = 'Erro ao processar rosto.';
+            }
+        }
+
+        function performFaceLogin(user) {
+            if (!user) return;
+            if (faceLoginInterval) { clearInterval(faceLoginInterval); faceLoginInterval = null; }
+            closeFaceLogin();
+            if (user.role === 'aluno') {
+                const student = state.students.find(s => s.id === user.alunoId);
+                if (!student) { toast('Aluno vinculado não encontrado.', 'error'); return; }
+                currentStudent = student;
+                logAction('Login Facial', `Aluno ${student.nome} entrou via reconhecimento facial`, 'aluno');
+                saveState();
+                document.getElementById('loginScreen').classList.add('hidden');
+                document.getElementById('app').classList.remove('hidden');
+                document.getElementById('sidebar').classList.add('hidden');
+                document.getElementById('sidebar').classList.remove('open');
+                enterFullscreen();
+                navigate('aluno');
+                toast('Bem-vindo, ' + student.nome + '!');
+            } else {
+                currentUser = user;
+                currentStudent = null;
+                logAction('Login Facial', `Usuário ${user.username} entrou via reconhecimento facial`, 'dashboard');
+                saveState();
+                document.getElementById('loginScreen').classList.add('hidden');
+                document.getElementById('app').classList.remove('hidden');
+                document.getElementById('sidebar').classList.remove('hidden');
+                document.getElementById('loggedUserName').textContent = currentUser.nome || currentUser.username;
+                document.getElementById('loggedUserRole').textContent = currentUser.role === 'admin' ? 'Administrador' : currentUser.role === 'aluno' ? 'Aluno' : 'Usuário Padrão';
+                enterFullscreen();
+                renderNav();
+                const firstPermitted = MODULES.find(m => can(m.key, 'ver'));
+                navigate(firstPermitted ? firstPermitted.key : 'dashboard');
+                toast('Bem-vindo, ' + (currentUser.nome || currentUser.username) + '!');
+            }
+        }
+
+        function closeFaceLogin() {
+            if (faceLoginInterval) { clearInterval(faceLoginInterval); faceLoginInterval = null; }
+            if (faceLoginStream) {
+                faceLoginStream.getTracks().forEach(t => t.stop());
+                faceLoginStream = null;
+            }
+            const v = document.getElementById('faceLoginVideo');
+            if (v) v.srcObject = null;
+            document.getElementById('faceLoginModal').classList.remove('show');
+        }
+
+        // ==================== CADASTRAR ROSTO (USUÁRIO) ====================
+        async function openCameraForFace() {
+            const ok = await loadFaceModels();
+            if (!ok) {
+                toast('Não foi possível carregar o modelo de reconhecimento facial. Verifique a conexão.', 'error');
+                return;
+            }
+            faceRegisterMode = 'user';
+            const modal = document.getElementById('faceRegisterModal');
+            modal.classList.add('show');
+            document.getElementById('faceRegisterStatus').textContent = 'Carregando câmera...';
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user', width: { ideal: 640 }, height: { ideal: 480 } }, audio: false });
+                faceRegisterStream = stream;
+                const video = document.getElementById('faceRegisterVideo');
+                video.srcObject = stream;
+                await video.play();
+                document.getElementById('faceRegisterStatus').textContent = 'Posicione o rosto e clique em "Capturar Rosto".';
+            } catch (err) {
+                console.error('Erro ao acessar câmera:', err);
+                toast('Não foi possível acessar a câmera.', 'error');
+                closeFaceRegister();
+            }
+        }
+
+        function closeFaceRegister() {
+            if (faceRegisterStream) {
+                faceRegisterStream.getTracks().forEach(t => t.stop());
+                faceRegisterStream = null;
+            }
+            const v = document.getElementById('faceRegisterVideo');
+            if (v) v.srcObject = null;
+            document.getElementById('faceRegisterModal').classList.remove('show');
+            faceRegisterMode = null;
+        }
+
+        async function captureFaceRegister() {
+            const video = document.getElementById('faceRegisterVideo');
+            const canvas = document.getElementById('faceRegisterCanvas');
+            const statusEl = document.getElementById('faceRegisterStatus');
+            if (!video || !video.videoWidth) {
+                statusEl.textContent = 'Câmera não está pronta.';
+                return;
+            }
+            statusEl.textContent = 'Analisando rosto...';
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            const ctx = canvas.getContext('2d');
+            ctx.save();
+            ctx.scale(-1, 1);
+            ctx.drawImage(video, -canvas.width, 0);
+            ctx.restore();
+            try {
+                const detection = await faceapi
+                    .detectSingleFace(canvas, new faceapi.TinyFaceDetectorOptions({ inputSize: 320 }))
+                    .withFaceLandmarks()
+                    .withFaceDescriptor();
+                if (!detection) {
+                    statusEl.textContent = 'Rosto não detectado. Tente novamente com boa iluminação.';
+                    return;
+                }
+                const descriptor = Array.from(detection.descriptor);
+                currentFaceDescriptor = descriptor;
+                updateFaceStatusUI();
+                statusEl.textContent = 'Rosto capturado com sucesso!';
+                toast('Rosto capturado! Clique em Salvar para confirmar.', 'success');
+                setTimeout(() => closeFaceRegister(), 800);
+            } catch (e) {
+                console.error(e);
+                statusEl.textContent = 'Erro ao processar rosto.';
+            }
+        }
+
+        function updateFaceStatusUI() {
+            const statusEl = document.getElementById('userFaceStatus');
+            const removeBtn = document.getElementById('btnRemoveUserFace');
+            if (!statusEl) return;
+            if (currentFaceDescriptor) {
+                statusEl.textContent = '✅ Rosto cadastrado';
+                statusEl.style.color = 'var(--success)';
+                if (removeBtn) removeBtn.style.display = '';
+            } else {
+                statusEl.textContent = 'Nenhum rosto cadastrado';
+                statusEl.style.color = 'var(--text-light)';
+                if (removeBtn) removeBtn.style.display = 'none';
+            }
+        }
+
+        function removeUserFace() {
+            if (!currentFaceDescriptor) return;
+            if (!confirm('Remover o rosto cadastrado deste usuário?')) return;
+            currentFaceDescriptor = null;
+            updateFaceStatusUI();
+            toast('Rosto removido. Clique em Salvar para confirmar.', 'warning');
+        }
+        // ==================== FIM FACE RECOGNITION ====================
+
         function genId() { return Date.now().toString(36) + Math.random().toString(36).substr(2, 5); }
         function esc(str) { return String(str ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;'); }
         function val(id) { return document.getElementById(id).value.trim(); }
@@ -1265,6 +1662,7 @@
                             if (u.username) u.username = u.username.toUpperCase();
                             if (u.password) u.password = u.password.toUpperCase();
                             if (!u.foto) u.foto = '';
+                            if (!('faceDescriptor' in u)) u.faceDescriptor = null;
                         });
                         state.students.forEach(s => {
                             if (!s.evolucaoFotos) s.evolucaoFotos = [];
@@ -1283,16 +1681,18 @@
                         seedData();
                         saveState();
                     }
+                    refreshFaceLoginSection();
                 })
                 .catch(err => {
                     console.error('Erro ao carregar estado do Firestore:', err);
                     seedData();
                     toast('Erro ao carregar dados do Firestore. Usando dados iniciais.', 'error');
                     saveState();
+                    refreshFaceLoginSection();
                 });
         }
         function seedData() {
-            state.users = [{ id: genId(), username: 'PAULO', password: '585851', nome: 'Paulo', role: 'admin', active: true, permissions: {}, foto: '' }];
+            state.users = [{ id: genId(), username: 'PAULO', password: '585851', nome: 'Paulo', role: 'admin', active: true, permissions: {}, foto: '', faceDescriptor: null }];
             state.academias = [{ id: genId(), nome: 'Academia Exemplo', endereco: 'Rua das Flores, 123', telefone: '(11) 99999-0000', responsavel: 'Carlos' }];
             state.students = []; state.schedule = []; state.workouts = [];
             state.album = []; state.cashflow = []; state.contasFuturas = [];
@@ -1327,7 +1727,7 @@
             const newUser = {
                 id: genId(), username: username.toUpperCase(), password: password,
                 nome: student.nome, role: 'aluno', active: true, permissions: {},
-                alunoId: student.id, foto: student.foto || ''
+                alunoId: student.id, foto: student.foto || '', faceDescriptor: null
             };
             state.users.push(newUser);
             return newUser;
@@ -1522,6 +1922,7 @@
                 closeLightbox();
                 exitFullscreen();
                 if (typeof updateInstallButtons === 'function') updateInstallButtons();
+                refreshFaceLoginSection();
             } else {
                 if (currentUser) { logAction('Logout', `Usuário ${currentUser.username} saiu`, 'dashboard'); saveState(); }
                 currentUser = null;
@@ -1534,6 +1935,7 @@
                 closeLightbox();
                 exitFullscreen();
                 if (typeof updateInstallButtons === 'function') updateInstallButtons();
+                refreshFaceLoginSection();
             }
         }
 
@@ -1613,12 +2015,11 @@
             return state.schedule.some(a => a.alunoId === alunoId && a.data === data && a.hora === hora && a.status !== 'Cancelada' && a.id !== excludeId);
         }
 
-        // ==================== DASHBOARD (CORRIGIDO) ====================
+        // ==================== DASHBOARD ====================
         function renderDashboard() {
             const totalAlunos = state.students.length;
             const totalAcademias = state.academias.length;
 
-            // *** CORREÇÃO: Contar apenas aulas FUTURAS com status "Agendada" ***
             const agora = new Date();
             const totalAgendadas = state.schedule.filter(a => {
                 if (a.status !== 'Agendada') return false;
@@ -1670,7 +2071,7 @@
             });
             document.getElementById('dashboardScheduleTable').innerHTML = html || '<tr><td colspan="5">Nenhuma aula futura.</td></tr>';
         }
-        // ==================== FIM DASHBOARD CORRIGIDO ====================
+        // ==================== FIM DASHBOARD ====================
 
         function fillAcademiaSelect(selectId, selectedId) {
             const select = document.getElementById(selectId);
@@ -1860,19 +2261,10 @@
 
             const nomeAluno = student.nome;
 
-            // 1) Remove o cadastro do aluno
             state.students = state.students.filter(s => s.id !== id);
-
-            // 2) Remove o usuário vinculado ao aluno
             state.users = state.users.filter(u => u.alunoId !== id);
-
-            // 3) Remove TODAS as aulas (agendamentos) do aluno na Agenda de Aulas (passadas, presentes e futuras)
             state.schedule = state.schedule.filter(a => a.alunoId !== id);
-
-            // 4) Remove as mensalidades futuras (contas a receber/pagar) do aluno
             state.contasFuturas = state.contasFuturas.filter(c => c.alunoId !== id);
-
-            // 5) Remove os treinos marcados para o aluno
             state.workouts = state.workouts.filter(w => w.alunoId !== id);
 
             logAction('Excluir Aluno', `Aluno ${nomeAluno} excluído (usuário, aulas, mensalidades e treinos removidos)`, 'alunos');
@@ -1885,6 +2277,7 @@
             renderSchedule();
             renderContasFuturas();
             renderDashboard();
+            refreshFaceLoginSection();
             toast('Aluno excluído, juntamente com usuário, aulas, mensalidades e treinos vinculados.', 'warning');
         }
         function confirmAdminDeletion() {
@@ -2073,7 +2466,6 @@
             toast(`${idsToDelete.length} aula(s) excluída(s) com sucesso!`, 'warning');
         }
 
-        // ==================== AGENDA: SOMENTE AULAS FUTURAS ====================
         function renderSchedule() {
             const tbody = document.getElementById('scheduleTableBody');
             const filterText = (document.getElementById('agendaFilterText')?.value || '').toLowerCase();
@@ -2081,7 +2473,6 @@
             const filterHora = document.getElementById('agendaFilterHora')?.value || '';
             const filterStatus = document.getElementById('agendaFilterStatus')?.value || '';
 
-            // *** Somente aulas que ainda NÃO foram dadas ***
             const agora = new Date();
             let filtered = state.schedule.filter(a => {
                 if (!a.data || !a.hora) return false;
@@ -2124,7 +2515,6 @@
             });
             tbody.innerHTML = html || `<tr><td colspan="8">Nenhuma aula futura encontrada.</td></tr>`;
         }
-        // ==================== FIM AGENDA: SOMENTE AULAS FUTURAS ====================
 
         function openRecurringScheduleForm() {
             if (!can('agenda', 'criar')) { toast('Sem permissão para criar.', 'error'); return; }
@@ -2538,7 +2928,6 @@
             openModal('contaModal');
         }
 
-        // Move uma conta para o histórico de mensalidades + fluxo de caixa
         function moverContaParaHistorico(id) {
             const conta = state.contasFuturas.find(c => c.id === id);
             if (!conta) return;
@@ -2547,14 +2936,12 @@
             const descricao = conta.descricao;
             const formaPgto = 'Dinheiro';
 
-            // 1) Lança no fluxo de caixa
             if (conta.tipo === 'Pagar') {
                 state.cashflow.push({ id: genId(), data: dataHoje, descricao: `Pagamento: ${descricao}`, entrada: 0, saida: valor, forma_pgto: formaPgto });
             } else if (conta.tipo === 'Receber') {
                 state.cashflow.push({ id: genId(), data: dataHoje, descricao: `Recebimento: ${descricao}`, entrada: valor, saida: 0, forma_pgto: formaPgto });
             }
 
-            // 2) Adiciona ao histórico de mensalidades
             if (!state.historicoMensalidades) state.historicoMensalidades = [];
             state.historicoMensalidades.push({
                 id: genId(),
@@ -2569,10 +2956,8 @@
                 forma_pgto: formaPgto
             });
 
-            // 3) Remove de Contas a Pagar e Receber (Futuras)
             state.contasFuturas = state.contasFuturas.filter(c => c.id !== id);
 
-            // 4) Lança o próximo vencimento
             lancarProximoVencimento(conta);
 
             logAction('Conta Paga', `Conta ${descricao} marcada como paga, lançada no fluxo de caixa e movida para Histórico de Mensalidades`, 'fluxocaixa');
@@ -2903,6 +3288,8 @@
             document.getElementById('userActive').checked = true;
             document.getElementById('userPasswordHint').textContent = '*';
             document.getElementById('userRole').value = 'padrao';
+            currentFaceDescriptor = null;
+
             if (id) {
                 const u = state.users.find(u => u.id === id);
                 if (!u) return;
@@ -2914,8 +3301,14 @@
                 document.getElementById('userActive').checked = u.active !== false;
                 userFotoData = u.foto || '';
                 document.getElementById('userFotoPreview').src = userFotoData;
+                if (u.faceDescriptor) {
+                    currentFaceDescriptor = u.faceDescriptor;
+                }
                 renderPermissionMatrix(u);
-            } else renderPermissionMatrix(null);
+            } else {
+                renderPermissionMatrix(null);
+            }
+            updateFaceStatusUI();
             openModal('userModal');
         }
         function saveUser(e) {
@@ -2937,6 +3330,7 @@
                 existing.username = username; existing.nome = nome; existing.role = role; existing.active = active;
                 if (password) existing.password = password;
                 existing.foto = foto;
+                existing.faceDescriptor = currentFaceDescriptor || null;
                 if (role === 'admin' || role === 'aluno') existing.permissions = {};
                 else existing.permissions = collectPermissions();
                 if (currentUser && currentUser.id === editingId) currentUser = existing;
@@ -2944,10 +3338,16 @@
             } else {
                 if (!password) { toast('A senha é obrigatória para novo usuário.', 'error'); return; }
                 if (state.users.some(u => u.username.toUpperCase() === username)) { toast('Já existe um usuário com esse nome.', 'error'); return; }
-                state.users.push({ id: genId(), username, password, nome, role, active, permissions: role === 'admin' || role === 'aluno' ? {} : collectPermissions(), foto });
+                state.users.push({
+                    id: genId(), username, password, nome, role, active,
+                    permissions: role === 'admin' || role === 'aluno' ? {} : collectPermissions(),
+                    foto,
+                    faceDescriptor: currentFaceDescriptor || null
+                });
                 logAction('Criar Usuário', `Usuário ${username} criado`, 'usuarios');
             }
             saveState(); closeModal('userModal'); renderUsers(); renderNav();
+            refreshFaceLoginSection();
             if (currentUser) {
                 document.getElementById('loggedUserName').textContent = currentUser.nome || currentUser.username;
                 document.getElementById('loggedUserRole').textContent = currentUser.role === 'admin' ? 'Administrador' : currentUser.role === 'aluno' ? 'Aluno' : 'Usuário Padrão';
@@ -2962,6 +3362,7 @@
             if (user) logAction('Excluir Usuário', `Usuário ${user.username} excluído`, 'usuarios');
             state.users = state.users.filter(u => u.id !== id);
             saveState(); renderUsers();
+            refreshFaceLoginSection();
             toast('Usuário excluído.', 'warning');
         }
         function renderUsers() {
@@ -2982,12 +3383,13 @@
                 else perfilBadge = '<span class="badge badge-padrao">Padrão</span>';
                 const ativo = u.active !== false ? '✅' : '❌';
                 const foto = u.foto ? `<img class="thumb" src="${esc(u.foto)}" alt="Foto">` : '<div class="thumb"><i class="fas fa-user"></i></div>';
-                html += `<tr><td>${foto}</td><td>${esc(u.username)}</td><td>${esc(u.nome || '-')}</td><td>${perfilBadge}</td><td>${ativo}</td><td>
+                const hasFace = u.faceDescriptor ? '✅' : '❌';
+                html += `<tr><td>${foto}</td><td>${esc(u.username)}</td><td>${esc(u.nome || '-')}</td><td>${perfilBadge}</td><td>${hasFace}</td><td>${ativo}</td><td>
                     <button class="btn btn-sm btn-outline" onclick="openUserForm('${u.id}')" ${can('usuarios', 'editar') ? '' : 'disabled'}><i class="fas fa-edit"></i></button>
                     <button class="btn btn-sm btn-danger" onclick="deleteUser('${u.id}')" ${can('usuarios', 'excluir') ? '' : 'disabled'}><i class="fas fa-trash"></i></button>
                 </td></tr>`;
             });
-            tbody.innerHTML = html || '<tr><td colspan="6">Nenhum usuário encontrado.</td></tr>';
+            tbody.innerHTML = html || '<tr><td colspan="7">Nenhum usuário encontrado.</td></tr>';
         }
 
         function renderAuditoria() {
@@ -3146,7 +3548,8 @@
             renderDashboard();
             setAgendaView('list');
             fillAlunosFilterAcademia();
-            document.addEventListener('keydown', function(e) { if (e.key === 'Escape') closeLightbox(); });
+            refreshFaceLoginSection();
+            document.addEventListener('keydown', function(e) { if (e.key === 'Escape') { closeLightbox(); closeFaceLogin(); closeFaceRegister(); } });
             document.getElementById('loginScreen').classList.remove('hidden');
             enterFullscreen();
         }
